@@ -1,0 +1,61 @@
+package org.example.service.user.admin.imp;
+
+import lombok.SneakyThrows;
+import org.example.domain.Employee;
+import org.example.domain.Handler;
+import org.example.domain.SubHandler;
+import org.example.enumirations.EmployeeState;
+import org.example.exeptions.HandlerIsNull;
+import org.example.service.handler.HandlerService;
+import org.example.service.handler.imp.HandlerBaseImp;
+import org.example.service.subHandler.SubHandlerService;
+import org.example.service.subHandler.imp.SubHandlerServiceImp;
+import org.example.service.user.admin.AdminService;
+import org.example.service.user.employee.EmployeeService;
+import org.example.service.user.employee.imp.EmployeeServiceImp;
+
+import java.util.Objects;
+
+public class AdminServiceImp implements AdminService {
+    private HandlerService handlerService = new HandlerBaseImp();
+    private SubHandlerService subHandlerService = new SubHandlerServiceImp();
+    private EmployeeService employeeService = new EmployeeServiceImp();
+    @Override
+    public void saveHandler(Handler handler) {
+        handlerService.save(handler);
+    }
+
+    @SneakyThrows
+    @Override
+    public void saveSubHandler(SubHandler subHandler,Integer handlerId) {
+        Handler handler = handlerService.findHandlerById(handlerId);
+        if (Objects.isNull(handler)){
+            throw new HandlerIsNull();
+        }
+        subHandler.setHandler(handler);
+        subHandlerService.saveSubHandler(subHandler);
+    }
+
+    @Override
+    public void saveEmployeeToSubHandler(Employee employee,Integer subHandlerId) {
+        SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
+        employee.getSubHandlers().add(subHandler);
+        employeeService.updateUser(employee);
+    }
+
+    @Override
+    public void deleteEmployeeFromSubHandler(Employee employee,Integer subHandlerId) {
+        SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
+        employee.getSubHandlers().remove(subHandler);
+        employeeService.updateUser(employee);
+    }
+    void validateTheEmployee(Employee employee){
+        if (ifEmployeeIsAccepted(employee)){
+            employee.setEmployeeState(EmployeeState.ACCEPTED);
+        }
+    }
+
+    private boolean ifEmployeeIsAccepted(Employee employee) {
+        return true;
+    }
+}
