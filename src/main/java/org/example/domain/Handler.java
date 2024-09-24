@@ -1,5 +1,7 @@
 package org.example.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 
 @AllArgsConstructor
@@ -7,7 +9,9 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@Entity
 public class Handler {
+    @Id
     private Integer id;
     private String name;
 }

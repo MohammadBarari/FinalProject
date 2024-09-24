@@ -1,6 +1,7 @@
 package org.example.service.user.employee.imp;
 
 import lombok.SneakyThrows;
+import org.example.domain.Credit;
 import org.example.domain.Employee;
 import org.example.domain.EmployeeImages;
 import org.example.domain.PassAndUser;
@@ -28,7 +29,14 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setEmployeeImage(employeeSignUpDto.employeeImage());
             employee.setTimeOfRegistration(LocalDateTime.now());
             employee.setScore(0);
-            PassAndUser passAndUser = PassAndUser.builder().pass(employeeSignUpDto.password()).typeOfUser(TypeOfUser.EMPLOYEE).username(employeeSignUpDto.phone()).build();
+            Credit credit = new Credit();
+            credit.setTypeOfEmployee(TypeOfUser.EMPLOYEE);
+            credit.setAmount(0);
+            employee.setCredit(credit);
+            PassAndUser passAndUser = PassAndUser.builder()
+                    .pass(employeeSignUpDto.password())
+                    .typeOfUser(TypeOfUser.EMPLOYEE)
+                    .username(employeeSignUpDto.phone()).build();
             savePassAndUser(passAndUser);
         }
     }

@@ -8,4 +8,5 @@ import org.example.service.user.BaseUserService;
 public interface CustomerService extends BaseUserService<Customer> {
     void signUpCustomer(CustomerSignUpDto customerDto);
     boolean validateCustomer(CustomerSignUpDto customerDto);
+    void getSubHandler();
 }

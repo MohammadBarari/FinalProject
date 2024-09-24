@@ -1,8 +1,10 @@
 package org.example.service.user.customer.imp;
 
 import lombok.SneakyThrows;
+import org.example.domain.Credit;
 import org.example.domain.Customer;
 import org.example.domain.PassAndUser;
+import org.example.domain.SubHandler;
 import org.example.dto.ChangingPasswordDto;
 import org.example.dto.CustomerSignUpDto;
 import org.example.enumirations.TypeOfUser;
@@ -29,6 +31,9 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             PassAndUser passAndUser = new PassAndUser();
             passAndUser.setUsername(customerDto.phone());
             passAndUser.setPass(customerDto.password());
+            Credit credit = new Credit();
+            credit.setTypeOfEmployee(TypeOfUser.CUSTOMER);
+            credit.setAmount(0);
             passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
             savePassAndUser(passAndUser);
             //setting its value
@@ -43,6 +48,11 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void getSubHandler(Customer customer, SubHandler subHandler) {
+
     }
 
     @Override

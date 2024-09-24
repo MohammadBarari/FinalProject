@@ -77,4 +77,5 @@ public abstract class BaseUserServiceImp <T extends User> implements BaseUserSer
     public void updateUser(T t){
         baseUserRepository.update(t);
     };
+
 }

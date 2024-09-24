@@ -5,6 +5,7 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.enumirations.EmployeeState;
+import org.example.exeptions.EmployeeIsNotAccepted;
 import org.example.exeptions.HandlerIsNull;
 import org.example.service.handler.HandlerService;
 import org.example.service.handler.imp.HandlerBaseImp;
@@ -35,12 +36,16 @@ public class AdminServiceImp implements AdminService {
         subHandler.setHandler(handler);
         subHandlerService.saveSubHandler(subHandler);
     }
-
+    @SneakyThrows
     @Override
     public void saveEmployeeToSubHandler(Employee employee,Integer subHandlerId) {
+        if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
         SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
         employee.getSubHandlers().add(subHandler);
         employeeService.updateUser(employee);
+        }else {
+            throw new EmployeeIsNotAccepted();
+        }
     }
 
     @Override
