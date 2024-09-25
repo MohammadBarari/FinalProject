@@ -14,7 +14,7 @@ import org.example.enumirations.TypeOfUser;
 public class Credit {
     @Id
     private int id;
-    private int amount;
+    private Double amount;
     private TypeOfUser typeOfEmployee;
     private int employee_id;
 }

@@ -1,14 +1,11 @@
-package org.example.service.getSubHandlerForCustomer;
+package org.example.service.getSubHandlerForCustomer.imp;
 
 import lombok.SneakyThrows;
 import org.example.domain.*;
 import org.example.dto.OfferDto;
 import org.example.dto.OrderDto;
 import org.example.enumirations.OrderState;
-import org.example.exeptions.HandlerIsNull;
-import org.example.exeptions.NotFoundOffer;
-import org.example.exeptions.NotFoundOrder;
-import org.example.exeptions.TimeOfWorkDoesntMatch;
+import org.example.exeptions.*;
 import org.example.service.offer.OfferService;
 import org.example.service.offer.imp.OfferServiceImp;
 import org.example.service.order.OrderService;
@@ -20,7 +17,6 @@ import org.example.service.user.employee.imp.EmployeeServiceImp;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 public class GetSubHandlerForCustomerService {
     private final OrderService orderService;
@@ -56,21 +52,22 @@ public class GetSubHandlerForCustomerService {
     public void GiveOfferToOrder(Integer orderId, Employee employee, OfferDto offerDto){
         try {
             Order order = orderService.findById(orderId);
-            Offer offer = new Offer();
-            offer.setEmployee(employee);
-            offer.setTimeOfCreate(LocalDateTime.now());
-            offer.setOfferPrice(offer.getOfferPrice());
-            if (offerDto.timeOfWork().isAfter(order.getTimeOfWork())){
-                offer.setTimeOfWork(offerDto.timeOfWork());
-            }else {
-                throw new TimeOfWorkDoesntMatch();
+            if (validateIfItCanGetOffer(order)) {
+                Offer offer = new Offer();
+                offer.setEmployee(employee);
+                offer.setTimeOfCreate(LocalDateTime.now());
+                offer.setOfferPrice(offer.getOfferPrice());
+                if (offerDto.timeOfWork().isAfter(order.getTimeOfWork())) {
+                    offer.setTimeOfWork(offerDto.timeOfWork());
+                } else {
+                    throw new TimeOfWorkDoesntMatch();
+                }
+                offer.setWorkTimeInMinutes(offerDto.WorkTimeInMinutes());
+                order.setOrderState(OrderState.UNDER_CHOOSING_EMPLOYEE);
+                orderService.update(order);
+                offer.setOrder(order);
+                offerService.save(offer);
             }
-            offer.setWorkTimeInMinutes(offerDto.WorkTimeInMinutes());
-            order.setOrderState(OrderState.UNDER_CHOOSING_EMPLOYEE);
-            orderService.update(order);
-            offer.setOrder(order);
-            offerService.save(offer);
-
         }catch (Exception e){
             throw new Exception(e);
 
@@ -113,5 +110,15 @@ public class GetSubHandlerForCustomerService {
 
     public void addToCreditToCustomer(){
 
+    }
+    @SneakyThrows
+    public boolean validateIfItCanGetOffer(Order order){
+        if (order.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER) &&
+                order.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE)
+        ) {
+            return true;
+        }else {
+            throw new OrderStateIsNotCorrect();
+        }
     }
 }

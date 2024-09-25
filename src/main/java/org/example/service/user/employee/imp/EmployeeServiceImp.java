@@ -31,7 +31,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setScore(0);
             Credit credit = new Credit();
             credit.setTypeOfEmployee(TypeOfUser.EMPLOYEE);
-            credit.setAmount(0);
+            credit.setAmount(0.0);
             employee.setCredit(credit);
             PassAndUser passAndUser = PassAndUser.builder()
                     .pass(employeeSignUpDto.password())
