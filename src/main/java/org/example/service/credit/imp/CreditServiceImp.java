@@ -29,7 +29,18 @@ public class CreditServiceImp implements CreditService {
     }
 
     @Override
-    public Credit findByUserId(int userId) {
-        return creditRepository.selectByUserId(userId);
+    public Credit findByCustomerId(int customerId) {
+        return creditRepository.selectByCustomerId(customerId);
     }
+
+    @Override
+    public Credit findByEmployeeId(int employeeId) {
+        return creditRepository.selectByEmployeeId(employeeId);
+    }
+
+    @Override
+    public void payToEmployee(Integer customerCreditId, Integer employeeCreditId, Long offerPrice) {
+        creditRepository.payToEmployee(customerCreditId,employeeCreditId,offerPrice);
+    }
+
 }

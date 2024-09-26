@@ -18,9 +18,16 @@ import org.example.service.user.employee.imp.EmployeeServiceImp;
 import java.util.Objects;
 
 public class AdminServiceImp implements AdminService {
-    private HandlerService handlerService = new HandlerBaseImp();
-    private SubHandlerService subHandlerService = new SubHandlerServiceImp();
-    private EmployeeService employeeService = new EmployeeServiceImp();
+       private final HandlerService handlerService ;
+    private final SubHandlerService subHandlerService ;
+      private final EmployeeService employeeService ;
+
+    public AdminServiceImp() {
+        handlerService = new HandlerBaseImp();
+        subHandlerService = new SubHandlerServiceImp();
+        employeeService = new EmployeeServiceImp();
+    }
+
     @Override
     public void saveHandler(Handler handler) {
         handlerService.save(handler);

@@ -28,7 +28,7 @@ public class OfferRepositoryImp implements OfferRepository {
         try {
             entityManager.getTransaction().begin();
             entityManager.merge(offer);
-            entityManager.getTransaction().commit()
+            entityManager.getTransaction().commit();
         }catch (Exception e){
             entityManager.getTransaction().rollback();
             throw e;
@@ -70,5 +70,22 @@ public class OfferRepositoryImp implements OfferRepository {
         }catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public Offer selectAcceptedOfferInOrder(Integer id) {
+        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
+        try {
+            Query query = entityManager.createNativeQuery("""
+        select * from offer
+        join orders o on o.id = offer.order_id
+        where o.id =? and offer.accepted = true;
+""",Offer.class);
+            query.setParameter(1, id);
+            Offer offer = (Offer) query.getSingleResult();
+            return offer;
+        }catch (Exception e) {
+            return null;
         }
+    }
 }

@@ -11,4 +11,5 @@ public interface OfferService {
     void delete(Integer offerId);
     List<Offer> findAllOffersForSpecificOrder(Integer orderId);
     Offer findById(int id);
+    Offer findAcceptedOfferInOrder(Integer id);
 }

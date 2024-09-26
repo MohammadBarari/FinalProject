@@ -1,9 +1,8 @@
 package org.example.dto;
 
-import org.example.domain.EmployeeImages;
 
 import java.awt.*;
 
 public record EmployeeSignUpDto(String name, String last_name, String email, String phone , String password,
-                                EmployeeImages employeeImage) {
+                                String imagePath) {
 }

@@ -10,4 +10,5 @@ public interface OfferRepository {
     void delete(int id);
     Offer findById(int id);
     List<Offer> findAllForOrder(int orderId);
+    Offer selectAcceptedOfferInOrder(Integer id);
 }

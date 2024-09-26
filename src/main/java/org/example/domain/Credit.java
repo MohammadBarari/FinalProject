@@ -16,5 +16,4 @@ public class Credit {
     private int id;
     private Double amount;
     private TypeOfUser typeOfEmployee;
-    private int employee_id;
 }

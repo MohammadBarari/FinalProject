@@ -7,6 +7,8 @@ public interface CreditService {
     void update(Credit credit);
     void delete(int creditId);
     Credit findCreditById(int id);
-    Credit findByUserId(int userId);
-    Credit findByCus
+    Credit findByCustomerId(int customerId);
+    Credit findByEmployeeId(int employeeId);
+    void payToEmployee(Integer customerCreditId,Integer employeeCreditId,Long offerPrice);
+
 }

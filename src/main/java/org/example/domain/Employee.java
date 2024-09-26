@@ -1,9 +1,6 @@
 package org.example.domain;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +21,10 @@ import java.util.Set;
 public class Employee extends User{
     private EmployeeState employeeState;
 
-    @Embedded
-    private EmployeeImages employeeImage;
-
-
     private Integer score;
+
+    @Lob
+    private byte[] image;
 
     @ManyToMany
     private Set<SubHandler> subHandlers;

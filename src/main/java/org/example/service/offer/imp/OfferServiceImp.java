@@ -38,4 +38,9 @@ public class OfferServiceImp implements OfferService {
     public Offer findById(int id) {
         return offerRepository.findById(id);
     }
+
+    @Override
+    public Offer findAcceptedOfferInOrder(Integer id) {
+        return offerRepository.selectAcceptedOfferInOrder(id);
+    }
 }

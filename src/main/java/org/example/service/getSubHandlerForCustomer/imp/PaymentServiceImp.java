@@ -31,7 +31,7 @@ public class PaymentServiceImp {
         Offer offer = offerService.findAcceptedOfferInOrder(order.getId());
         //todo: validate for paying
         if (validateCustomerCanPay(order,customer,offer)){
-            Credit cusromerCredit = creditService.findCustomerCredit(customer.getId());
+            Credit cusromerCredit = creditService.findCreditById(customer.getCredit().getId());
             Credit employeeCredit = creditService.findByEmployeeId(offer.getEmployee().getId());
             creditService.payToEmployee(cusromerCredit.getId(),employeeCredit.getId(),offer.getOfferPrice());
         }

@@ -10,5 +10,7 @@ public interface CreditRepository {
     void delete(int creditId);
     Credit selectCreditById(int creditId);
     List<Credit> selectAllCredits();
-    Credit selectByUserId(int userId);
+    Credit selectByCustomerId(int customerId);
+    Credit selectByEmployeeId(int employeeId);
+    void payToEmployee(Integer customerCreditId,Integer employeeCreditId,Long offerPrice);
 }

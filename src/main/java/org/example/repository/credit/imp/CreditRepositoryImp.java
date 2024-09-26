@@ -72,7 +72,54 @@ public class CreditRepositoryImp implements CreditRepository {
     }
 
     @Override
-    public Credit selectByUserId(int userId) {
-        En
+    public Credit selectByCustomerId(int customerId) {
+        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
+        try {
+        Query query  =          entityManager.createNativeQuery("""
+select c2 from customer c join credit c2 on c2.id = c.credit_id
+where c.id = ?;
+""",Credit.class);
+        query.setParameter(1, customerId);
+        Credit credit = (Credit) query.getSingleResult();
+        return credit;
+        }catch (Exception e){
+            return null;
+        }
     }
+
+    @Override
+    public Credit selectByEmployeeId(int employeeId) {
+        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
+        try {
+            Query query = entityManager.createNativeQuery("""
+            select c.id from employee join credit c on c.id = employee.credit_id
+        where employee.id = 1;
+            """,Integer.class);
+            List<Object> credit =  query.getResultList();
+            Integer integer = (Integer) credit.get(0);
+            Query query1 = entityManager.createNativeQuery("""
+            select * from testforfinalproject.credit
+            where id = ?
+""",Credit.class);
+            query1.setParameter(1, integer);
+
+            Credit credit1 = (Credit) query1.getSingleResult();
+            return credit1;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    public void payToEmployee(Integer customerCreditId, Integer employeeCreditId, Long offerPrice) {
+        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
+        try {
+            Credit creditCustomer = entityManager.find(Credit.class, customerCreditId);
+            Credit creditEmployee = entityManager.find(Credit.class, employeeCreditId);
+            entityManager.getTransaction().begin();
+
+        }
+    }
+
 }
