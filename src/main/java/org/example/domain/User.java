@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Table
 public class User {
     @Id
-    private Long id;
+    private Integer id;
     private String name;
     private String last_name;
     private String email;

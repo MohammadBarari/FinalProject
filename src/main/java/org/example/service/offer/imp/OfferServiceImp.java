@@ -1,6 +1,8 @@
 package org.example.service.offer.imp;
 
 import org.example.domain.Offer;
+import org.example.repository.offer.OfferRepository;
+import org.example.repository.offer.imp.OfferRepositoryImp;
 import org.example.service.offer.OfferService;
 
 import java.util.List;
@@ -29,11 +31,11 @@ public class OfferServiceImp implements OfferService {
 
     @Override
     public List<Offer> findAllOffersForSpecificOrder(Integer orderId) {
-       return offerRepository.selectById(orderId);
+       return offerRepository.findAllForOrder(orderId);
     }
 
     @Override
-    public List<Offer> findAll() {
-        return List.of();
+    public Offer findById(int id) {
+        return offerRepository.findById(id);
     }
 }

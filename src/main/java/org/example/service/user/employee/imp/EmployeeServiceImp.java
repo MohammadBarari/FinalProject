@@ -9,10 +9,11 @@ import org.example.dto.EmployeeSignUpDto;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.FileIsInvalid;
 import org.example.exeptions.ImageSizeIsOver;
+import org.example.repository.user.employee.EmployeeRepository;
+import org.example.repository.user.employee.imp.EmployeeRepositoryImp;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -76,7 +77,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
-        if (Objects.isNull(employeeRepository.find(user)))
+        if (Objects.isNull(employeeRepository.find(user,Employee.class)))
         {
             return true;
         }

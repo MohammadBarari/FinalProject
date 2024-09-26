@@ -6,11 +6,15 @@ import org.example.domain.User;
 import org.example.dto.ChangingPasswordDto;
 import org.example.exeptions.AllNotBeLetterOrDigits;
 import org.example.exeptions.PassNot8Digits;
-
-import java.util.function.Predicate;
+import org.example.repository.user.BaseUserRepository;
+import org.example.repository.user.BaseUserRepositoryImp;
 
 public abstract class BaseUserServiceImp <T extends User> implements BaseUserService<T> {
-    BaseUserRepository baseUserRepository = new baseUserRepositoryImp();
+    BaseUserRepository baseUserRepository ;
+
+    public BaseUserServiceImp() {
+        baseUserRepository = new BaseUserRepositoryImp();
+    }
 
     @SneakyThrows
     @Override
@@ -29,7 +33,7 @@ public abstract class BaseUserServiceImp <T extends User> implements BaseUserSer
     }
     @Override
     public void savePassAndUser(PassAndUser passAndUser){
-        baseUserRepository.saveUserAndPass();
+        baseUserRepository.saveUserAndPass(passAndUser);
     }
 
     private boolean checkIfIts8Digits(String pass) throws PassNot8Digits{
@@ -67,7 +71,7 @@ public abstract class BaseUserServiceImp <T extends User> implements BaseUserSer
     @Override
     public void changingPassword(ChangingPasswordDto changingPasswordDto){
         PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user()).typeOfUser(changingPasswordDto.typeOfUser()).pass(changingPasswordDto.oldPass()).build();
-        PassAndUser newPassAndUser = baseUserRepository.findPassAndUser(passAndUser);
+        PassAndUser newPassAndUser = baseUserRepository.findPass(passAndUser);
         if(newPassAndUser != null){
         newPassAndUser.setPass(changingPasswordDto.newPass());
         baseUserRepository.updatePass(newPassAndUser);
@@ -77,5 +81,8 @@ public abstract class BaseUserServiceImp <T extends User> implements BaseUserSer
     public void updateUser(T t){
         baseUserRepository.update(t);
     };
-
+    @Override
+    public T findById(int id , Class<T> tClass){
+        return (T) baseUserRepository.findById(id,tClass);
+    }
 }

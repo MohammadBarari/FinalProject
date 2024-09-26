@@ -11,4 +11,5 @@ public interface OrderService {
     void delete(int id);
     List<Order> findAll();
     List<Order> findOrdersForEmployee(Employee employee);
+    Order findById(int id);
 }

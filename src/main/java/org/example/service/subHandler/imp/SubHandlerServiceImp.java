@@ -2,6 +2,8 @@ package org.example.service.subHandler.imp;
 
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
+import org.example.repository.subHandler.SubHandlerRepository;
+import org.example.repository.subHandler.imp.SubHandlerRepositoryImp;
 import org.example.service.subHandler.SubHandlerService;
 
 import java.util.List;
@@ -25,11 +27,11 @@ public class SubHandlerServiceImp implements SubHandlerService {
 
     @Override
     public List<SubHandler> findAllSubHandlerSameHandler(Handler handler) {
-        return subHandlerRepository.selectAll(handler);
+        return subHandlerRepository.selectBySameHandler(handler);
     }
 
     @Override
     public SubHandler findSubHandlerById(Integer subHandlerId) {
-        return subHandlerRepository.findSubHandlerById(subHandlerId);
+        return subHandlerRepository.selectById(subHandlerId);
     }
 }

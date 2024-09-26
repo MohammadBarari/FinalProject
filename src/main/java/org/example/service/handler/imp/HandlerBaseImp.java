@@ -3,6 +3,8 @@ package org.example.service.handler.imp;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.SaveSubHandlerDto;
+import org.example.repository.handler.HandlerRepository;
+import org.example.repository.handler.imp.HandlerRepositoryImp;
 import org.example.service.handler.HandlerService;
 import org.xml.sax.HandlerBase;
 
@@ -34,6 +36,6 @@ public class HandlerBaseImp implements HandlerService {
 
     @Override
     public Handler findHandlerById(Integer id) {
-        return handlerRepository.findByID(id);
+        return handlerRepository.findById(id);
     }
 }

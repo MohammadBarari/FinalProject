@@ -4,11 +4,10 @@ import lombok.SneakyThrows;
 import org.example.domain.Credit;
 import org.example.domain.Customer;
 import org.example.domain.PassAndUser;
-import org.example.domain.SubHandler;
-import org.example.dto.ChangingPasswordDto;
 import org.example.dto.CustomerSignUpDto;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.PasswordNotCorrect;
+import org.example.repository.user.customer.CustomerRepository;
+import org.example.repository.user.customer.imp.CustomerRepositoryImp;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
 
@@ -33,7 +32,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             passAndUser.setPass(customerDto.password());
             Credit credit = new Credit();
             credit.setTypeOfEmployee(TypeOfUser.CUSTOMER);
-            credit.setAmount(0);
+            credit.setAmount(0d);
             passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
             savePassAndUser(passAndUser);
             //setting its value
@@ -50,10 +49,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return false;
     }
 
-    @Override
-    public void getSubHandler(Customer customer, SubHandler subHandler) {
-
-    }
 
     @Override
     public Customer login(String user, String pass) {
@@ -61,7 +56,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
-        if (Objects.isNull(customerRepository.find(user)))
+        if (Objects.isNull(customerRepository.find(user,Customer.class)))
         {
             return true;
         }

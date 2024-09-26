@@ -84,7 +84,7 @@ public class GetSubHandlerForCustomerService {
             offer.setAccepted(true);
             offerService.update(offer);
             Order order = orderService.findById(offer.getOrder().getId());
-            Employee employee = employeeService.findById(offer.getEmployee().getId());
+            Employee employee = employeeService.findById(offer.getEmployee().getId(),Employee.class);
             order.setEmployee(employee);
             order.setOrderState(OrderState.UNDER_REACHING_EMPLOYEE);
             orderService.update(order);
