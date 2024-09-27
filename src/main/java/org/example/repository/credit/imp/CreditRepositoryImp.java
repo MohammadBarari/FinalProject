@@ -75,15 +75,24 @@ public class CreditRepositoryImp implements CreditRepository {
     public Credit selectByCustomerId(int customerId) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
-        Query query  =          entityManager.createNativeQuery("""
-select c2 from customer c join credit c2 on c2.id = c.credit_id
-where c.id = ?;
+            Query query = entityManager.createNativeQuery("""
+            select c.id from customer join credit c on c.id = customer.credit_id
+        where customer.id = ?;
+            """,Integer.class);
+            query.setParameter(1, customerId);
+            List<Object> credit =  query.getResultList();
+            Integer integer = (Integer) credit.get(0);
+            Query query1 = entityManager.createNativeQuery("""
+            select * from credit
+            where id = ?
 """,Credit.class);
-        query.setParameter(1, customerId);
-        Credit credit = (Credit) query.getSingleResult();
-        return credit;
+            query1.setParameter(1, integer);
+
+            Credit credit1 = (Credit) query1.getSingleResult();
+            return credit1;
         }catch (Exception e){
-            return null;
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -115,10 +124,15 @@ where c.id = ?;
     public void payToEmployee(Integer customerCreditId, Integer employeeCreditId, Long offerPrice) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
+            entityManager.getTransaction().begin();
             Credit creditCustomer = entityManager.find(Credit.class, customerCreditId);
             Credit creditEmployee = entityManager.find(Credit.class, employeeCreditId);
-            entityManager.getTransaction().begin();
-
+            creditCustomer.setAmount(creditCustomer.getAmount() - offerPrice);
+            creditEmployee.setAmount(creditEmployee.getAmount() + offerPrice);
+            entityManager.getTransaction().commit();
+        }catch (Exception e) {
+            entityManager.getTransaction().rollback();
+            throw e;
         }
     }
 

@@ -1,15 +1,15 @@
 package org.example.repository.order;
 
 import org.example.domain.Employee;
-import org.example.domain.Order;
+import org.example.domain.Orders;
 
 import java.util.List;
 
 public interface OrderRepository {
-     void save(Order order);
-    void update(Order order);
+     void save(Orders orders);
+    void update(Orders orders);
     void delete(int orderId);
-    Order findById(int orderId);
-    List<Order> findAll();
-    List<Order> selectByEmployeeSubHandler(Employee employee);
+    Orders findById(int orderId);
+    List<Orders> findAll();
+    List<Orders> selectByEmployeeSubHandler(Employee employee);
 }

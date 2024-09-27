@@ -1,15 +1,15 @@
 package org.example.service.order;
 
 import org.example.domain.Employee;
-import org.example.domain.Order;
+import org.example.domain.Orders;
 
 import java.util.List;
 
 public interface OrderService {
-    void save(Order order);
-    void update(Order order);
+    void save(Orders orders);
+    void update(Orders orders);
     void delete(int id);
-    List<Order> findAll();
-    List<Order> findOrdersForEmployee(Employee employee);
-    Order findById(int id);
+    List<Orders> findAll();
+    List<Orders> findOrdersForEmployee(Employee employee);
+    Orders findById(int id);
 }

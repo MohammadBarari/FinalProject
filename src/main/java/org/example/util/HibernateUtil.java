@@ -11,7 +11,7 @@ public class HibernateUtil {
         hibernateUtil = new HibernateUtil();
     }
     public static HibernateUtil getInstance() {
-        emf = Persistence.createEntityManagerFactory("hibernate");
+        emf = Persistence.createEntityManagerFactory("jpa");
         return hibernateUtil;
     }
     public EntityManager getEntityManager() {

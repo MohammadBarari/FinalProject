@@ -33,6 +33,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             Credit credit = new Credit();
             credit.setTypeOfEmployee(TypeOfUser.CUSTOMER);
             credit.setAmount(0d);
+            customer.setCredit(credit);
             passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
             savePassAndUser(passAndUser);
             //setting its value

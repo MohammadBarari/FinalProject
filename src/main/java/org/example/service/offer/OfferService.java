@@ -1,7 +1,6 @@
 package org.example.service.offer;
 
 import org.example.domain.Offer;
-import org.example.domain.Order;
 
 import java.util.List;
 

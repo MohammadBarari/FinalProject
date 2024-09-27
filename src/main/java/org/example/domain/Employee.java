@@ -8,8 +8,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.example.enumirations.EmployeeState;
 
-import java.awt.*;
-import java.io.File;
 import java.util.Set;
 
 @SuperBuilder
@@ -18,17 +16,18 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Employee extends User{
+public class Employee extends Users {
+    @Enumerated(EnumType.STRING)
     private EmployeeState employeeState;
-
-    private Integer score;
 
     @Lob
     private byte[] image;
 
+    private Integer score;
+
     @ManyToMany
     private Set<SubHandler> subHandlers;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Credit credit;
 }

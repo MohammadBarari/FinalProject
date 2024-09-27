@@ -1,8 +1,6 @@
 package org.example.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -13,10 +11,11 @@ import lombok.*;
 @Entity
 public class SubHandler {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private String detail;
     private Double BasePrice;
-    @ManyToOne
+    @ManyToOne(cascade = { CascadeType.MERGE})
     private Handler handler;
 }

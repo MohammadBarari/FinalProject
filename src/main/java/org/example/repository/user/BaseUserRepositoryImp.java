@@ -3,10 +3,11 @@ package org.example.repository.user;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.example.domain.PassAndUser;
-import org.example.domain.User;
+import org.example.domain.Users;
+import org.example.domain.Users;
 import org.example.util.HibernateUtil;
 
-public class BaseUserRepositoryImp<T extends User> implements BaseUserRepository<T>{
+public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepository<T>{
         public void save(T user){
                 EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
             try {

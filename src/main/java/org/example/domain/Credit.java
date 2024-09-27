@@ -1,9 +1,7 @@
 package org.example.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
-import org.example.enumirations.TypeOfEmployee;
 import org.example.enumirations.TypeOfUser;
 @Entity
 @Getter
@@ -13,6 +11,8 @@ import org.example.enumirations.TypeOfUser;
 @Builder
 public class Credit {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
     private Double amount;
     private TypeOfUser typeOfEmployee;

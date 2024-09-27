@@ -7,7 +7,7 @@ import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.example.util.HibernateUtil;
 
-public class EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {
+public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {
     @Override
     public Employee login(String username, String password) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();

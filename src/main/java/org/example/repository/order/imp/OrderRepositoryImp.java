@@ -3,7 +3,7 @@ package org.example.repository.order.imp;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.example.domain.Employee;
-import org.example.domain.Order;
+import org.example.domain.Orders;
 import org.example.repository.order.OrderRepository;
 import org.example.util.HibernateUtil;
 
@@ -11,11 +11,11 @@ import java.util.List;
 
 public class OrderRepositoryImp implements OrderRepository {
     @Override
-    public void save(Order order) {
+    public void save(Orders orders) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
             entityManager.getTransaction().begin();
-            entityManager.persist(order);
+            entityManager.persist(orders);
             entityManager.getTransaction().commit();
         }catch (Exception e) {
             entityManager.getTransaction().rollback();
@@ -24,11 +24,11 @@ public class OrderRepositoryImp implements OrderRepository {
     }
 
     @Override
-    public void update(Order order) {
+    public void update(Orders orders) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
             entityManager.getTransaction().begin();
-            entityManager.merge(order);
+            entityManager.merge(orders);
             entityManager.getTransaction().commit();
         }catch (Exception e) {
             entityManager.getTransaction().rollback();
@@ -40,9 +40,9 @@ public class OrderRepositoryImp implements OrderRepository {
     public void delete(int orderId) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
-            Order order = entityManager.find(Order.class, orderId);
+            Orders orders = entityManager.find(Orders.class, orderId);
             entityManager.getTransaction().begin();
-            entityManager.remove(order);
+            entityManager.remove(orders);
             entityManager.getTransaction().commit();
         }catch (Exception e) {
             entityManager.getTransaction().rollback();
@@ -51,34 +51,34 @@ public class OrderRepositoryImp implements OrderRepository {
     }
 
     @Override
-    public Order findById(int orderId) {
+    public Orders findById(int orderId) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
-            Order order = entityManager.find(Order.class, orderId);
-            return order;
+            Orders orders = entityManager.find(Orders.class, orderId);
+            return orders;
         }catch (Exception e) {
             return null;
         }
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<Orders> findAll() {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
-        Query query = entityManager.createQuery("from Order order",Order.class);
-        List<Order> orders = query.getResultList();
+        Query query = entityManager.createQuery("from Orders order", Orders.class);
+        List<Orders> orders = query.getResultList();
         return orders;
     }
 
     @Override
-    public List<Order> selectByEmployeeSubHandler(Employee employee) {
+    public List<Orders> selectByEmployeeSubHandler(Employee employee) {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
             Query query = entityManager.createNativeQuery("""
         select * from testforfinalproject.orders
         where employee_id = ?
-""",Order.class);
+""", Orders.class);
             query.setParameter(1, employee.getId());
-            List<Order> orders = query.getResultList();
+            List<Orders> orders = query.getResultList();
             return orders;
         }catch (Exception e) {
             return null;

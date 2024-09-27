@@ -1,7 +1,7 @@
 package org.example.service.user.customer;
 
 import org.example.domain.Customer;
-import org.example.domain.User;
+import org.example.domain.Users;
 import org.example.dto.CustomerSignUpDto;
 import org.example.service.user.BaseUserService;
 

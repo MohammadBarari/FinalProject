@@ -4,6 +4,7 @@ import org.example.domain.Credit;
 import org.example.domain.Employee;
 import org.example.domain.PassAndUser;
 import org.example.dto.EmployeeSignUpDto;
+import org.example.enumirations.EmployeeState;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.FileIsInvalid;
 import org.example.exeptions.ImageSizeIsOver;
@@ -13,17 +14,14 @@ import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     EmployeeRepository employeeRepository = new EmployeeRepositoryImp();
     @Override
-    public void signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws FileNotFoundException {
+    public void signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws IOException {
         File file = new File(employeeSignUpDto.imagePath());
         if (validateEmployee(employeeSignUpDto,file)) {
             Employee employee = new Employee();
@@ -52,6 +50,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                     .typeOfUser(TypeOfUser.EMPLOYEE)
                     .username(employeeSignUpDto.phone()).build();
             savePassAndUser(passAndUser);
+            employee.setEmployeeState(EmployeeState.NEW);
+            employeeRepository.save(employee);
         }
     }
     @SneakyThrows
@@ -60,7 +60,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             BufferedImage image = ImageIO.read(imageFile);
             return true;
         }catch (Exception e) {
-            throw new Exception(e);
+            throw new Exception("cant read file!");
         }
     }
     @SneakyThrows
@@ -70,10 +70,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         throw new Exception("file is too large");
     }
-    private void addImageToEmployee(Employee employee, File file) throws FileNotFoundException {
+    private void addImageToEmployee(Employee employee, File file) throws IOException {
         if (file.exists()) {
             InputStream inputStream = new FileInputStream(file);
             byte[] photo = new byte[(int) file.length()];
+            inputStream.read(photo);
             employee.setImage(photo);
         }
     }

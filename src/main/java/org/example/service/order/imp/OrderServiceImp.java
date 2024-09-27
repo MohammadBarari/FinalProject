@@ -1,7 +1,7 @@
 package org.example.service.order.imp;
 
 import org.example.domain.Employee;
-import org.example.domain.Order;
+import org.example.domain.Orders;
 import org.example.repository.order.OrderRepository;
 import org.example.repository.order.imp.OrderRepositoryImp;
 import org.example.service.order.OrderService;
@@ -11,13 +11,13 @@ import java.util.List;
 public class OrderServiceImp implements OrderService {
     OrderRepository orderRepository = new OrderRepositoryImp();
     @Override
-    public void save(Order order) {
-        orderRepository.save(order);
+    public void save(Orders orders) {
+        orderRepository.save(orders);
     }
 
     @Override
-    public void update(Order order) {
-        orderRepository.update(order);
+    public void update(Orders orders) {
+        orderRepository.update(orders);
 
     }
 
@@ -27,17 +27,17 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<Orders> findAll() {
         return List.of();
     }
 
     @Override
-    public List<Order> findOrdersForEmployee(Employee employee) {
+    public List<Orders> findOrdersForEmployee(Employee employee) {
         return orderRepository.selectByEmployeeSubHandler(employee);
     }
 
     @Override
-    public Order findById(int id) {
+    public Orders findById(int id) {
         return orderRepository.findById(id);
     }
 

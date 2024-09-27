@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Customer extends User{
-    @OneToOne
+public class Customer extends Users {
+    @OneToOne(cascade = CascadeType.ALL)
     private Credit credit;
 }

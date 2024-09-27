@@ -7,6 +7,8 @@ import org.example.domain.SubHandler;
 import org.example.enumirations.EmployeeState;
 import org.example.exeptions.EmployeeIsNotAccepted;
 import org.example.exeptions.HandlerIsNull;
+import org.example.repository.user.admin.AdminRepository;
+import org.example.repository.user.admin.imp.AdminRepositoryImp;
 import org.example.service.handler.HandlerService;
 import org.example.service.handler.imp.HandlerBaseImp;
 import org.example.service.subHandler.SubHandlerService;
@@ -21,11 +23,12 @@ public class AdminServiceImp implements AdminService {
        private final HandlerService handlerService ;
     private final SubHandlerService subHandlerService ;
       private final EmployeeService employeeService ;
-
+      private AdminRepository adminRepository;
     public AdminServiceImp() {
         handlerService = new HandlerBaseImp();
         subHandlerService = new SubHandlerServiceImp();
         employeeService = new EmployeeServiceImp();
+        adminRepository = new AdminRepositoryImp();
     }
 
     @Override
@@ -57,10 +60,17 @@ public class AdminServiceImp implements AdminService {
 
     @Override
     public void deleteEmployeeFromSubHandler(Employee employee,Integer subHandlerId) {
-        SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
-        employee.getSubHandlers().remove(subHandler);
+        adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
+    }
+
+
+    @Override
+    public void changeEmployeeState(Integer employeeId, EmployeeState employeeState) {
+        Employee employee = employeeService.findById(employeeId,Employee.class);
+        employee.setEmployeeState(employeeState);
         employeeService.updateUser(employee);
     }
+
     void validateTheEmployee(Employee employee){
         if (ifEmployeeIsAccepted(employee)){
             employee.setEmployeeState(EmployeeState.ACCEPTED);

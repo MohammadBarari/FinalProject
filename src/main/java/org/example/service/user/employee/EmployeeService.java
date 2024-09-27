@@ -9,8 +9,9 @@ import org.example.service.user.BaseUserService;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public interface EmployeeService  extends BaseUserService<Employee> {
-    void signUpEmployee(EmployeeSignUpDto employee) throws FileNotFoundException;
+    void signUpEmployee(EmployeeSignUpDto employee) throws IOException;
     boolean validateEmployee(EmployeeSignUpDto employee, File file);
 }

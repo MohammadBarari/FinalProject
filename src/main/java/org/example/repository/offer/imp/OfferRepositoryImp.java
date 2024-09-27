@@ -77,15 +77,31 @@ public class OfferRepositoryImp implements OfferRepository {
         EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
         try {
             Query query = entityManager.createNativeQuery("""
+        select offer.id from offer
+        join orders o on o.id = offer.order_id
+        where o.id =? and offer.accepted = true;
+""",Integer.class);
+            query.setParameter(1, id);
+            int offerId = (Integer) query.getSingleResult();
+            Query query1 = entityManager.createNativeQuery("""
+        select * from offer where id = ?
+""",Offer.class);
+            query1.setParameter(1, offerId);
+       return (Offer) query1.getSingleResult();
+        }catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
+        Query query = entityManager.createNativeQuery("""
         select * from offer
         join orders o on o.id = offer.order_id
         where o.id =? and offer.accepted = true;
 """,Offer.class);
-            query.setParameter(1, id);
-            Offer offer = (Offer) query.getSingleResult();
-            return offer;
-        }catch (Exception e) {
-            return null;
-        }
+        query.setParameter(1, 4);
+        Offer i =  (Offer) query.getSingleResult();
+        System.out.println(i.getId());
     }
 }

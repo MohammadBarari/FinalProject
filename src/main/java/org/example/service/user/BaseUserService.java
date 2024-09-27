@@ -1,10 +1,11 @@
 package org.example.service.user;
 
 import org.example.domain.PassAndUser;
-import org.example.domain.User;
+import org.example.domain.Users;
+import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
 
-public interface BaseUserService<T extends User> {
+public interface BaseUserService<T extends Users> {
     void signUp(T t);
 
     void updateUser(T t);
