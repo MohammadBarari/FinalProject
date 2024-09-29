@@ -38,6 +38,4 @@ public class Orders {
     //todo: these should be store in database last ones
     private Integer score;
     private String comment;
-    //todo: i dont know man i dont know
-    //todo: you lost something in yourself dont seek outside just look inside see what are u missing whats makes and change your mood completely
 }

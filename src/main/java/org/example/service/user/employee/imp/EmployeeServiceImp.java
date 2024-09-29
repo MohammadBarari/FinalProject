@@ -28,13 +28,10 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setName(employeeSignUpDto.name());
             employee.setEmail(employeeSignUpDto.email());
             employee.setPhone(employeeSignUpDto.phone());
-
             employee.setLast_name(employeeSignUpDto.last_name());
-
             if (validateEmployee(employeeSignUpDto,file)){
                 addImageToEmployee(employee,file);
             }
-
             employee.setTimeOfRegistration(LocalDateTime.now());
 
             employee.setScore(0);
@@ -57,7 +54,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @SneakyThrows
     public  boolean validateImage(File imageFile) {
         try {
-            BufferedImage image = ImageIO.read(imageFile);
+            ImageIO.read(imageFile);
             return true;
         }catch (Exception e) {
             throw new Exception("cant read file!");
@@ -65,7 +62,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
     @SneakyThrows
     public  boolean checkIfImageSizeIsOkay(File imageFile) {
-        if (imageFile.length() < 300_000){
+        if (imageFile.length() < 300*1024){
             return true;
         }
         throw new Exception("file is too large");
