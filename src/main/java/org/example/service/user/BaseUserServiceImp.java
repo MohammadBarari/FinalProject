@@ -29,8 +29,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         }
     }
     @Override
-    public void signUp(T t){
-        baseUserRepository.save(t);
+    public void signUp(T t,PassAndUser passAndUser){
+        baseUserRepository.save(t,passAndUser);
+
     }
     @Override
     public void savePassAndUser(PassAndUser passAndUser){

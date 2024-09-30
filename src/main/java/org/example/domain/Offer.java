@@ -1,6 +1,7 @@
 package org.example.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,16 @@ public class Offer {
     private LocalDateTime timeOfCreate;
     private Long offerPrice;
     //todo: must be after time that customer set
+    @Future
     private LocalDateTime timeOfWork;
-    private Integer WorkTimeInMinutes;
+    private Integer workTimeInMinutes;
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Orders orders;
     private boolean accepted;
+
+    @PrePersist
+    private void setTimeOfCreate() {
+        timeOfCreate = LocalDateTime.now();
+    }
 }

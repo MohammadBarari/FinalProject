@@ -30,4 +30,13 @@ public class Employee extends Users {
 
     @OneToOne(cascade = CascadeType.ALL)
     private Credit credit;
+
+    public Employee setEmployeeState(EmployeeState employeeState) {
+        if (employeeState == null) {
+            this.employeeState = EmployeeState.NEW;
+        }else {
+        this.employeeState = employeeState;
+        }
+            return this;
+    }
 }

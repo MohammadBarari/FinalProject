@@ -1,4 +1,4 @@
-package org.example.service.getSubHandlerForCustomer;
+package org.example.service.mainService;
 
 import org.example.domain.Customer;
 import org.example.domain.Offer;

@@ -2,6 +2,6 @@ package org.example.exeptions;
 
 public class PasswordNotCorrect extends Exception{
     public PasswordNotCorrect(){
-        super("Password not correct");
+        super("password is not corrects");
     }
 }

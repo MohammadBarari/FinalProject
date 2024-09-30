@@ -1,4 +1,4 @@
-package org.example.service.getSubHandlerForCustomer.imp;
+package org.example.service.mainService.imp;
 
 import lombok.SneakyThrows;
 import org.example.domain.*;
@@ -12,6 +12,8 @@ import org.example.service.order.OrderService;
 import org.example.service.order.imp.OrderServiceImp;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.subHandler.imp.SubHandlerServiceImp;
+import org.example.service.user.customer.CustomerService;
+import org.example.service.user.customer.imp.CustomerServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.example.service.user.employee.imp.EmployeeServiceImp;
 
@@ -23,42 +25,49 @@ public class GetSubHandlerForCustomerService {
     private final SubHandlerService subHandlerService;
     private final OfferService offerService;
     private final EmployeeService employeeService;
+    private final CustomerService customerService;
     public  GetSubHandlerForCustomerService(){
         orderService = new OrderServiceImp();
         subHandlerService = new SubHandlerServiceImp();
         offerService = new OfferServiceImp();
         employeeService = new EmployeeServiceImp();
+        customerService = new CustomerServiceImp();
     }
     @SneakyThrows
-    public void GetSubHandlerForCustomerService(Integer subHandlerId, Customer customer, OrderDto orderDto) {
-        try {
-            SubHandler subHandler =  subHandlerService.findSubHandlerById(subHandlerId);
+    public void GetSubHandlerForCustomer(OrderDto orderDto) {
+            Customer customer = customerService.findById(orderDto.customerId() , Customer.class);
+            SubHandler subHandler =  subHandlerService.findSubHandlerById(orderDto.subHandlerId());
             if (Objects.isNull(subHandler)) {
                 throw new HandlerIsNull();
             }
-            Orders orders = new Orders();
-            orders.setCustomer(customer);
-            orders.setSubHandler(subHandler);
-            orders.setAddress(orderDto.address());
-            orders.setDetail(orderDto.detail());
-            orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
-            if (orderDto.timeOfWork().isBefore(LocalDateTime.now())){
-                throw new TimeOfWorkDoesntMatch();
+            if (Objects.isNull(customer)) {
+                throw new NotFoundCustomer();
             }
-            orders.setTimeOfWork(orderDto.timeOfWork());
-            if (orderDto.OfferedPrice()<subHandler.getBasePrice()){
-                throw new OrderPriceShouldBeHigherThanBase();
+            if (isOrderValidated(orderDto,subHandler)) {
+                Orders orders = new Orders();
+                orders.setCustomer(customer);
+                orders.setSubHandler(subHandler);
+                orders.setAddress(orderDto.address());
+                orders.setDetail(orderDto.detail());
+                orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
+                orders.setOfferedPrice(orderDto.offeredPrice());
+                orderService.save(orders);
             }
-            orders.setOfferedPrice(orderDto.OfferedPrice());
-            orderService.save(orders);
-        }catch (Exception e){
-            throw new Exception(e);
+    }
+    private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler) throws TimeOfWorkDoesntMatch, OrderPriceShouldBeHigherThanBase {
+        if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
+            throw new TimeOfWorkDoesntMatch();
         }
+        if (orderDto.offeredPrice() < subHandler.getBasePrice()) {
+            throw new OrderPriceShouldBeHigherThanBase();
+        }
+        return true;
     }
     @SneakyThrows
-    public void GiveOfferToOrder(Integer orderId, Employee employee, OfferDto offerDto){
+    public void GiveOfferToOrder(OfferDto offerDto){
         try {
-            Orders orders = orderService.findById(orderId);
+            Employee employee = employeeService.findById(offerDto.employeeId(),Employee.class);
+            Orders orders = orderService.findById(offerDto.orderId());
             if (validateIfItCanGetOffer(orders)) {
                 Offer offer = new Offer();
                 offer.setEmployee(employee);
@@ -72,7 +81,7 @@ public class GetSubHandlerForCustomerService {
                 } else {
                     throw new TimeOfWorkDoesntMatch();
                 }
-                offer.setWorkTimeInMinutes(offerDto.WorkTimeInMinutes());
+                offer.setWorkTimeInMinutes(offerDto.workTimeInMinutes());
                 orders.setOrderState(OrderState.UNDER_CHOOSING_EMPLOYEE);
                 orderService.update(orders);
                 offer.setOrders(orders);
@@ -115,7 +124,6 @@ public class GetSubHandlerForCustomerService {
             throw new Exception(e);
         }
     }
-
     public void addToCreditToCustomer(){
 
     }

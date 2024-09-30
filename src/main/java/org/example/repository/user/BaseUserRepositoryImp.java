@@ -8,11 +8,12 @@ import org.example.domain.Users;
 import org.example.util.HibernateUtil;
 
 public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepository<T>{
-        public void save(T user){
+        public void save(T user,PassAndUser passAndUser){
                 EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
             try {
                 entityManager.getTransaction().begin();
                 entityManager.persist(user);
+                entityManager.persist(passAndUser);
                 entityManager.getTransaction().commit();
             }catch (Exception e) {
                 entityManager.getTransaction().rollback();

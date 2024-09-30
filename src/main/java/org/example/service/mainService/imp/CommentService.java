@@ -1,13 +1,12 @@
-package org.example.service.getSubHandlerForCustomer.imp;
+package org.example.service.mainService.imp;
 
 import lombok.SneakyThrows;
 import org.example.domain.Orders;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.NotFoundOrder;
-import org.example.exeptions.starShouldBeenBetween1To5;
+import org.example.exeptions.StarShouldBeenBetween1To5;
 import org.example.service.order.OrderService;
 import org.example.service.order.imp.OrderServiceImp;
-import org.hibernate.query.Order;
 
 public class CommentService {
     private OrderService orderService;
@@ -24,7 +23,7 @@ public class CommentService {
             if (validateScore(star)){
                 orders.setScore(star);
             }else {
-                throw new starShouldBeenBetween1To5();
+                throw new StarShouldBeenBetween1To5();
             }
             orders.setComment(comment);
             orderService.update(orders);

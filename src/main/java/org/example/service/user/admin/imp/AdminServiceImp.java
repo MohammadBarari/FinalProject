@@ -5,8 +5,10 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.enumirations.EmployeeState;
+import org.example.exeptions.CantRemoveEmployeeFromSubHandler;
 import org.example.exeptions.EmployeeIsNotAccepted;
 import org.example.exeptions.HandlerIsNull;
+import org.example.exeptions.NotFoundSomething;
 import org.example.repository.user.admin.AdminRepository;
 import org.example.repository.user.admin.imp.AdminRepositoryImp;
 import org.example.service.handler.HandlerService;
@@ -18,6 +20,7 @@ import org.example.service.user.employee.EmployeeService;
 import org.example.service.user.employee.imp.EmployeeServiceImp;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 public class AdminServiceImp implements AdminService {
        private final HandlerService handlerService ;
@@ -59,8 +62,25 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public void deleteEmployeeFromSubHandler(Employee employee,Integer subHandlerId) {
-        adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
+    public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
+        try {
+            Employee employee = employeeService.findById(employeeId,Employee.class);
+            if (Objects.isNull(employee)){
+                throw new NotFoundSomething("employee");
+            }
+            SubHandler  subHandler = subHandlerService.findSubHandlerById(subHandlerId);
+            if (Objects.isNull(subHandler)){
+                throw new NotFoundSomething("subHandler");
+            }
+            adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
+        }catch (NotFoundSomething e){
+            e.printStackTrace();
+            throw e;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new CantRemoveEmployeeFromSubHandler();
+        }
+
     }
 
 
@@ -71,9 +91,20 @@ public class AdminServiceImp implements AdminService {
         employeeService.updateUser(employee);
     }
 
-    void validateTheEmployee(Employee employee){
+    void validateTheEmployee(Integer employeeId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
+        try {
+           Employee employee =  employeeService.findById(employeeId,Employee.class);
+           if (Objects.isNull(employee)){
+               throw new NotFoundSomething("employee");
+           }
+        }catch (Exception e){
+
+        }
+
+
         if (ifEmployeeIsAccepted(employee)){
             employee.setEmployeeState(EmployeeState.ACCEPTED);
+
         }
     }
 

@@ -7,7 +7,6 @@ import org.example.enumirations.TypeOfUser;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class Credit {
     @Id
@@ -15,5 +14,11 @@ public class Credit {
     @Column(name = "id")
     private int id;
     private Double amount;
+
+    @Enumerated(EnumType.STRING)
     private TypeOfUser typeOfEmployee;
+
+    public Credit() {
+        this.amount = 0.0;
+    }
 }

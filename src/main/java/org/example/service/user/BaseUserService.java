@@ -6,7 +6,7 @@ import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
 
 public interface BaseUserService<T extends Users> {
-    void signUp(T t);
+    void signUp(T t,PassAndUser passAndUser);
 
     void updateUser(T t);
 

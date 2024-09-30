@@ -1,6 +1,4 @@
-package org.example.service.getSubHandlerForCustomer;
-
-import org.example.domain.Customer;
+package org.example.service.mainService;
 
 public interface CommentService {
     void giveComment(Integer ordersId, int star, String comment);

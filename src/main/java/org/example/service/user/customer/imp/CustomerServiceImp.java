@@ -37,7 +37,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
             savePassAndUser(passAndUser);
             //setting its value
-            signUp(customer);
+            signUp(customer,passAndUser);
         }
     }
 

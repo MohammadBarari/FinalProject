@@ -4,7 +4,7 @@ import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 
 public interface BaseUserRepository<T extends Users> {
-    void save(T user) ;
+    void save(T user,PassAndUser passAndUser) ;
     void update(T user);
     void saveUserAndPass(PassAndUser passAndUser);
     PassAndUser findPass(PassAndUser passAndUser);

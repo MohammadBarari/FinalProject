@@ -1,4 +1,4 @@
-package org.example.service.getSubHandlerForCustomer.imp;
+package org.example.service.mainService.imp;
 
 import lombok.SneakyThrows;
 import org.example.domain.*;
@@ -7,7 +7,7 @@ import org.example.exeptions.DontHaveEnoughMoney;
 import org.example.exeptions.NotFoundOffer;
 import org.example.service.credit.CreditService;
 import org.example.service.credit.imp.CreditServiceImp;
-import org.example.service.getSubHandlerForCustomer.PaymentService;
+import org.example.service.mainService.PaymentService;
 import org.example.service.offer.OfferService;
 import org.example.service.offer.imp.OfferServiceImp;
 import org.example.service.order.OrderService;

@@ -10,6 +10,6 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link Orders}
  */
-public record OrderDto(@NotNull Double OfferedPrice, String detail, @Future LocalDateTime timeOfWork,
-                       String address) implements Serializable {
+public record OrderDto(@NotNull Double offeredPrice, String detail, @Future LocalDateTime timeOfWork,
+                       String address , Integer subHandlerId,Integer customerId) implements Serializable {
 }
