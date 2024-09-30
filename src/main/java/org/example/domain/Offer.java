@@ -11,10 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Offer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Offer extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "employee_Id")
     private Employee employee;

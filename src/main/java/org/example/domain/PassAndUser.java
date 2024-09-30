@@ -12,10 +12,7 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 @Entity
 @Table
-public class PassAndUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class PassAndUser extends BaseEntity {
     @Column(length = 8,  nullable = false)
     private String pass;
     private String username;

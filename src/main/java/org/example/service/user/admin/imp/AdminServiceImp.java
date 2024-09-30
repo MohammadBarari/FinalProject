@@ -11,6 +11,7 @@ import org.example.exeptions.HandlerIsNull;
 import org.example.exeptions.NotFoundSomething;
 import org.example.repository.user.admin.AdminRepository;
 import org.example.repository.user.admin.imp.AdminRepositoryImp;
+import org.example.service.exceptionHandling.NullExceptionHandling;
 import org.example.service.handler.HandlerService;
 import org.example.service.handler.imp.HandlerBaseImp;
 import org.example.service.subHandler.SubHandlerService;
@@ -93,18 +94,13 @@ public class AdminServiceImp implements AdminService {
 
     void validateTheEmployee(Integer employeeId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
         try {
-           Employee employee =  employeeService.findById(employeeId,Employee.class);
-           if (Objects.isNull(employee)){
-               throw new NotFoundSomething("employee");
-           }
+           Employee employee = (Employee) NullExceptionHandling.getInstance().handlingNullExceptions
+                   (employeeService.findById(employeeId,Employee.class),Employee.class);
+            if (ifEmployeeIsAccepted(employee)){
+                employee.setEmployeeState(EmployeeState.ACCEPTED);
+            }
         }catch (Exception e){
-
-        }
-
-
-        if (ifEmployeeIsAccepted(employee)){
-            employee.setEmployeeState(EmployeeState.ACCEPTED);
-
+            throw e;
         }
     }
 

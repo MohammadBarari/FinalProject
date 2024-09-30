@@ -10,10 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-public class SubHandler {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class SubHandler extends BaseEntity {
     @NotNull
     @Column(unique = true)
     private String name;

@@ -8,11 +8,7 @@ import org.example.enumirations.TypeOfUser;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Credit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+public class Credit extends BaseEntity{
     private Double amount;
 
     @Enumerated(EnumType.STRING)

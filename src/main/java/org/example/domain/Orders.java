@@ -14,10 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Orders {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Orders extends BaseEntity {
     @Column(nullable = false)
     private Double offeredPrice;
 
