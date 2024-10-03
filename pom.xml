@@ -18,6 +18,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+    <!-- -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -51,26 +52,42 @@
           <artifactId>jakarta.el-api</artifactId>
           <version>4.0.0</version>
       </dependency>
+      <!-- -->
       <dependency>
           <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter</artifactId>
+          <artifactId>spring-boot-starter-data-jpa</artifactId>
       </dependency>
-
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-test</artifactId>
           <scope>test</scope>
       </dependency>
+      <dependency>
+          <groupId>org.hibernate.orm</groupId>
+          <artifactId>hibernate-jpamodelgen</artifactId>
+      </dependency>
 
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+      </dependency>
   </dependencies>
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

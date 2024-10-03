@@ -1,5 +1,6 @@
 package org.example.service.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
@@ -8,14 +9,12 @@ import org.example.dto.ChangingPasswordDto;
 import org.example.exeptions.AllNotBeLetterOrDigits;
 import org.example.exeptions.PassNot8Digits;
 import org.example.repository.user.BaseUserRepository;
-import org.example.repository.user.BaseUserRepositoryImp;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {
-    BaseUserRepository baseUserRepository ;
-
-    public BaseUserServiceImp() {
-        baseUserRepository = new BaseUserRepositoryImp();
-    }
+    private final BaseUserRepository baseUserRepository ;
 
     @SneakyThrows
     @Override

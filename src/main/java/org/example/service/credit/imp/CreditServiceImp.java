@@ -25,7 +25,7 @@ public class CreditServiceImp implements CreditService {
 
     @Override
     public Credit findCreditById(int id) {
-        return creditRepository.selectCreditById(id);
+        return creditRepository.findById(id);
     }
 
     @Override
