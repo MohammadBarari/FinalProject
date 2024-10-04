@@ -1,13 +1,16 @@
 package org.example.service.credit.imp;
 
+import lombok.RequiredArgsConstructor;
 import org.example.domain.Credit;
 import org.example.repository.credit.CreditRepository;
-import org.example.repository.credit.imp.CreditRepositoryImp;
 import org.example.service.credit.CreditService;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class CreditServiceImp implements CreditService {
 
-    CreditRepository creditRepository = new CreditRepositoryImp();
+    private final CreditRepository creditRepository;
     @Override
     public void save(Credit credit) {
         creditRepository.save(credit);
@@ -25,7 +28,7 @@ public class CreditServiceImp implements CreditService {
 
     @Override
     public Credit findCreditById(int id) {
-        return creditRepository.findById(id);
+        return creditRepository.selectCreditById(id);
     }
 
     @Override

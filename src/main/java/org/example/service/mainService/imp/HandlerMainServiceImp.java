@@ -5,17 +5,16 @@ import org.example.dto.ChangeSubHandlerDto;
 import org.example.exeptions.ErrorWhileUpdatingSubHandler;
 import org.example.exeptions.SubHandlerNull;
 import org.example.exeptions.YouInsertNothing;
-import org.example.service.handler.HandlerService;
 import org.example.service.mainService.HandlersMainService;
 import org.example.service.subHandler.SubHandlerService;
-import org.example.service.subHandler.imp.SubHandlerServiceImp;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-
+@Service
 public class HandlerMainServiceImp implements HandlersMainService {
     private final SubHandlerService subHandlerService;
-    public HandlerMainServiceImp() {
-        subHandlerService = new SubHandlerServiceImp();
+    public HandlerMainServiceImp(SubHandlerService subHandlerService) {
+        this.subHandlerService =subHandlerService;
     }
 
     @Override

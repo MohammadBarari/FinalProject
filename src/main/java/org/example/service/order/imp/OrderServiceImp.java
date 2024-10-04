@@ -1,15 +1,17 @@
 package org.example.service.order.imp;
 
+import lombok.RequiredArgsConstructor;
 import org.example.domain.Employee;
 import org.example.domain.Orders;
 import org.example.repository.order.OrderRepository;
-import org.example.repository.order.imp.OrderRepositoryImp;
 import org.example.service.order.OrderService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
+@RequiredArgsConstructor
 public class OrderServiceImp implements OrderService {
-    OrderRepository orderRepository = new OrderRepositoryImp();
+    private final OrderRepository orderRepository ;
     @Override
     public void save(Orders orders) {
         orderRepository.save(orders);

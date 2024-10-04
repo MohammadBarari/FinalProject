@@ -1,17 +1,16 @@
 package org.example.service.handler.imp;
 
+import lombok.RequiredArgsConstructor;
 import org.example.domain.Handler;
-import org.example.domain.SubHandler;
-import org.example.dto.SaveSubHandlerDto;
 import org.example.repository.handler.HandlerRepository;
-import org.example.repository.handler.imp.HandlerRepositoryImp;
 import org.example.service.handler.HandlerService;
-import org.xml.sax.HandlerBase;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
+@RequiredArgsConstructor
 public class HandlerBaseImp implements HandlerService {
-    HandlerRepository handlerRepository = new HandlerRepositoryImp();
+    private final HandlerRepository handlerRepository ;
 
 
     @Override

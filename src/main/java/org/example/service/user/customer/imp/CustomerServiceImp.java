@@ -1,5 +1,6 @@
 package org.example.service.user.customer.imp;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Credit;
 import org.example.domain.Customer;
@@ -7,15 +8,16 @@ import org.example.domain.PassAndUser;
 import org.example.dto.CustomerSignUpDto;
 import org.example.enumirations.TypeOfUser;
 import org.example.repository.user.customer.CustomerRepository;
-import org.example.repository.user.customer.imp.CustomerRepositoryImp;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-
+@Service
+@RequiredArgsConstructor
 public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements CustomerService {
-    CustomerRepository customerRepository = new CustomerRepositoryImp();
+    private final CustomerRepository customerRepository ;
     @SneakyThrows
     @Override
     public void signUpCustomer(CustomerSignUpDto customerDto){

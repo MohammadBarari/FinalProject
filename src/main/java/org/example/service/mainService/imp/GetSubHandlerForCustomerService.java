@@ -7,31 +7,32 @@ import org.example.dto.OrderDto;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.*;
 import org.example.service.offer.OfferService;
-import org.example.service.offer.imp.OfferServiceImp;
 import org.example.service.order.OrderService;
-import org.example.service.order.imp.OrderServiceImp;
 import org.example.service.subHandler.SubHandlerService;
-import org.example.service.subHandler.imp.SubHandlerServiceImp;
 import org.example.service.user.customer.CustomerService;
-import org.example.service.user.customer.imp.CustomerServiceImp;
 import org.example.service.user.employee.EmployeeService;
-import org.example.service.user.employee.imp.EmployeeServiceImp;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-
+@Service
 public class GetSubHandlerForCustomerService {
     private final OrderService orderService;
     private final SubHandlerService subHandlerService;
     private final OfferService offerService;
     private final EmployeeService employeeService;
     private final CustomerService customerService;
-    public  GetSubHandlerForCustomerService(){
-        orderService = new OrderServiceImp();
-        subHandlerService = new SubHandlerServiceImp();
-        offerService = new OfferServiceImp();
-        employeeService = new EmployeeServiceImp();
-        customerService = new CustomerServiceImp();
+    public  GetSubHandlerForCustomerService(OrderService orderService,
+    SubHandlerService subHandlerService,
+    OfferService offerService,
+    EmployeeService employeeService,
+    CustomerService customerService
+ ){
+        this.orderService =  orderService;
+        this.subHandlerService =  subHandlerService;
+        this.offerService =  offerService;
+        this.employeeService =  employeeService;
+        this.customerService =  customerService;
     }
     @SneakyThrows
     public void GetSubHandlerForCustomer(OrderDto orderDto) {

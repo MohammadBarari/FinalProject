@@ -1,18 +1,17 @@
 package org.example.service.offer.imp;
 
+import lombok.RequiredArgsConstructor;
 import org.example.domain.Offer;
 import org.example.repository.offer.OfferRepository;
-import org.example.repository.offer.imp.OfferRepositoryImp;
 import org.example.service.offer.OfferService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
+@RequiredArgsConstructor
 public class OfferServiceImp implements OfferService {
     private final OfferRepository offerRepository;
 
-    public OfferServiceImp() {
-        offerRepository = new OfferRepositoryImp();
-    }
 
     @Override
     public void save(Offer offer) {

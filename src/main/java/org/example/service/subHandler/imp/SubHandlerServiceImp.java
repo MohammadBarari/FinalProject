@@ -1,15 +1,17 @@
 package org.example.service.subHandler.imp;
 
+import lombok.RequiredArgsConstructor;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.repository.subHandler.SubHandlerRepository;
-import org.example.repository.subHandler.imp.SubHandlerRepositoryImp;
 import org.example.service.subHandler.SubHandlerService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
+@RequiredArgsConstructor
 public class SubHandlerServiceImp implements SubHandlerService {
-    SubHandlerRepository subHandlerRepository = new SubHandlerRepositoryImp();
+    private final SubHandlerRepository subHandlerRepository;
     @Override
     public void saveSubHandler(SubHandler subHandler) {
         subHandlerRepository.save(subHandler);

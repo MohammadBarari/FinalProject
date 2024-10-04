@@ -37,4 +37,7 @@ public class Users extends BaseEntity {
     @Column(nullable = false,unique = true,length = 11)
     private String phone;
     private LocalDateTime timeOfRegistration;
+
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private PassAndUser passAndUser;
 }

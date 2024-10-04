@@ -10,29 +10,34 @@ import org.example.exeptions.EmployeeIsNotAccepted;
 import org.example.exeptions.HandlerIsNull;
 import org.example.exeptions.NotFoundSomething;
 import org.example.repository.user.admin.AdminRepository;
-import org.example.repository.user.admin.imp.AdminRepositoryImp;
 import org.example.service.exceptionHandling.NullExceptionHandling;
 import org.example.service.handler.HandlerService;
-import org.example.service.handler.imp.HandlerBaseImp;
 import org.example.service.subHandler.SubHandlerService;
-import org.example.service.subHandler.imp.SubHandlerServiceImp;
 import org.example.service.user.admin.AdminService;
 import org.example.service.user.employee.EmployeeService;
-import org.example.service.user.employee.imp.EmployeeServiceImp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+
+@Service
 
 public class AdminServiceImp implements AdminService {
-       private final HandlerService handlerService ;
+
+    private final HandlerService handlerService ;
     private final SubHandlerService subHandlerService ;
-      private final EmployeeService employeeService ;
-      private AdminRepository adminRepository;
-    public AdminServiceImp() {
-        handlerService = new HandlerBaseImp();
-        subHandlerService = new SubHandlerServiceImp();
-        employeeService = new EmployeeServiceImp();
-        adminRepository = new AdminRepositoryImp();
+    private final EmployeeService employeeService ;
+    private final AdminRepository adminRepository;
+   @Autowired
+    public AdminServiceImp(HandlerService handlerService,
+    SubHandlerService subHandlerService ,
+    EmployeeService employeeService ,
+    AdminRepository adminRepository
+ ) {
+        this.handlerService =  handlerService;
+        this.subHandlerService =  subHandlerService;
+        this.employeeService =  employeeService;
+        this.adminRepository =  adminRepository;
     }
 
     @Override

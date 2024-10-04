@@ -1,26 +1,30 @@
 package org.example.service.mainService.imp;
 
 import lombok.SneakyThrows;
-import org.example.domain.*;
+import org.example.domain.Credit;
+import org.example.domain.Customer;
+import org.example.domain.Offer;
+import org.example.domain.Orders;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.DontHaveEnoughMoney;
 import org.example.exeptions.NotFoundOffer;
 import org.example.service.credit.CreditService;
-import org.example.service.credit.imp.CreditServiceImp;
 import org.example.service.mainService.PaymentService;
 import org.example.service.offer.OfferService;
-import org.example.service.offer.imp.OfferServiceImp;
 import org.example.service.order.OrderService;
-import org.example.service.order.imp.OrderServiceImp;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PaymentServiceImp implements PaymentService {
     private final CreditService creditService;
     private final OfferService offerService;
-    OrderService orderService;
-    public PaymentServiceImp() {
-        offerService = new OfferServiceImp();
-        creditService = new CreditServiceImp();
-        orderService = new OrderServiceImp();
+    private final OrderService orderService;
+    public PaymentServiceImp(CreditService creditService,
+    OfferService offerService ,OrderService orderService
+ ) {
+        this.offerService =  offerService;
+        this.creditService =  creditService;
+        this.orderService =  orderService;
     }
     @SneakyThrows
     public void customerChargeCart(Customer customer, double amount){

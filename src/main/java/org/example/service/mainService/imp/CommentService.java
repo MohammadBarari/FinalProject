@@ -1,18 +1,18 @@
 package org.example.service.mainService.imp;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Orders;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.NotFoundOrder;
 import org.example.exeptions.StarShouldBeenBetween1To5;
 import org.example.service.order.OrderService;
-import org.example.service.order.imp.OrderServiceImp;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class CommentService {
-    private OrderService orderService;
-    public CommentService() {
-        orderService = new OrderServiceImp();
-    }
+    private final OrderService orderService;
     @SneakyThrows
     public void giveComment(Integer ordersId, int star, String comment){
         Orders orders = orderService.findById(ordersId);

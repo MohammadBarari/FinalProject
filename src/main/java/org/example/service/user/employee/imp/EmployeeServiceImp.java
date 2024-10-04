@@ -1,4 +1,6 @@
 package org.example.service.user.employee.imp;
+
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Credit;
 import org.example.domain.Employee;
@@ -6,20 +8,22 @@ import org.example.domain.PassAndUser;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.FileIsInvalid;
-import org.example.exeptions.ImageSizeIsOver;
 import org.example.repository.user.employee.EmployeeRepository;
-import org.example.repository.user.employee.imp.EmployeeRepositoryImp;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
+import org.springframework.stereotype.Service;
+
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
+@Service
+@AllArgsConstructor
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
-    EmployeeRepository employeeRepository = new EmployeeRepositoryImp();
+    private final EmployeeRepository employeeRepository ;
     @Override
     public void signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws IOException {
         File file = new File(employeeSignUpDto.imagePath());
@@ -48,7 +52,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                     .username(employeeSignUpDto.phone()).build();
             savePassAndUser(passAndUser);
             employee.setEmployeeState(EmployeeState.NEW);
-            employeeRepository.save(employee);
+            employeeRepository.save(employee,passAndUser);
         }
     }
     @SneakyThrows
