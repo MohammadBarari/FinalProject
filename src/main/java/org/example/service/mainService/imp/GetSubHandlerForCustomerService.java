@@ -37,12 +37,12 @@ public class GetSubHandlerForCustomerService {
     @SneakyThrows
     public void GetSubHandlerForCustomer(OrderDto orderDto) {
             Customer customer = customerService.findById(orderDto.customerId() , Customer.class);
+            if (Objects.isNull(customer)) {
+                throw new NotFoundCustomer();
+            }
             SubHandler subHandler =  subHandlerService.findSubHandlerById(orderDto.subHandlerId());
             if (Objects.isNull(subHandler)) {
                 throw new HandlerIsNull();
-            }
-            if (Objects.isNull(customer)) {
-                throw new NotFoundCustomer();
             }
             if (isOrderValidated(orderDto,subHandler)) {
                 Orders orders = new Orders();
@@ -64,9 +64,8 @@ public class GetSubHandlerForCustomerService {
         }
         return true;
     }
-    @SneakyThrows
-    public void GiveOfferToOrder(OfferDto offerDto){
-        try {
+
+    public void GiveOfferToOrder(OfferDto offerDto) throws Exception {
             Employee employee = employeeService.findById(offerDto.employeeId(),Employee.class);
             Orders orders = orderService.findById(offerDto.orderId());
             if (validateIfItCanGetOffer(orders)) {
@@ -88,9 +87,7 @@ public class GetSubHandlerForCustomerService {
                 offer.setOrders(orders);
                 offerService.save(offer);
             }
-        }catch (Exception e){
-            throw new Exception(e);
-        }
+
     }
     @SneakyThrows
     public void customerAcceptOffer(Integer  offerId){
@@ -107,7 +104,7 @@ public class GetSubHandlerForCustomerService {
             orders.setOrderState(OrderState.UNDER_REACHING_EMPLOYEE);
             orderService.update(orders);
         }catch (Exception e){
-            throw new Exception(e);
+            throw e;
         }
     }
 
@@ -122,11 +119,8 @@ public class GetSubHandlerForCustomerService {
             orders.setOrderState(orderState);
             orderService.update(orders);
         }catch (Exception e){
-            throw new Exception(e);
+            throw e;
         }
-    }
-    public void addToCreditToCustomer(){
-
     }
     @SneakyThrows
     public boolean validateIfItCanGetOffer(Orders orders){
@@ -138,4 +132,6 @@ public class GetSubHandlerForCustomerService {
             throw new OrderStateIsNotCorrect();
         }
     }
+
+
 }

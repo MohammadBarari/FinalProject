@@ -6,9 +6,10 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.example.domain.Credit;
 import org.example.repository.credit.CreditRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public class CreditRepositoryImp implements CreditRepository {
     @PersistenceContext
     private EntityManager entityManager;

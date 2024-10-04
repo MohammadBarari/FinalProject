@@ -18,29 +18,31 @@ public class HandlerMainServiceImp implements HandlersMainService {
     }
 
     @Override
-    public void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto) throws SubHandlerNull {
+    public void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto) throws SubHandlerNull, ErrorWhileUpdatingSubHandler, YouInsertNothing {
         try {
-            SubHandler subHandler = subHandlerService.findSubHandlerById(changeSubHandlerDto.id());
+            SubHandler subHandler = null;
             try {
-                if (!Objects.isNull(changeSubHandlerDto.detail())){
-                    subHandler.setDetail(changeSubHandlerDto.detail());
+                 subHandler = subHandlerService.findSubHandlerById(changeSubHandlerDto.id());
+                if (subHandler == null) {
+                    throw new SubHandlerNull();
                 }
-                if (Objects.isNull(changeSubHandlerDto.basePrice())){
-                    subHandler.setBasePrice(changeSubHandlerDto.basePrice());
-                }
-                if (Objects.isNull(changeSubHandlerDto.basePrice())
-                &&
-                        Objects.isNull(changeSubHandlerDto.detail())){
-                    throw new YouInsertNothing();
-                }
-                subHandlerService.updateSubHandler(subHandler);
             }catch (Exception e){
-                throw new ErrorWhileUpdatingSubHandler();
+                throw new SubHandlerNull();
             }
-        }catch (Exception e) {
-            throw new SubHandlerNull();
+            if (!Objects.isNull(changeSubHandlerDto.detail())) {
+                subHandler.setDetail(changeSubHandlerDto.detail());
+            }
+            if (!Objects.isNull(changeSubHandlerDto.basePrice())) {
+                subHandler.setBasePrice(changeSubHandlerDto.basePrice());
+            }
+            if (Objects.isNull(changeSubHandlerDto.basePrice())
+                    &&
+                    Objects.isNull(changeSubHandlerDto.detail())) {
+                throw new YouInsertNothing();
+            }
+            subHandlerService.updateSubHandler(subHandler);
+        } catch (Exception e) {
+            throw e;
         }
-
     }
-
 }

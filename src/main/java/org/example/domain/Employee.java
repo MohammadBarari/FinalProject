@@ -10,7 +10,6 @@ import org.example.enumirations.EmployeeState;
 
 import java.util.Set;
 
-@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
