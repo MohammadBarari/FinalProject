@@ -5,10 +5,7 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.enumirations.EmployeeState;
-import org.example.exeptions.CantRemoveEmployeeFromSubHandler;
-import org.example.exeptions.EmployeeIsNotAccepted;
-import org.example.exeptions.HandlerIsNull;
-import org.example.exeptions.NotFoundSomething;
+import org.example.exeptions.*;
 import org.example.repository.user.admin.AdminRepository;
 import org.example.service.exceptionHandling.NullExceptionHandling;
 import org.example.service.handler.HandlerService;
@@ -58,13 +55,23 @@ public class AdminServiceImp implements AdminService {
     @SneakyThrows
     @Override
     public void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId) {
-       
+       Employee employee = employeeService.findById(employeeId,Employee.class);
+       //1
+       if (Objects.isNull(employee)){
+           throw new NotFoundEmployee();
+       }
+       //2
        if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
-        SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
-        employee.getSubHandlers().add(subHandler);
-        employeeService.updateUser(employee);
+          SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
+         //3
+          if (Objects.isNull(subHandler)){
+              throw new HandlerIsNull();
+          }
+          employee.getSubHandlers().add(subHandler);
+          employeeService.updateUser(employee);
         }else {
-            throw new EmployeeIsNotAccepted();
+           //4
+           throw new EmployeeIsNotAccepted();
         }
     }
 

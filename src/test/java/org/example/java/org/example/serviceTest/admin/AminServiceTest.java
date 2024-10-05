@@ -74,6 +74,8 @@ public class AminServiceTest {
         Employee employee = new Employee();
         when(employeeService.findById(1,Employee.class)).thenReturn(employee);
         SubHandler subHandler = new SubHandler();
-
+        when(subHandlerService.findSubHandlerById(1)).thenReturn(subHandler);
+        adminServiceImp.saveEmployeeToSubHandler(1,1);
+        verify(subHandlerService).saveSubHandler(any(SubHandler.class));
     }
 }

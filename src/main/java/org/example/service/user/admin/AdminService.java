@@ -10,7 +10,7 @@ import org.example.exeptions.NotFoundSomething;
 public interface AdminService {
     void saveHandler(Handler handler);
     void saveSubHandler(SubHandler subHandler,Integer handlerId);
-    void saveEmployeeToSubHandler(Employee employee,Integer subHandlerId);
+    void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId);
     void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler;
     void changeEmployeeState(Integer employeeId, EmployeeState employeeState);
 }
