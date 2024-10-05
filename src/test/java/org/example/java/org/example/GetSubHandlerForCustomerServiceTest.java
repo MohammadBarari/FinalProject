@@ -1,4 +1,4 @@
-package org.example;
+package org.example.java.org.example;
 
 import org.example.domain.*;
 import org.example.dto.OfferDto;
@@ -51,57 +51,42 @@ public class GetSubHandlerForCustomerServiceTest {
     }
     @Test
     void testGetSubHandlerForCustomer_success() throws Exception {
-
         OrderDto orderDto = new OrderDto(60.0,"want to fix my pipe",
                 LocalDateTime.now().plusDays(1),"mir",1,1);Customer customer = new Customer();
         SubHandler subHandler = new SubHandler();
         subHandler.setBasePrice(50.0);
-
         when(customerService.findById(orderDto.customerId(), Customer.class)).thenReturn(customer);
         when(subHandlerService.findSubHandlerById(orderDto.subHandlerId())).thenReturn(subHandler);
-
-
         getSubHandlerForCustomerService.GetSubHandlerForCustomer(orderDto);
-
         verify(orderService).save(any(Orders.class));
     }
 
     @Test
     void testGetSubHandlerForCustomer_subHandlerNotFound() {
-
         OrderDto orderDto = new OrderDto(10.0,"want to fix my pipe",
                 LocalDateTime.now().plusDays(1),"mir",1,1);
         when(customerService.findById(orderDto.customerId(), Customer.class)).thenReturn(new Customer());
         when(subHandlerService.findSubHandlerById(orderDto.subHandlerId())).thenReturn(null);
-
-
         assertThrows(HandlerIsNull.class, () -> getSubHandlerForCustomerService.GetSubHandlerForCustomer(orderDto));
     }
 
     @Test
     void testGetSubHandlerForCustomer_customerNotFound() {
-
         OrderDto orderDto = new OrderDto(10.0,"want to fix my pipe",
                 LocalDateTime.now().plusDays(1),"mir",1,1);
         when(customerService.findById(orderDto.customerId(), Customer.class)).thenReturn(null);
-
-
         assertThrows(NotFoundCustomer.class, () -> getSubHandlerForCustomerService.GetSubHandlerForCustomer(orderDto));
     }
 
     @Test
     void testGetSubHandlerForCustomer_timeOfWorkDoesNotMatch() {
-
         OrderDto orderDto = new OrderDto(20000.0,"want to fix my pipe",
                 LocalDateTime.now().minusDays(2),"mir",1,1);
         Customer customer = new Customer();
         SubHandler subHandler = new SubHandler();
         subHandler.setBasePrice(50.0);
-
         when(customerService.findById(orderDto.customerId(), Customer.class)).thenReturn(customer);
         when(subHandlerService.findSubHandlerById(orderDto.subHandlerId())).thenReturn(subHandler);
-
-
         assertThrows(TimeOfWorkDoesntMatch.class, () -> getSubHandlerForCustomerService.GetSubHandlerForCustomer(orderDto));
     }
 
@@ -113,10 +98,8 @@ public class GetSubHandlerForCustomerServiceTest {
         Customer customer = new Customer();
         SubHandler subHandler = new SubHandler();
         subHandler.setBasePrice(50.0);
-
         when(customerService.findById(orderDto.customerId(), Customer.class)).thenReturn(customer);
         when(subHandlerService.findSubHandlerById(orderDto.subHandlerId())).thenReturn(subHandler);
-
         assertThrows(OrderPriceShouldBeHigherThanBase.class, () -> getSubHandlerForCustomerService.GetSubHandlerForCustomer(orderDto));
     }
 
@@ -128,16 +111,10 @@ public class GetSubHandlerForCustomerServiceTest {
         order.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
         order.setOfferedPrice(100.0);
         order.setTimeOfWork(LocalDateTime.now().plusDays(2)); // Future date
-
         Employee employee = new Employee();
-
         when(employeeService.findById(1, Employee.class)).thenReturn(employee);
         when(orderService.findById(1)).thenReturn(order);
-
-
         getSubHandlerForCustomerService.GiveOfferToOrder(offerDto);
-
-
         verify(orderService).update(order);
         verify(offerService).save(any(Offer.class));
     }
@@ -164,64 +141,45 @@ public class GetSubHandlerForCustomerServiceTest {
     void testGiveOfferToOrder_timeOfWorkDoesNotMatch() {
 
       OfferDto offerDto = new OfferDto(200L,LocalDateTime.now().plusDays(1),40,1,1);
-
         Orders order = new Orders();
         order.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
         order.setOfferedPrice(100.0);
         order.setTimeOfWork(LocalDateTime.now().plusDays(2));
-
         Employee employee = new Employee();
-
         when(employeeService.findById(1, Employee.class)).thenReturn(employee);
         when(orderService.findById(1)).thenReturn(order);
-
-
         assertThrows(TimeOfWorkDoesntMatch.class, () -> getSubHandlerForCustomerService.GiveOfferToOrder(offerDto));
     }
 
     @Test
     void testGiveOfferToOrder_invalidOrderState() {
         OfferDto offerDto = new OfferDto(200L,LocalDateTime.now().plusDays(3),40,1,1);
-
-
         Orders order = new Orders();
-        order.setOrderState(OrderState.DONE); // Invalid state
+        order.setOrderState(OrderState.DONE);
         order.setOfferedPrice(100.0);
         order.setTimeOfWork(LocalDateTime.now().plusDays(2));
-
         Employee employee = new Employee();
-
         when(employeeService.findById(1, Employee.class)).thenReturn(employee);
         when(orderService.findById(1)).thenReturn(order);
-
-
         assertThrows(OrderStateIsNotCorrect.class, () -> getSubHandlerForCustomerService.GiveOfferToOrder(offerDto));
     }
-    // continue
+
     @Test
     void testCustomerAcceptOffer_success() throws Exception {
         Integer offerId = 1;
         Offer offer = new Offer();
         offer.setId(offerId);
         offer.setAccepted(false);
-
         Orders orders = new Orders();
         orders.setId(1);
-
         Employee employee = new Employee();
         employee.setId(1);
-
         offer.setOrders(orders);
         offer.setEmployee(employee);
-
         when(offerService.findById(offerId)).thenReturn(offer);
         when(orderService.findById(orders.getId())).thenReturn(orders);
         when(employeeService.findById(employee.getId(), Employee.class)).thenReturn(employee);
-
-
         getSubHandlerForCustomerService.customerAcceptOffer(offerId);
-
-
         verify(offerService).update(offer);
         verify(orderService).update(orders);
         verify(employeeService).findById(employee.getId(), Employee.class);
@@ -229,11 +187,8 @@ public class GetSubHandlerForCustomerServiceTest {
 
     @Test
     void testCustomerAcceptOffer_offerNotFound() {
-
         Integer offerId = 1;
         when(offerService.findById(offerId)).thenReturn(null);
-
-
         assertThrows(NotFoundOffer.class, () -> getSubHandlerForCustomerService.customerAcceptOffer(offerId));
     }
 
@@ -256,7 +211,6 @@ public class GetSubHandlerForCustomerServiceTest {
 
     @Test
     void testSetOrderStateToStart_orderNotFound() {
-
         Integer orderId = 1;
         when(orderService.findById(orderId)).thenReturn(null);
 

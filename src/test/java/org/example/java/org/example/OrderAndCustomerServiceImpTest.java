@@ -1,30 +1,19 @@
-package org.example;
+package org.example.java.org.example;
 
 
 import org.example.domain.Offer;
 import org.example.domain.Orders;
-import org.example.domain.SubHandler;
-import org.example.dto.ChangeSubHandlerDto;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.*;
-import org.example.service.handler.HandlerService;
-import org.example.service.mainService.HandlersMainService;
-import org.example.service.mainService.imp.HandlerMainServiceImp;
 import org.example.service.mainService.imp.OrderAndCustomerServiceImp;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
-import org.example.service.subHandler.SubHandlerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
