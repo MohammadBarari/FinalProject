@@ -51,14 +51,15 @@ public class AdminServiceImp implements AdminService {
         Handler handler = handlerService.findHandlerById(handlerId);
         if (Objects.isNull(handler)){
             throw new HandlerIsNull();
-        }
+    }
         subHandler.setHandler(handler);
         subHandlerService.saveSubHandler(subHandler);
     }
     @SneakyThrows
     @Override
-    public void saveEmployeeToSubHandler(Employee employee,Integer subHandlerId) {
-        if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
+    public void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId) {
+       
+       if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
         SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
         employee.getSubHandlers().add(subHandler);
         employeeService.updateUser(employee);

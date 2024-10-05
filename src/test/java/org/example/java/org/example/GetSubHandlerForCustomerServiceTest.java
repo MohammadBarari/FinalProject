@@ -52,7 +52,8 @@ public class GetSubHandlerForCustomerServiceTest {
     @Test
     void testGetSubHandlerForCustomer_success() throws Exception {
         OrderDto orderDto = new OrderDto(60.0,"want to fix my pipe",
-                LocalDateTime.now().plusDays(1),"mir",1,1);Customer customer = new Customer();
+                LocalDateTime.now().plusDays(1),"mir",1,1);
+        Customer customer = new Customer();
         SubHandler subHandler = new SubHandler();
         subHandler.setBasePrice(50.0);
         when(customerService.findById(orderDto.customerId(), Customer.class)).thenReturn(customer);
