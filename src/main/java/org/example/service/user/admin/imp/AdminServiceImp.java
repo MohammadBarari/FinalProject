@@ -84,23 +84,27 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
+    public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler, NotFoundEmployee, SubHandlerNull {
         try {
             Employee employee = employeeService.findById(employeeId,Employee.class);
             if (Objects.isNull(employee)){
-                throw new NotFoundSomething("employee");
+                throw new NotFoundEmployee();
             }
             SubHandler  subHandler = subHandlerService.findSubHandlerById(subHandlerId);
             if (Objects.isNull(subHandler)){
-                throw new NotFoundSomething("subHandler");
+                throw new SubHandlerNull();
             }
             adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
-        }catch (NotFoundSomething e){
-            e.printStackTrace();
-            throw e;
+
         }catch (Exception e){
             e.printStackTrace();
-            throw new CantRemoveEmployeeFromSubHandler();
+            if (!(e instanceof NotFoundEmployee ||
+                   e instanceof  SubHandlerNull)){
+
+                throw new CantRemoveEmployeeFromSubHandler();
+            }else {
+                throw e;
+            }
         }
 
     }

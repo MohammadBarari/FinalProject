@@ -4,9 +4,7 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.enumirations.EmployeeState;
-import org.example.exeptions.EmployeeIsNotAccepted;
-import org.example.exeptions.HandlerIsNull;
-import org.example.exeptions.NotFoundEmployee;
+import org.example.exeptions.*;
 import org.example.repository.user.admin.AdminRepository;
 import org.example.service.handler.HandlerService;
 import org.example.service.subHandler.SubHandlerService;
@@ -130,4 +128,31 @@ public class AminServiceTest {
         assertTrue(subHandlers.contains(subHandler));
         assertEquals(2,employee.getSubHandlers().size());
     }
+
+    @Test
+    public void removeEmployeeFromSubHandlerTest() throws NotFoundSomething, CantRemoveEmployeeFromSubHandler, NotFoundEmployee, SubHandlerNull {
+        Employee employee = new Employee();
+        when(employeeService.findById(1,Employee.class)).thenReturn(employee);
+        SubHandler subHandler = new SubHandler();
+        when(subHandlerService.findSubHandlerById(1)).thenReturn(subHandler);
+        adminServiceImp.removeEmployeeFromSubHandler(1,1);
+        verify(adminRepository).deleteEmployeeFromSubHandler(employee,1);
+    }
+    @Test
+    public void removeEmployeeFromSubHandlerNotFountEmployeeTest(){
+        when(employeeService.findById(1,Employee.class)).thenReturn(null);
+        assertThrows(NotFoundEmployee.class,()->{
+            adminServiceImp.removeEmployeeFromSubHandler(1,1);
+        });
+    }
+    @Test
+    public void removeEmployeeFromSubHandlerNotFoundSubHandlerTest(){
+        Employee employee = new Employee();
+        when(employeeService.findById(1,Employee.class)).thenReturn(employee);
+        when(subHandlerService.findSubHandlerById(1)).thenReturn(null);
+        assertThrows(SubHandlerNull.class,() ->{
+            adminServiceImp.removeEmployeeFromSubHandler(1,1);
+        });
+    }
+
 }
