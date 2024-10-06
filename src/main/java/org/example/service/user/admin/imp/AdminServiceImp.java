@@ -15,7 +15,9 @@ import org.example.service.user.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 
@@ -67,7 +69,13 @@ public class AdminServiceImp implements AdminService {
           if (Objects.isNull(subHandler)){
               throw new HandlerIsNull();
           }
-          employee.getSubHandlers().add(subHandler);
+          if (Objects.isNull(employee.getSubHandlers()))
+          {
+              Set<SubHandler> handlers = Set.of(subHandler);
+              employee.setSubHandlers(handlers);
+          }else {
+            employee.getSubHandlers().add(subHandler);
+          }
           employeeService.updateUser(employee);
         }else {
            //4
