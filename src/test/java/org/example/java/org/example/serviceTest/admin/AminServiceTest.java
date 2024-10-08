@@ -17,13 +17,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AminServiceTest {
    @Mock
@@ -153,6 +151,31 @@ public class AminServiceTest {
         assertThrows(SubHandlerNull.class,() ->{
             adminServiceImp.removeEmployeeFromSubHandler(1,1);
         });
+    }
+    @Test
+    public void removeEmployeeFromSubHandlerCantRemoveExceptionTest(){
+        Employee employee = new Employee();
+        when(employeeService.findById(1,Employee.class)).thenReturn(employee);
+        SubHandler subHandler = new SubHandler();
+        when(subHandlerService.findSubHandlerById(1)).thenReturn(subHandler);
+        doThrow(new RuntimeException("DataBase error")).when(adminRepository).deleteEmployeeFromSubHandler(employee,1);
+        assertThrows(CantRemoveEmployeeFromSubHandler.class,()->{
+           adminServiceImp.removeEmployeeFromSubHandler(1,1);
+        });
+    }
+    @Test
+    public void validateEmployeeTest() throws NotFoundSomething {
+        when(employeeService.findById(1,Employee.class)).thenReturn(null);
+        assertThrows(NotFoundSomething.class,()->{
+            adminServiceImp.validateTheEmployee(1);
+        });
+    }
+    @Test
+    public void validateEmployee_successTest() throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
+        Employee employee = new Employee();
+        when(employeeService.findById(1,Employee.class)).thenReturn(employee);
+        adminServiceImp.validateTheEmployee(1);
+        verify(employeeService).updateUser(employee);
     }
 
 }

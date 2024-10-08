@@ -117,12 +117,13 @@ public class AdminServiceImp implements AdminService {
         employeeService.updateUser(employee);
     }
 
-    void validateTheEmployee(Integer employeeId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
+    public void validateTheEmployee(Integer employeeId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
         try {
            Employee employee = (Employee) NullExceptionHandling.getInstance().handlingNullExceptions
                    (employeeService.findById(employeeId,Employee.class),Employee.class);
             if (ifEmployeeIsAccepted(employee)){
                 employee.setEmployeeState(EmployeeState.ACCEPTED);
+                employeeService.updateUser(employee);
             }
         }catch (Exception e){
             throw e;

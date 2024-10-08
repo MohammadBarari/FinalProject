@@ -6,8 +6,9 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
+import org.springframework.stereotype.Repository;
 
-
+@Repository
 public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepository<T>{
 
        @PersistenceContext
@@ -16,7 +17,6 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
         public void save(T user,PassAndUser passAndUser){
             try {
                 entityManager.persist(user);
-                entityManager.persist(passAndUser);
             }catch (Exception e) {
                 entityManager.getTransaction().rollback();
                 throw e;

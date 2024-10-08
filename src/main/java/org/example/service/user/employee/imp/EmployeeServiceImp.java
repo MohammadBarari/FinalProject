@@ -1,5 +1,9 @@
 package org.example.service.user.employee.imp;
 
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Credit;
@@ -12,6 +16,7 @@ import org.example.repository.user.employee.EmployeeRepository;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -21,14 +26,16 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Objects;
 @Service
+@Validated
 @AllArgsConstructor
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
+    private final Validator validator;
     @Override
-    public void signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws IOException {
+    public void signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws IOException {
         File file = new File(employeeSignUpDto.imagePath());
         if (validateEmployee(employeeSignUpDto,file)) {
-            Employee employee = new Employee();
+           @Valid Employee employee = new Employee();
             employee.setName(employeeSignUpDto.name());
             employee.setEmail(employeeSignUpDto.email());
             employee.setPhone(employeeSignUpDto.phone());
@@ -50,10 +57,16 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                     .pass(employeeSignUpDto.password())
                     .typeOfUser(TypeOfUser.EMPLOYEE)
                     .username(employeeSignUpDto.phone()).build();
-            savePassAndUser(passAndUser);
             employee.setEmployeeState(EmployeeState.NEW);
-            employeeRepository.save(employee,passAndUser);
+            saveEmployee(employee,passAndUser);
         }
+    }
+    @SneakyThrows
+    public void saveEmployee(@Valid Employee employee, @Valid PassAndUser passAndUser){
+        validator.validate(passAndUser);
+        validator.validate(employee);
+        employee.setPassAndUser(passAndUser);
+        employeeRepository.save(employee,passAndUser);
     }
     @SneakyThrows
     public  boolean validateImage(File imageFile) {
