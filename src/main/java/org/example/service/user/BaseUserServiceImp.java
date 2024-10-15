@@ -1,5 +1,6 @@
 package org.example.service.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.PassAndUser;
@@ -32,11 +33,13 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         }
     }
     @Override
+    @Transactional
     public void signUp(T t,PassAndUser passAndUser){
         baseUserRepository.save(t,passAndUser);
 
     }
     @Override
+    @Transactional
     public void savePassAndUser(PassAndUser passAndUser){
         baseUserRepository.saveUserAndPass(passAndUser);
     }
@@ -74,6 +77,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         }
     }
     @Override
+    @Transactional
     public void changingPassword(ChangingPasswordDto changingPasswordDto){
         PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user()).typeOfUser(changingPasswordDto.typeOfUser()).pass(changingPasswordDto.oldPass()).build();
         PassAndUser newPassAndUser = baseUserRepository.findPass(passAndUser);
@@ -83,6 +87,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         }
     }
     @Override
+    @Transactional
     public void updateUser(T t){
         baseUserRepository.update(t);
     };

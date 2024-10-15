@@ -14,54 +14,25 @@ public class CreditRepositoryImp implements CreditRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    @Transactional
     public void save(Credit credit) {
-
-        try {
-            entityManager.getTransaction().begin();
             entityManager.persist(credit);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void update(Credit credit) {
-
-        try {
-            entityManager.getTransaction().begin();
             entityManager.merge(credit);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void delete(int creditId) {
-
-        try {
             Credit credit = entityManager.find(Credit.class, creditId);
-            entityManager.getTransaction().begin();
             entityManager.remove(credit);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
     public Credit selectCreditById(int creditId) {
-
         try {
-            Credit credit = entityManager.find(Credit.class, creditId);
-            return credit;
+            return entityManager.find(Credit.class, creditId);
         }catch (Exception e){
             return null;
         }
@@ -79,7 +50,6 @@ public class CreditRepositoryImp implements CreditRepository {
 
     @Override
     public Credit selectByCustomerId(int customerId) {
-
         try {
             Query query = entityManager.createNativeQuery("""
             select c.id from customer join credit c on c.id = customer.credit_id

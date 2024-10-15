@@ -14,52 +14,28 @@ public class HandlerRepositoryImp implements HandlerRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    @Transactional
     public void save(Handler handler) {
-
-        try {
-            entityManager.getTransaction().begin();
             entityManager.persist(handler);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void update(Handler handler) {
-
-        try {
-            entityManager.getTransaction().begin();
             entityManager.merge(handler);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void delete(int id) {
-
-        try {
             Handler handler = entityManager.find(Handler.class, id);
-            entityManager.getTransaction().begin();
             entityManager.remove(handler);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
     public Handler findById(int id) {
-
+        try {
         return entityManager.find(Handler.class, id);
+        }catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

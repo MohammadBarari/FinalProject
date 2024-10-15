@@ -1,5 +1,6 @@
 package org.example.service.credit.imp;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Credit;
 import org.example.repository.credit.CreditRepository;
@@ -12,16 +13,19 @@ public class CreditServiceImp implements CreditService {
 
     private final CreditRepository creditRepository;
     @Override
+    @Transactional
     public void save(Credit credit) {
         creditRepository.save(credit);
     }
 
     @Override
+    @Transactional
     public void update(Credit credit) {
         creditRepository.update(credit);
     }
 
     @Override
+    @Transactional
     public void delete(int creditId) {
         creditRepository.delete(creditId);
     }
@@ -42,6 +46,7 @@ public class CreditServiceImp implements CreditService {
     }
 
     @Override
+    @Transactional
     public void payToEmployee(Integer customerCreditId, Integer employeeCreditId, Long offerPrice) {
         creditRepository.payToEmployee(customerCreditId,employeeCreditId,offerPrice);
     }

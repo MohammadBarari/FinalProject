@@ -1,5 +1,6 @@
 package org.example.service.user.customer.imp;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Credit;
@@ -20,6 +21,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final CustomerRepository customerRepository ;
     @SneakyThrows
     @Override
+    @Transactional
     public void signUpCustomer(CustomerSignUpDto customerDto){
         if (validateCustomer(customerDto)) {
             Customer customer = new Customer();
@@ -54,7 +56,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
 
 
     @Override
-    public Customer login(String user, String pass) {
+    public Customer login(String user, String pass)
+    {
         return customerRepository.login(user,pass);
     }
     @Override

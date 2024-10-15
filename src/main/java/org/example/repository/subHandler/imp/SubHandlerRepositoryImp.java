@@ -16,42 +16,19 @@ public class SubHandlerRepositoryImp implements SubHandlerRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    @Transactional
     public void save(SubHandler subHandler) {
-
-        try {
-            entityManager.getTransaction().begin();
             entityManager.persist(subHandler);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void delete(Integer id) {
-        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
-        try {
             SubHandler subHandler = entityManager.find(SubHandler.class, id);
             entityManager.remove(subHandler);
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
-        }
+    }
 
     @Override
-    @Transactional
     public void update(SubHandler subHandler) {
-        EntityManager entityManager = HibernateUtil.getInstance().getEntityManager();
-        try {
             entityManager.merge(subHandler);
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override

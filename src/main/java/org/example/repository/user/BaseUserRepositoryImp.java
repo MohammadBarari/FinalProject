@@ -13,23 +13,12 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
 
        @PersistenceContext
        private EntityManager entityManager;
-       @Transactional
+
         public void save(T user,PassAndUser passAndUser){
-            try {
                 entityManager.persist(user);
-            }catch (Exception e) {
-                entityManager.getTransaction().rollback();
-                throw e;
-            }
         }
-        @Transactional
         public void saveUserAndPass(PassAndUser passAndUser) {
-            try {
                 entityManager.persist(passAndUser);
-            }catch (Exception e) {
-                entityManager.getTransaction().rollback();
-                throw e;
-            }
         }
         public PassAndUser findPass(PassAndUser passAndUser){
             try {
@@ -45,29 +34,16 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
 
 
     @Override
-    @Transactional
     public void updatePass(PassAndUser passAndUser) {
-        try {
             entityManager.merge(passAndUser);
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
-    @Transactional
     public void update(T t) {
-            try {
 
                 entityManager.merge(t);
 
-            }catch (Exception e){
-                entityManager.getTransaction().rollback();
-                throw e;
-            }
         }
         //todo: must check this out
-    @Transactional
         public void delete(T t)throws Exception{
             entityManager.remove(t);
         }

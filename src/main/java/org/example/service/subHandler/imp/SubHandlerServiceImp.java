@@ -6,6 +6,7 @@ import org.example.domain.SubHandler;
 import org.example.repository.subHandler.SubHandlerRepository;
 import org.example.service.subHandler.SubHandlerService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -13,16 +14,19 @@ import java.util.List;
 public class SubHandlerServiceImp implements SubHandlerService {
     private final SubHandlerRepository subHandlerRepository;
     @Override
+    @Transactional
     public void saveSubHandler(SubHandler subHandler) {
         subHandlerRepository.save(subHandler);
     }
 
     @Override
+    @Transactional
     public void deleteSubHandler(Integer subHandlerId) {
         subHandlerRepository.delete(subHandlerId);
     }
 
     @Override
+    @Transactional
     public void updateSubHandler(SubHandler subHandler) {
         subHandlerRepository.update(subHandler);
     }

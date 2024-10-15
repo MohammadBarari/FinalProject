@@ -15,49 +15,24 @@ public class OfferRepositoryImp implements OfferRepository {
     private EntityManager entityManager;
 
     @Override
-    @Transactional
     public void save(Offer offer) {
-        try {
-            entityManager.getTransaction().begin();
             entityManager.persist(offer);
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void update(Offer offer) {
-
-        try {
-            entityManager.getTransaction().begin();
             entityManager.merge(offer);
-
-        }catch (Exception e){
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
+
     public void delete(int id) {
-
-        try {
-           Offer offer = entityManager.find(Offer.class, id);
-           entityManager.getTransaction().begin();
+         Offer offer = entityManager.find(Offer.class, id);
            entityManager.remove(offer);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
     public Offer findById(int id) {
-
         try {
             return entityManager.find(Offer.class, id);
         }catch (Exception e) {

@@ -15,44 +15,19 @@ public class OrderRepositoryImp implements OrderRepository {
     @PersistenceContext
     EntityManager entityManager;
     @Override
-    @Transactional
     public void save(Orders orders) {
-        try {
-            entityManager.getTransaction().begin();
             entityManager.persist(orders);
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override
-    @Transactional
     public void update(Orders orders) {
-
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(orders);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
+        entityManager.merge(orders);
     }
 
     @Override
-    @Transactional
     public void delete(int orderId) {
-
-        try {
             Orders orders = entityManager.find(Orders.class, orderId);
-            entityManager.getTransaction().begin();
             entityManager.remove(orders);
-
-        }catch (Exception e) {
-            entityManager.getTransaction().rollback();
-            throw e;
-        }
     }
 
     @Override

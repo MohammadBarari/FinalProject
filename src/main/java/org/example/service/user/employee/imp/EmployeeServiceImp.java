@@ -1,4 +1,5 @@
 package org.example.service.user.employee.imp;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -32,6 +33,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     private final EmployeeRepository employeeRepository ;
     private final Validator validator;
     @Override
+    @Transactional
     public void signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws IOException {
         File file = new File(employeeSignUpDto.imagePath());
         if (validateEmployee(employeeSignUpDto,file)) {
@@ -62,6 +64,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
     }
     @SneakyThrows
+    @Transactional
     public void saveEmployee(@Valid Employee employee, @Valid PassAndUser passAndUser){
         validator.validate(passAndUser, PassAndUser.class);
         Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);

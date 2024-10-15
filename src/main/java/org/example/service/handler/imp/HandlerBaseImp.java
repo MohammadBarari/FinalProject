@@ -5,6 +5,7 @@ import org.example.domain.Handler;
 import org.example.repository.handler.HandlerRepository;
 import org.example.service.handler.HandlerService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -14,16 +15,19 @@ public class HandlerBaseImp implements HandlerService {
 
 
     @Override
+    @Transactional
     public void save(Handler handler) {
         handlerRepository.save(handler);
     }
 
     @Override
+    @Transactional
     public void deleteHandler(Integer id) {
         handlerRepository.delete(id);
     }
 
     @Override
+    @Transactional
     public void updateHandler(Handler handler) {
         handlerRepository.update(handler);
     }

@@ -5,6 +5,7 @@ import org.example.domain.Offer;
 import org.example.repository.offer.OfferRepository;
 import org.example.service.offer.OfferService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -14,16 +15,19 @@ public class OfferServiceImp implements OfferService {
 
 
     @Override
+    @Transactional
     public void save(Offer offer) {
         offerRepository.save(offer);
     }
 
     @Override
+    @Transactional
     public void update(Offer offer) {
         offerRepository.update(offer);
     }
 
     @Override
+    @Transactional
     public void delete(Integer offerId) {
         offerRepository.delete(offerId);
     }

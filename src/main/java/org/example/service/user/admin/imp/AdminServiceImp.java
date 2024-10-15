@@ -14,6 +14,7 @@ import org.example.service.user.admin.AdminService;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -40,12 +41,14 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
+    @Transactional
     public void saveHandler(Handler handler) {
         handlerService.save(handler);
     }
 
     @SneakyThrows
     @Override
+    @Transactional
     public void saveSubHandler(SubHandler subHandler,Integer handlerId) {
         Handler handler = handlerService.findHandlerById(handlerId);
         if (Objects.isNull(handler)){
@@ -56,6 +59,7 @@ public class AdminServiceImp implements AdminService {
     }
     @SneakyThrows
     @Override
+    @Transactional
     public void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId) {
        Employee employee = employeeService.findById(employeeId,Employee.class);
        //1
@@ -84,6 +88,7 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
+    @Transactional
     public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler, NotFoundEmployee, SubHandlerNull {
         try {
             Employee employee = employeeService.findById(employeeId,Employee.class);
@@ -111,12 +116,14 @@ public class AdminServiceImp implements AdminService {
 
 
     @Override
+    @Transactional
     public void changeEmployeeState(Integer employeeId, EmployeeState employeeState) {
         Employee employee = employeeService.findById(employeeId,Employee.class);
         employee.setEmployeeState(employeeState);
         employeeService.updateUser(employee);
     }
 
+    @Transactional
     public void validateTheEmployee(Integer employeeId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
         try {
            Employee employee = (Employee) NullExceptionHandling.getInstance().handlingNullExceptions
