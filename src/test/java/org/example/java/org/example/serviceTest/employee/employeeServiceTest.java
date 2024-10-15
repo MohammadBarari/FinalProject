@@ -1,12 +1,13 @@
 package org.example.java.org.example.serviceTest.employee;
 
+import jakarta.validation.Validator;
 import org.example.domain.Employee;
 import org.example.domain.PassAndUser;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.exeptions.DontHaveEnoughMoney;
 import org.example.exeptions.PassNot8Digits;
 import org.example.repository.user.employee.EmployeeRepository;
-import org.example.service.user.employee.EmployeeService;
+
 import org.example.service.user.employee.imp.EmployeeServiceImp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,9 @@ public class employeeServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
 
+    @Mock
+    private Validator validator;
+
     @InjectMocks
     private EmployeeServiceImp employeeService;
 
@@ -37,7 +41,6 @@ public class employeeServiceTest {
                 "09335212399","138013za","C:\\Users\\ASUS\\Pictures\\Camera Roll\\WIN_20241007_20_30_32_Pro.jpg");
         System.out.println("dto works fine");
         employeeService.signUpEmployee(employeeSignUpDto);
-
         verify(employeeRepository).save(any(Employee.class),any(PassAndUser.class));
     }
 

@@ -1,9 +1,7 @@
 package org.example.service.user.employee.imp;
-
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Credit;
@@ -25,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
+
 @Service
 @Validated
 @AllArgsConstructor
@@ -35,7 +35,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public void signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws IOException {
         File file = new File(employeeSignUpDto.imagePath());
         if (validateEmployee(employeeSignUpDto,file)) {
-           @Valid Employee employee = new Employee();
+            Employee employee = new Employee();
             employee.setName(employeeSignUpDto.name());
             employee.setEmail(employeeSignUpDto.email());
             employee.setPhone(employeeSignUpDto.phone());
@@ -63,8 +63,10 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
     @SneakyThrows
     public void saveEmployee(@Valid Employee employee, @Valid PassAndUser passAndUser){
-        validator.validate(passAndUser);
-        validator.validate(employee);
+        validator.validate(passAndUser, PassAndUser.class);
+        Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
+
+        validator.validate(employee,Employee.class);
         employee.setPassAndUser(passAndUser);
         employeeRepository.save(employee,passAndUser);
     }
@@ -92,6 +94,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setImage(photo);
         }
     }
+
     @SneakyThrows
     @Override
     public boolean validateEmployee(EmployeeSignUpDto employee, File file) {
@@ -117,6 +120,5 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         return false;
     }
-
 
 }

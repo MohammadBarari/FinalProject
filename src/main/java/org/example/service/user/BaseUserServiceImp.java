@@ -11,7 +11,7 @@ import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.springframework.stereotype.Service;
 
-@Service
+
 @RequiredArgsConstructor
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {
     private final BaseUserRepository baseUserRepository ;
