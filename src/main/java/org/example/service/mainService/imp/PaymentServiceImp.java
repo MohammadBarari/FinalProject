@@ -1,10 +1,8 @@
 package org.example.service.mainService.imp;
 
 import lombok.SneakyThrows;
-import org.example.domain.Credit;
-import org.example.domain.Customer;
-import org.example.domain.Offer;
-import org.example.domain.Orders;
+import org.example.domain.*;
+import org.example.dto.PayToCartDto;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.DontHaveEnoughMoney;
 import org.example.exeptions.NotFoundOffer;
@@ -63,7 +61,10 @@ public class PaymentServiceImp implements PaymentService {
         }
     }
 
-    @SneakyThrows
-    public void chargeCart(Integer)
+//    @SneakyThrows
+//    public void customerChargeCart(PayToCartDto payToCartDto){
+//        Credit customerCredit = ;
+//        CustomerCart customerCart = ;
+//    }
 }
 

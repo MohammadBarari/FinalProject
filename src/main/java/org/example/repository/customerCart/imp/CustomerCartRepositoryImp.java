@@ -1,0 +1,46 @@
+package org.example.repository.customerCart.imp;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import lombok.RequiredArgsConstructor;
+import org.example.domain.CustomerCart;
+import org.example.repository.customerCart.CustomerCartRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class CustomerCartRepositoryImp implements CustomerCartRepository {
+    @PersistenceContext
+    private EntityManager em;
+
+    @Override
+    public void saveCustomerCart(CustomerCart customerCart) {
+        em.persist(customerCart);
+    }
+
+    @Override
+    public void updateCustomerCart(CustomerCart customerCart) {
+        em.merge(customerCart);
+    }
+
+    @Override
+    public CustomerCart selectCustomerCart(Integer id) {
+      try {
+          return em.find(CustomerCart.class, id);
+      }catch(Exception e) {
+          return null;
+      }
+    }
+
+    @Override
+    public CustomerCart selectByCustomerId(Integer customerId) {
+        try {
+            Query query = em.createNativeQuery("""
+        
+""",CustomerCart.class);
+            return null;
+        }catch (Exception e) {
+            return null;
+        }
+    }
+}

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
+import org.example.dto.PayToCartDto;
 import org.example.service.user.BaseUserService;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface CustomerService extends BaseUserService<Customer> {
     void customerAcceptOffer(Integer offerId);
     List<Handler> customerSeeAllHandlers();
     List<SubHandler> findAllSubHandlerForHandler(Integer handlerId);
-
+    String customerChargeCart(PayToCartDto payToCartDto);
 }

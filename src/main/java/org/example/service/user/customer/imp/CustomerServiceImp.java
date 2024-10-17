@@ -8,11 +8,14 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.CustomerSignUpOutPut;
 import org.example.dto.OrderDto;
+import org.example.dto.PayToCartDto;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.customer.CustomerRepository;
+import org.example.service.credit.CreditService;
+import org.example.service.customerCart.CustomerCartService;
 import org.example.service.handler.HandlerService;
 import org.example.service.mainService.imp.CustomerAcceptOfferClass;
 import org.example.service.offer.OfferService;
@@ -34,8 +37,9 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final OfferService offerService ;
     private final CustomerAcceptOfferClass customerAcceptOfferClass;
     private final HandlerService handlerService;
-
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
+    private final CreditService creditService;
+    private final CustomerCartService customerCartService;
+    public CustomerServiceImp(BaseUserRepository baseUserRepository,CustomerCartService customerCartService ,CreditService creditService,CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
         super(baseUserRepository);
         this.customerRepository = customerRepository;
         this.subHandlerService = subHandlerService;
@@ -43,6 +47,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         this.offerService = offerService;
         this.customerAcceptOfferClass = customerAcceptOfferClass;
         this.handlerService = handlerService;
+        this.creditService = creditService;
+        this.customerCartService = customerCartService;
     }
 
     @SneakyThrows
@@ -192,6 +198,32 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
     private boolean validateScore(int star) {
         return star <= 5 && star >= 0;
+    }
+    @Override
+    @Transactional
+    @SneakyThrows
+    public String customerChargeCart(PayToCartDto payToCartDto){
+        Credit customerCredit = creditService.findByCustomerId(payToCartDto.customerId());
+        CustomerCart customerCart = customerCartService.findCustomerCartByCustomerId(payToCartDto.customerId());
+        if (Objects.isNull(customerCart)){
+            customerCart  = new CustomerCart();
+            customerCart.setCartNumber(payToCartDto.cartNumber());
+            customerCart.setExpiresDate(payToCartDto.expiresDate());
+            customerCart.setCvv2(payToCartDto.cvv2());
+            Customer customer = new Customer();
+            customer.setId(payToCartDto.customerId());
+            customerCart.setCustomer(customer);
+            customerCart.setMoney(payToCartDto.amount() + 1000d);
+        }
+        if (customerCart.getMoney() - payToCartDto.amount() >0) {
+            customerCredit.setAmount(customerCredit.getAmount() + payToCartDto.amount());
+            creditService.update(customerCredit);
+            customerCart.setMoney(customerCart.getMoney() - payToCartDto.amount());
+            customerCartService.updateCustomerCart(customerCart);
+            return "successful";
+        }else {
+            throw new DontHaveEnoughMoney();
+        }
     }
 
 }
