@@ -25,6 +25,7 @@ public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
     }
 
     @Override
+    //todo:to be deleted
     public void changeOrderToStart(Integer orderId) throws NotFoundOrder, OrderStateIsNotCorrect {
         Orders order = orderService.findById(orderId);
         if (Objects.isNull(order)){
@@ -36,7 +37,7 @@ public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
         order.setOrderState(OrderState.STARTED);
         orderService.save(order);
     }
-
+//todo: should be deleted
     @Override
     public List<Offer> customerSeeAllOfferInOneOrder(Integer orderId) throws ErrorWhileFindingOffers {
         try {

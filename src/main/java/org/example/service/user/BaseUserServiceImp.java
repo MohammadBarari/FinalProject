@@ -10,6 +10,7 @@ import org.example.exeptions.AllNotBeLetterOrDigits;
 import org.example.exeptions.PassNot8Digits;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.BaseUserRepositoryImp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -17,9 +18,6 @@ import org.springframework.stereotype.Service;
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {
     private final BaseUserRepository baseUserRepository ;
 
-    public BaseUserServiceImp() {
-        baseUserRepository = new BaseUserRepositoryImp();
-    }
 
     @SneakyThrows
     @Override
@@ -34,8 +32,8 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     }
     @Override
     @Transactional
-    public void signUp(T t,PassAndUser passAndUser){
-        baseUserRepository.save(t,passAndUser);
+    public void signUp(T t){
+        baseUserRepository.save(t);
 
     }
     @Override

@@ -11,5 +11,6 @@ public interface OrderRepository {
     void delete(int orderId);
     Orders findById(int orderId);
     List<Orders> findAll();
-    List<Orders> selectByEmployeeSubHandler(Employee employee);
+    List<Orders> selectByEmployeeSubHandler(Integer employeeId);
+    List<Orders> selectOrdersByCustomer(Integer customerId);
 }

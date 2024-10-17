@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepository<T>{
 
        @PersistenceContext
-       private EntityManager entityManager;
+       public EntityManager entityManager;
 
-        public void save(T user,PassAndUser passAndUser){
+        public void save(T user){
                 entityManager.persist(user);
         }
         public void saveUserAndPass(PassAndUser passAndUser) {
@@ -51,15 +51,15 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
 
     @Override
 
-    public T find(String userName , Class<T> userType) {
+    public Object find(String userName , Class<T> userType) {
         try {
             Query query = entityManager.createNativeQuery("""
-        select * from passanduser
+        select * from pass_and_user
         where username = ?
-""", userType);
+""");
             query.setParameter(1, userName);
-            T t = (T) query.getSingleResult();
-            return t;
+            return query.getSingleResult();
+
         }catch (Exception e) {
             return null;
         }

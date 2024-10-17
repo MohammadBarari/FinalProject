@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
+import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SaveSubHandlerDto;
 import org.example.enumirations.EmployeeState;
 import org.example.exeptions.*;
@@ -97,7 +98,28 @@ public class AdminServiceImp implements AdminService {
            throw new EmployeeIsNotAccepted();
         }
     }
+    @Override
+    @SneakyThrows
+    public void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto)  {
+            SubHandler subHandler = null;
 
+            subHandler = subHandlerService.findSubHandlerById(changeSubHandlerDto.id());
+            if (subHandler == null) {
+                throw new SubHandlerNull();
+            }
+            if (!Objects.isNull(changeSubHandlerDto.detail())) {
+                subHandler.setDetail(changeSubHandlerDto.detail());
+            }
+            if (!Objects.isNull(changeSubHandlerDto.basePrice())) {
+                subHandler.setBasePrice(changeSubHandlerDto.basePrice());
+            }
+            if (Objects.isNull(changeSubHandlerDto.basePrice())
+                    &&
+                    Objects.isNull(changeSubHandlerDto.detail())) {
+                throw new YouInsertNothing();
+            }
+            subHandlerService.updateSubHandler(subHandler);
+    }
     @Override
     @SneakyThrows
     @Transactional

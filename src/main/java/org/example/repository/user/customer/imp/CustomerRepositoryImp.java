@@ -6,10 +6,10 @@ import jakarta.persistence.Query;
 import org.example.domain.Customer;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.customer.CustomerRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class CustomerRepositoryImp extends BaseUserRepositoryImp<Customer> implements CustomerRepository {
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Override
     public Customer login(String username, String password) {

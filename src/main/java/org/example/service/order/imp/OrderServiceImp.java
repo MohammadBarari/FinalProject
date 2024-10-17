@@ -1,8 +1,11 @@
 package org.example.service.order.imp;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.example.domain.Employee;
 import org.example.domain.Orders;
+import org.example.exeptions.NotFoundSomething;
+import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.repository.order.OrderRepository;
 import org.example.service.order.OrderService;
 import org.springframework.stereotype.Service;
@@ -38,13 +41,22 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
-    public List<Orders> findOrdersForEmployee(Employee employee) {
-        return orderRepository.selectByEmployeeSubHandler(employee);
+    public List<Orders> findOrdersForEmployee(Integer employeeId) {
+        return orderRepository.selectByEmployeeSubHandler(employeeId);
     }
 
     @Override
     public Orders findById(int id) {
         return orderRepository.findById(id);
+    }
+
+    @Override
+    public List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect {
+        List<Orders> allDefind =orderRepository.selectOrdersByCustomer(customerId);
+        if (allDefind.isEmpty()) {
+            throw new OrderStateIsNotCorrect();
+        }
+        return allDefind;
     }
 
 }

@@ -7,7 +7,7 @@ import jakarta.transaction.Transactional;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.repository.subHandler.SubHandlerRepository;
-import org.example.util.HibernateUtil;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

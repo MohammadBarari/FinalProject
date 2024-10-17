@@ -7,7 +7,9 @@ import jakarta.transaction.Transactional;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.repository.user.admin.AdminRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class AdminRepositoryImp implements AdminRepository {
     @PersistenceContext
     private EntityManager entityManager;

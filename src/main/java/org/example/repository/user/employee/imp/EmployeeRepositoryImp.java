@@ -6,13 +6,14 @@ import jakarta.persistence.Query;
 import org.example.domain.Employee;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.employee.EmployeeRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Primary
 public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {
 
-   @PersistenceContext
-   private EntityManager entityManager;
+
 
     @Override
     public Employee login(String username, String password) {

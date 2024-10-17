@@ -3,6 +3,7 @@ package org.example.controller.user.admin;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
+import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SaveSubHandlerDto;
 import org.example.service.user.admin.AdminService;
 import org.springframework.web.bind.annotation.*;
@@ -37,4 +38,11 @@ public class AdminController {
     public void validateTheEmployee(@PathVariable("employeeId") Integer employeeId){
         adminService.validateTheEmployee(employeeId);
     }
+
+    @PostMapping("/updatingSubHandler")
+    public void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto){
+        adminService.detailPriceSubHandlerChanger(changeSubHandlerDto);
+    }
+
+
 }
