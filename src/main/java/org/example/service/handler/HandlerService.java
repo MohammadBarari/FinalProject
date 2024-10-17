@@ -10,4 +10,5 @@ public interface HandlerService {
     void updateHandler(Handler handler);
     List<Handler> findAllHandlers();
     Handler findHandlerById(Integer id);
+    Handler findHandlerByName(String name);
 }

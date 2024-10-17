@@ -13,7 +13,6 @@ import java.util.List;
 public class HandlerBaseImp implements HandlerService {
     private final HandlerRepository handlerRepository ;
 
-
     @Override
     @Transactional
     public void save(Handler handler) {
@@ -40,5 +39,10 @@ public class HandlerBaseImp implements HandlerService {
     @Override
     public Handler findHandlerById(Integer id) {
         return handlerRepository.findById(id);
+    }
+
+    @Override
+    public Handler findHandlerByName(String name) {
+        return handlerRepository.findByName(name);
     }
 }

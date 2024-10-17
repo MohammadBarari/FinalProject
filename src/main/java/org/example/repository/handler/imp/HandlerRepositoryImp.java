@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.example.domain.Handler;
 import org.example.repository.handler.HandlerRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.List;
 @Repository
@@ -47,5 +48,15 @@ public class HandlerRepositoryImp implements HandlerRepository {
         }catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public Handler findByName(String name) {
+        Query query = entityManager.createNativeQuery("""
+        select * from handler where name = ?
+""",Handler.class);
+        query.setParameter(1, name);
+        return (Handler) query.getSingleResult();
+
     }
 }

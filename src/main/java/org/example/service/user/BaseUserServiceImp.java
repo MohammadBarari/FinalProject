@@ -79,7 +79,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     @Override
     @Transactional
     public void changingPassword(ChangingPasswordDto changingPasswordDto){
-        PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user()).typeOfUser(changingPasswordDto.typeOfUser()).pass(changingPasswordDto.oldPass()).build();
+        PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user())
+                .typeOfUser(changingPasswordDto.typeOfUser())
+                .pass(changingPasswordDto.oldPass()).build();
         PassAndUser newPassAndUser = baseUserRepository.findPass(passAndUser);
         if(newPassAndUser != null){
         newPassAndUser.setPass(changingPasswordDto.newPass());

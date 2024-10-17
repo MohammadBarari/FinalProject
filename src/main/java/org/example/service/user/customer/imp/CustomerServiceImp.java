@@ -7,6 +7,7 @@ import org.example.domain.Credit;
 import org.example.domain.Customer;
 import org.example.domain.PassAndUser;
 import org.example.dto.CustomerSignUpDto;
+import org.example.dto.CustomerSignUpOutPut;
 import org.example.enumirations.TypeOfUser;
 import org.example.repository.user.customer.CustomerRepository;
 import org.example.service.user.BaseUserServiceImp;
@@ -22,7 +23,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @SneakyThrows
     @Override
     @Transactional
-    public void signUpCustomer(CustomerSignUpDto customerDto){
+    public CustomerSignUpDto signUpCustomer(CustomerSignUpDto customerDto){
         if (validateCustomer(customerDto)) {
             Customer customer = new Customer();
             //settingCustomer from customerDto and pass it to base for saving
@@ -42,7 +43,9 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             savePassAndUser(passAndUser);
             //setting its value
             signUp(customer,passAndUser);
+            return customerDto;
         }
+        return null;
     }
 
     @Override
@@ -53,7 +56,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         }
         return false;
     }
-
 
     @Override
     public Customer login(String user, String pass)

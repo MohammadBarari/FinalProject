@@ -16,7 +16,6 @@ import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +24,6 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
-
 @Service
 @Validated
 @AllArgsConstructor
@@ -34,7 +32,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     private final Validator validator;
     @Override
     @Transactional
-    public void signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws IOException {
+    @SneakyThrows
+    public EmployeeSignUpDto signUpEmployee( EmployeeSignUpDto employeeSignUpDto) {
         File file = new File(employeeSignUpDto.imagePath());
         if (validateEmployee(employeeSignUpDto,file)) {
             Employee employee = new Employee();
@@ -42,8 +41,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setEmail(employeeSignUpDto.email());
             employee.setPhone(employeeSignUpDto.phone());
             employee.setLast_name(employeeSignUpDto.last_name());
-            if (validateEmployee(employeeSignUpDto,file)){
-                addImageToEmployee(employee,file);
+            if (validateEmployee(employeeSignUpDto, file)) {
+                addImageToEmployee(employee, file);
             }
             employee.setTimeOfRegistration(LocalDateTime.now());
 
@@ -60,16 +59,14 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                     .typeOfUser(TypeOfUser.EMPLOYEE)
                     .username(employeeSignUpDto.phone()).build();
             employee.setEmployeeState(EmployeeState.NEW);
-            saveEmployee(employee,passAndUser);
+            saveEmployee(employee, passAndUser);
+            return employeeSignUpDto;
         }
+        return null;
     }
     @SneakyThrows
     @Transactional
-    public void saveEmployee(@Valid Employee employee, @Valid PassAndUser passAndUser){
-        validator.validate(passAndUser, PassAndUser.class);
-        Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
-
-        validator.validate(employee,Employee.class);
+    public void saveEmployee( Employee employee, PassAndUser passAndUser){
         employee.setPassAndUser(passAndUser);
         employeeRepository.save(employee,passAndUser);
     }
@@ -106,7 +103,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         && checkIfImageSizeIsOkay(file) && validateImage(file)) {
             return true;
         }
-
         return false;
     }
 

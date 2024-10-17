@@ -27,7 +27,7 @@ public class Orders extends BaseEntity {
     private String address;
     @Enumerated(EnumType.STRING)
     private OrderState orderState;
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
     //todo: it doesnt save to database for two initial state of order

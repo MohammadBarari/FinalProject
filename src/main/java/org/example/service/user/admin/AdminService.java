@@ -3,16 +3,14 @@ package org.example.service.user.admin;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
+import org.example.dto.SaveSubHandlerDto;
 import org.example.enumirations.EmployeeState;
-import org.example.exeptions.CantRemoveEmployeeFromSubHandler;
-import org.example.exeptions.NotFoundEmployee;
-import org.example.exeptions.NotFoundSomething;
-import org.example.exeptions.SubHandlerNull;
+import org.example.exeptions.*;
 
 public interface AdminService {
-    void saveHandler(Handler handler);
-    void saveSubHandler(SubHandler subHandler,Integer handlerId);
+    Handler saveHandler(String handlerName) ;
+    SubHandler saveSubHandler(SaveSubHandlerDto saveSubHandlerDto);
     void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId);
-    void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler, NotFoundEmployee, SubHandlerNull;
-    void changeEmployeeState(Integer employeeId, EmployeeState employeeState);
+    void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) ;
+    void validateTheEmployee(Integer employeeId);
 }

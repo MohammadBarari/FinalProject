@@ -8,6 +8,6 @@ import java.io.File;
 import java.io.IOException;
 
 public interface EmployeeService  extends BaseUserService<Employee> {
-    void signUpEmployee(EmployeeSignUpDto employee) throws IOException;
+    EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employee) ;
     boolean validateEmployee(EmployeeSignUpDto employee, File file);
 }

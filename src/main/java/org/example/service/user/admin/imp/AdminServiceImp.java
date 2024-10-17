@@ -1,9 +1,11 @@
 package org.example.service.user.admin.imp;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
+import org.example.dto.SaveSubHandlerDto;
 import org.example.enumirations.EmployeeState;
 import org.example.exeptions.*;
 import org.example.repository.user.admin.AdminRepository;
@@ -28,7 +30,7 @@ public class AdminServiceImp implements AdminService {
     private final SubHandlerService subHandlerService ;
     private final EmployeeService employeeService ;
     private final AdminRepository adminRepository;
-   @Autowired
+    @Autowired
     public AdminServiceImp(HandlerService handlerService,
     SubHandlerService subHandlerService ,
     EmployeeService employeeService ,
@@ -39,27 +41,36 @@ public class AdminServiceImp implements AdminService {
         this.employeeService =  employeeService;
         this.adminRepository =  adminRepository;
     }
-
+    @SneakyThrows
     @Override
-    @Transactional
-    public void saveHandler(Handler handler) {
+    public Handler saveHandler( String handlerName)  {
+            Handler handler1 = handlerService.findHandlerByName(handlerName);
+            if (handler1 != null) {
+                throw new HandlerIsDuplicate();
+            }
+        Handler handler = new Handler();
+        handler.setName(handlerName);
         handlerService.save(handler);
-    }
+        return handler;
+   }
 
     @SneakyThrows
     @Override
-    @Transactional
-    public void saveSubHandler(SubHandler subHandler,Integer handlerId) {
-        Handler handler = handlerService.findHandlerById(handlerId);
+    public SubHandler saveSubHandler( SaveSubHandlerDto saveSubHandlerDto) {
+        Handler handler = handlerService.findHandlerById(saveSubHandlerDto.handlerId());
         if (Objects.isNull(handler)){
             throw new HandlerIsNull();
     }
+        SubHandler subHandler = new SubHandler();
+        subHandler.setName(handler.getName());
+        subHandler.setBasePrice(saveSubHandlerDto.basePrice());
+        subHandler.setDetail(saveSubHandlerDto.detail());
         subHandler.setHandler(handler);
         subHandlerService.saveSubHandler(subHandler);
+        return subHandler;
     }
     @SneakyThrows
     @Override
-    @Transactional
     public void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId) {
        Employee employee = employeeService.findById(employeeId,Employee.class);
        //1
@@ -88,9 +99,9 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
+    @SneakyThrows
     @Transactional
-    public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler, NotFoundEmployee, SubHandlerNull {
-        try {
+    public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId)  {
             Employee employee = employeeService.findById(employeeId,Employee.class);
             if (Objects.isNull(employee)){
                 throw new NotFoundEmployee();
@@ -100,41 +111,26 @@ public class AdminServiceImp implements AdminService {
                 throw new SubHandlerNull();
             }
             adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
-
-        }catch (Exception e){
-            e.printStackTrace();
-            if (!(e instanceof NotFoundEmployee ||
-                   e instanceof  SubHandlerNull)){
-
-                throw new CantRemoveEmployeeFromSubHandler();
-            }else {
-                throw e;
-            }
-        }
-
     }
 
 
+//    @Override
+//    public void changeEmployeeState(Integer employeeId, EmployeeState employeeState) {
+//        Employee employee = employeeService.findById(employeeId,Employee.class);
+//        employee.setEmployeeState(employeeState);
+//        employeeService.updateUser(employee);
+//    }
+
+
+    @SneakyThrows
     @Override
-    @Transactional
-    public void changeEmployeeState(Integer employeeId, EmployeeState employeeState) {
-        Employee employee = employeeService.findById(employeeId,Employee.class);
-        employee.setEmployeeState(employeeState);
-        employeeService.updateUser(employee);
-    }
-
-    @Transactional
-    public void validateTheEmployee(Integer employeeId) throws NotFoundSomething, CantRemoveEmployeeFromSubHandler {
-        try {
+    public void validateTheEmployee(Integer employeeId){
            Employee employee = (Employee) NullExceptionHandling.getInstance().handlingNullExceptions
                    (employeeService.findById(employeeId,Employee.class),Employee.class);
             if (ifEmployeeIsAccepted(employee)){
                 employee.setEmployeeState(EmployeeState.ACCEPTED);
                 employeeService.updateUser(employee);
             }
-        }catch (Exception e){
-            throw e;
-        }
     }
 
     private boolean ifEmployeeIsAccepted(Employee employee) {

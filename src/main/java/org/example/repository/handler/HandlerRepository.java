@@ -10,4 +10,5 @@ public interface HandlerRepository {
     void delete(int id);
     Handler findById(int id);
     List<Handler> findAll();
+    Handler findByName(String name);
 }

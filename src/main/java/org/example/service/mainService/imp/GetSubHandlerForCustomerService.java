@@ -35,7 +35,7 @@ public class GetSubHandlerForCustomerService {
         this.customerService =  customerService;
     }
     @SneakyThrows
-    public void GetSubHandlerForCustomer(OrderDto orderDto) {
+    public OrderDto GetSubHandlerForCustomer(OrderDto orderDto) {
             Customer customer = customerService.findById(orderDto.customerId() , Customer.class);
             if (Objects.isNull(customer)) {
                 throw new NotFoundCustomer();
@@ -53,9 +53,12 @@ public class GetSubHandlerForCustomerService {
                 orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
                 orders.setOfferedPrice(orderDto.offeredPrice());
                 orderService.save(orders);
+                return orderDto;
             }
+            return null;
     }
-    private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler) throws TimeOfWorkDoesntMatch, OrderPriceShouldBeHigherThanBase {
+    private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler)
+            throws TimeOfWorkDoesntMatch, OrderPriceShouldBeHigherThanBase {
         if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
             throw new TimeOfWorkDoesntMatch();
         }
@@ -64,8 +67,9 @@ public class GetSubHandlerForCustomerService {
         }
         return true;
     }
-
-    public void GiveOfferToOrder(OfferDto offerDto) throws Exception {
+@SneakyThrows
+    public OfferDto GiveOfferToOrder(OfferDto offerDto)
+    {
             Employee employee = employeeService.findById(offerDto.employeeId(),Employee.class);
             Orders orders = orderService.findById(offerDto.orderId());
             if (validateIfItCanGetOffer(orders)) {
@@ -86,8 +90,9 @@ public class GetSubHandlerForCustomerService {
                 orderService.update(orders);
                 offer.setOrders(orders);
                 offerService.save(offer);
+                return offerDto;
             }
-
+            return null;
     }
     @SneakyThrows
     public void customerAcceptOffer(Integer  offerId){
