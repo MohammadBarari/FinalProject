@@ -1,11 +1,16 @@
 package org.example.dto;
 
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * DTO for {@link org.example.domain.Offer}
  */
-public record OfferDto(Long offerPrice, LocalDateTime timeOfWork, Integer workTimeInMinutes
-,Integer orderId,Integer employeeId) implements Serializable {
+public record OfferDto(@NotNull @Digits(integer = 4,fraction = 0)  Long offerPrice,
+                      @NotNull LocalDateTime timeOfWork,
+                  @Digits(integer = 4,fraction = 0) @NotNull Integer workTimeInMinutes
+, @NotNull  Integer orderId,@NotNull Integer employeeId) implements Serializable {
 }

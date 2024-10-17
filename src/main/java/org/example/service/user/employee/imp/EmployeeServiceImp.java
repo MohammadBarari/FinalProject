@@ -18,6 +18,7 @@ import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
+import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 @Service
@@ -37,13 +40,16 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     private final EmployeeRepository employeeRepository ;
     private final OrderService orderService ;
     private final OfferService offerService ;
+    private final SubHandlerService subHandlerService;
     //4
 
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService) {
+
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
         super(baseUserRepository);
         this.employeeRepository = employeeRepository;
         this.orderService = orderService;
         this.offerService = offerService;
+        this.subHandlerService = subHandlerService;
     }
 
     @Override
@@ -145,6 +151,31 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             return true;
         }
         throw new Exception("file is too large");
+    }
+
+    @Override
+    public List<SubHandler> findAllSubHandlersForEmployee(Integer employeeId) {
+        return subHandlerService.subHandlersForEmployee(employeeId);
+    }
+
+    @Override
+    public List<Orders> findAllOrdersForEmployee(Integer employeeId) {
+        List<Orders> orders = new ArrayList<>();
+        List<SubHandler> subHandlers = findAllSubHandlersForEmployee(employeeId);
+        if (subHandlers!=null && !subHandlers.isEmpty()) {
+            for (SubHandler subHandler : subHandlers) {
+                List<Orders> ordersPerSubHandler = orderService.findOrdersForSubHandler(subHandler.getId());
+                if (!orderService.findOrdersForSubHandler(subHandler.getId()).isEmpty()) {
+                    if (!orders.isEmpty()) {
+                        orders.addAll(orderService.findOrdersForSubHandler(subHandler.getId()));
+                    } else {
+                        orders.addAll(ordersPerSubHandler);
+                    }
+                }
+            }
+        }
+
+        return orders;
     }
 
     private void addImageToEmployee(Employee employee, File file) throws IOException {

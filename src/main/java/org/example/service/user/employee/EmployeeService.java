@@ -2,13 +2,13 @@ package org.example.service.user.employee;
 
 import org.example.domain.Employee;
 import org.example.domain.Orders;
-import org.example.domain.PassAndUser;
+import org.example.domain.SubHandler;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.OfferDto;
 import org.example.service.user.BaseUserService;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
 public interface EmployeeService  extends BaseUserService<Employee> {
     EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employee) ;
@@ -18,5 +18,6 @@ public interface EmployeeService  extends BaseUserService<Employee> {
     void saveEmployee( Employee employee);
     boolean validateImage(File imageFile);
     boolean checkIfImageSizeIsOkay(File imageFile);
-
+    List<SubHandler> findAllSubHandlersForEmployee(Integer employeeId);
+    List<Orders> findAllOrdersForEmployee(Integer employeeId);
 }

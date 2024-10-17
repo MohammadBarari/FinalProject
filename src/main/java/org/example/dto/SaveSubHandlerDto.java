@@ -1,5 +1,6 @@
 package org.example.dto;
 
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 
 public record SaveSubHandlerDto(
@@ -10,6 +11,7 @@ public record SaveSubHandlerDto(
         @NotNull
         String detail,
         @NotNull
+        @Digits(integer = 10, fraction = 2)
         Double basePrice
 ) {
 }

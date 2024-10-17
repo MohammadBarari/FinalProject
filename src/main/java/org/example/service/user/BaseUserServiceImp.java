@@ -92,6 +92,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         baseUserRepository.update(t);
     };
     @Override
+    @Transactional
     public T findById(int id , Class<T> tClass){
         return (T) baseUserRepository.findById(id,tClass);
     }

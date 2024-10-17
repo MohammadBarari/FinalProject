@@ -18,6 +18,6 @@ public class SubHandler extends BaseEntity {
     private String detail;
     @NotNull
     private Double basePrice;
-    @ManyToOne(cascade = { CascadeType.MERGE})
+    @ManyToOne(cascade = { CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Handler handler;
 }

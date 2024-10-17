@@ -52,7 +52,7 @@ public class OrderRepositoryImp implements OrderRepository {
         public List<Orders> selectByEmployeeSubHandler(Integer employeeId) {
         try {
             Query query = entityManager.createNativeQuery("""
-        select * from testforfinalproject.orders
+        select * from orders
         where employee_id = ?
 """, Orders.class);
             query.setParameter(1, employeeId);
@@ -67,9 +67,23 @@ public class OrderRepositoryImp implements OrderRepository {
     public List<Orders> selectOrdersByCustomer(Integer customerId) {
         try {
             Query query = entityManager.createNativeQuery("""
-        select * from testforfinalproject.orders where customer_id = ?
+        select * from orders where customer_id = ?
 """, Customer.class);
         return  query.setParameter(1, customerId).getResultList();
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    @Override
+    public List<Orders> selectOrdersBySubHandlerId(Integer subHandlerId) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+select o.* from customtestschema.orders as o join customtestschema.sub_handler sh on sh.id = o.sub_handler_id
+where sh.id = ?
+""",Orders.class);
+            query.setParameter(1, subHandlerId);
+            return  query.getResultList();
         }catch (Exception e){
             return null;
         }

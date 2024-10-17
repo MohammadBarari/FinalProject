@@ -52,11 +52,15 @@ public class HandlerRepositoryImp implements HandlerRepository {
 
     @Override
     public Handler findByName(String name) {
-        Query query = entityManager.createNativeQuery("""
-        select * from handler where name = ?
-""",Handler.class);
-        query.setParameter(1, name);
-        return (Handler) query.getSingleResult();
+        try {
 
+            Query query = entityManager.createNativeQuery("""
+        select * from handler where name = ?
+""", Handler.class);
+            query.setParameter(1, name);
+            return (Handler) query.getSingleResult();
+        }catch (Exception e) {
+            return null;
+        }
     }
 }

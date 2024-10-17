@@ -59,4 +59,9 @@ public class OrderServiceImp implements OrderService {
         return allDefind;
     }
 
+    @Override
+    public List<Orders> findOrdersForSubHandler(Integer subHandlerId) {
+        return orderRepository.selectOrdersBySubHandlerId(subHandlerId);
+    }
+
 }

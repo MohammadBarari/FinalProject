@@ -13,6 +13,7 @@ import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.customer.CustomerRepository;
+import org.example.service.handler.HandlerService;
 import org.example.service.mainService.imp.CustomerAcceptOfferClass;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -32,14 +33,16 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final OrderService orderService ;
     private final OfferService offerService ;
     private final CustomerAcceptOfferClass customerAcceptOfferClass;
+    private final HandlerService handlerService;
 
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass) {
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
         super(baseUserRepository);
         this.customerRepository = customerRepository;
         this.subHandlerService = subHandlerService;
         this.orderService = orderService;
         this.offerService = offerService;
         this.customerAcceptOfferClass = customerAcceptOfferClass;
+        this.handlerService = handlerService;
     }
 
     @SneakyThrows
@@ -87,6 +90,16 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @SneakyThrows
     public void customerAcceptOffer(Integer offerId){
         customerAcceptOfferClass.customerAcceptOffer(offerId);
+    }
+
+    @Override
+    public List<Handler> customerSeeAllHandlers() {
+        return handlerService.findAllHandlers();
+    }
+
+    @Override
+    public List<SubHandler> findAllSubHandlerForHandler(Integer handlerId) {
+        return subHandlerService.findAllSubHandlerSameHandler(handlerId);
     }
 
     @SneakyThrows

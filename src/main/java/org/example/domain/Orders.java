@@ -19,7 +19,7 @@ public class Orders extends BaseEntity {
     private Double offeredPrice;
 
     private String detail;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private SubHandler subHandler;
     @Future
     private LocalDateTime timeOfWork;
@@ -27,16 +27,17 @@ public class Orders extends BaseEntity {
     private String address;
     @Enumerated(EnumType.STRING)
     private OrderState orderState;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
     //todo: it doesnt save to database for two initial state of order
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employee;
     //todo: these should be store in database last ones
     private Integer score;
     private String comment;
+
 
     public Orders setOrderState(OrderState orderState) {
         if (orderState == null) {

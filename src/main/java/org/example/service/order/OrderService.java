@@ -15,4 +15,5 @@ public interface OrderService {
     List<Orders> findOrdersForEmployee(Integer employeeId);
     Orders findById(int id);
     List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect;
+    List<Orders> findOrdersForSubHandler(Integer subHandlerId);
 }

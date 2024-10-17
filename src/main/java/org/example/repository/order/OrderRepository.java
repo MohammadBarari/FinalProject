@@ -13,4 +13,5 @@ public interface OrderRepository {
     List<Orders> findAll();
     List<Orders> selectByEmployeeSubHandler(Integer employeeId);
     List<Orders> selectOrdersByCustomer(Integer customerId);
+    List<Orders> selectOrdersBySubHandlerId(Integer subHandlerId);
 }

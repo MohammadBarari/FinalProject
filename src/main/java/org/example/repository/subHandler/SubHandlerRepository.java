@@ -10,5 +10,6 @@ public interface SubHandlerRepository {
     void delete(Integer id);
     void update(SubHandler subHandler);
     SubHandler selectById(Integer id);
-    List<SubHandler> selectBySameHandler(Handler handler);
+    List<SubHandler> selectBySameHandler(Integer handlerId);
+    List<SubHandler> selectByEmployeeId(Integer employeeId);
 }

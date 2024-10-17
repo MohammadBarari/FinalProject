@@ -12,6 +12,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SubHandlerServiceImp implements SubHandlerService {
+    @Override
+    public List<SubHandler> subHandlersForEmployee(Integer employeeId) {
+        return subHandlerRepository.selectByEmployeeId(employeeId);
+    }
+
     private final SubHandlerRepository subHandlerRepository;
     @Override
     @Transactional
@@ -32,8 +37,8 @@ public class SubHandlerServiceImp implements SubHandlerService {
     }
 
     @Override
-    public List<SubHandler> findAllSubHandlerSameHandler(Handler handler) {
-        return subHandlerRepository.selectBySameHandler(handler);
+    public List<SubHandler> findAllSubHandlerSameHandler(Integer handlerId) {
+        return subHandlerRepository.selectBySameHandler(handlerId);
     }
 
     @Override

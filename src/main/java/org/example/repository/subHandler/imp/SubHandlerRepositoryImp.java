@@ -41,17 +41,31 @@ public class SubHandlerRepositoryImp implements SubHandlerRepository {
     }
 
     @Override
-    public List<SubHandler> selectBySameHandler(Handler handler) {
+    public List<SubHandler> selectBySameHandler(Integer handlerId) {
         try {
             Query query = entityManager.createNativeQuery("""
-        select * from testforfinalproject.subhandler
+        select * from subhandler
         where handler_id= ?
 """, SubHandler.class);
 
-            query.setParameter(1, handler.getId());
+            query.setParameter(1, handlerId);
             return query.getResultList();
         }catch (Exception e) {
             return null;
         }
         }
+
+    @Override
+    public List<SubHandler> selectByEmployeeId(Integer employeeId) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+       select DISTINCT * from sub_handler join employee_sub_handlers esh on sub_handler.id = esh.sub_handlers_id
+       where employee_id = ?
+""",SubHandler.class);
+            query.setParameter(1, employeeId);
+            return query.getResultList();
+        }catch (Exception e) {
+            return null;
+        }
+    }
 }
