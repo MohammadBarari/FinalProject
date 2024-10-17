@@ -31,4 +31,18 @@ public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> impl
             return null;
         }
     }
+
+    @Override
+    public Boolean employeeExistsById(Integer id) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+             SELECT COUNT(e) FROM Employee e WHERE e.id = ?
+""",Integer.class);
+            query.setParameter(1, id);
+            Integer count = (Integer) query.getSingleResult();
+            return count > 0;
+        }catch (Exception e) {
+            return false;
+        }
+    }
 }

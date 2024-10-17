@@ -62,5 +62,8 @@ public class PaymentServiceImp implements PaymentService {
             throw new DontHaveEnoughMoney();
         }
     }
+
+    @SneakyThrows
+    public void chargeCart(Integer)
 }
 

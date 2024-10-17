@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -18,6 +19,7 @@ public class SubHandler extends BaseEntity {
     private String detail;
     @NotNull
     private Double basePrice;
+    @JsonIgnore
     @ManyToOne(cascade = { CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Handler handler;
 }

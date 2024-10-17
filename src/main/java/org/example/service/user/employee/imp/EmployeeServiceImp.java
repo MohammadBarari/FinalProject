@@ -11,6 +11,7 @@ import org.example.dto.OfferDto;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
+import org.example.exeptions.NotFoundEmployee;
 import org.example.exeptions.OfferPriceIsLessThanOrderPrice;
 import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.exeptions.TimeOfWorkDoesntMatch;
@@ -92,10 +93,14 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     public OfferDto GiveOfferToOrder(OfferDto offerDto)
     {
-        Employee employee = findById(offerDto.employeeId(),Employee.class);
+        if (!employeeExistsByEmployeeId(offerDto.employeeId())){
+            throw new NotFoundEmployee();
+        }
         Orders orders = orderService.findById(offerDto.orderId());
         if (validateIfItCanGetOffer(orders)) {
             Offer offer = new Offer();
+            Employee employee = new Employee();
+            employee.setId(offerDto.employeeId());
             offer.setEmployee(employee);
             offer.setTimeOfCreate(LocalDateTime.now());
             if (offerDto.offerPrice()<orders.getOfferedPrice()){
@@ -176,6 +181,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
 
         return orders;
+    }
+
+    @Override
+    public Boolean employeeExistsByEmployeeId(Integer employeeId) {
+        return employeeRepository.employeeExistsById(employeeId);
     }
 
     private void addImageToEmployee(Employee employee, File file) throws IOException {

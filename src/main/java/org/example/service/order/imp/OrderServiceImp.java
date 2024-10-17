@@ -52,11 +52,11 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect {
-        List<Orders> allDefind =orderRepository.selectOrdersByCustomer(customerId);
-        if (allDefind.isEmpty()) {
+        List<Orders> allDefiend =orderRepository.selectOrdersByCustomer(customerId);
+        if (allDefiend.isEmpty()) {
             throw new OrderStateIsNotCorrect();
         }
-        return allDefind;
+        return allDefiend;
     }
 
     @Override

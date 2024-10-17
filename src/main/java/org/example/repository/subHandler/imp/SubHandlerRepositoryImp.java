@@ -59,7 +59,7 @@ public class SubHandlerRepositoryImp implements SubHandlerRepository {
     public List<SubHandler> selectByEmployeeId(Integer employeeId) {
         try {
             Query query = entityManager.createNativeQuery("""
-       select DISTINCT * from sub_handler join employee_sub_handlers esh on sub_handler.id = esh.sub_handlers_id
+       select DISTINCT * from sub_handler join  employee_sub_handlers esh on sub_handler.id = esh.sub_handlers_id
        where employee_id = ?
 """,SubHandler.class);
             query.setParameter(1, employeeId);

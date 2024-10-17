@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 public interface EmployeeRepository extends BaseUserRepository<Employee> {
     Employee login (String username, String password);
+    Boolean employeeExistsById(Integer id);
 }

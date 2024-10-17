@@ -68,7 +68,7 @@ public class OrderRepositoryImp implements OrderRepository {
         try {
             Query query = entityManager.createNativeQuery("""
         select * from orders where customer_id = ?
-""", Customer.class);
+""", Orders.class);
         return  query.setParameter(1, customerId).getResultList();
         }catch (Exception e){
             return null;
@@ -79,7 +79,7 @@ public class OrderRepositoryImp implements OrderRepository {
     public List<Orders> selectOrdersBySubHandlerId(Integer subHandlerId) {
         try {
             Query query = entityManager.createNativeQuery("""
-select o.* from customtestschema.orders as o join customtestschema.sub_handler sh on sh.id = o.sub_handler_id
+select o.* from orders as o join   sub_handler sh on sh.id = o.sub_handler_id
 where sh.id = ?
 """,Orders.class);
             query.setParameter(1, subHandlerId);

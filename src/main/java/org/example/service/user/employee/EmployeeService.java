@@ -20,4 +20,5 @@ public interface EmployeeService  extends BaseUserService<Employee> {
     boolean checkIfImageSizeIsOkay(File imageFile);
     List<SubHandler> findAllSubHandlersForEmployee(Integer employeeId);
     List<Orders> findAllOrdersForEmployee(Integer employeeId);
+    Boolean employeeExistsByEmployeeId(Integer employeeId);
 }

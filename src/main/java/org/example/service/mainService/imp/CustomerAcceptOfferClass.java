@@ -9,6 +9,7 @@ import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomerAcceptOfferClass {
@@ -89,6 +90,7 @@ public class CustomerAcceptOfferClass {
 //            return null;
 //    }
     @SneakyThrows
+    @Transactional
     public void customerAcceptOffer(Integer  offerId){
         try {
             Offer offer = offerService.findById(offerId);

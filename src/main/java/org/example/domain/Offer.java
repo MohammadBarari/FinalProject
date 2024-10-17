@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import lombok.*;
@@ -23,6 +24,7 @@ public class Offer extends BaseEntity {
     private Integer workTimeInMinutes;
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Orders orders;
     private boolean accepted;
 

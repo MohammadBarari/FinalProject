@@ -61,6 +61,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             orders.setSubHandler(subHandler);
             orders.setAddress(orderDto.address());
             orders.setDetail(orderDto.detail());
+            orders.setTimeOfWork(orderDto.timeOfWork());
             orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
             orders.setOfferedPrice(orderDto.offeredPrice());
             orderService.save(orders);
