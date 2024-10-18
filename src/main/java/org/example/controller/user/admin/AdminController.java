@@ -2,14 +2,19 @@ package org.example.controller.user.admin;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.example.domain.Customer;
+import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SaveSubHandlerDto;
 import org.example.service.user.admin.AdminService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,5 +53,29 @@ public class AdminController {
         adminService.detailPriceSubHandlerChanger(changeSubHandlerDto);
     }
 
+    @GetMapping("/findCustomersWithInformations")
+    public List<Customer> findCustomersWithInformations(@RequestParam(required = false) String name
+                            , @RequestParam(required = false) String lastName,
+                                                        @RequestParam(required = false) String email ,
+                                                        @RequestParam(required = false) String phone
+                                              ){
+        return adminService.findCustomerByOptional(name,lastName,email,phone);
+    }
+
+    @GetMapping("/findEmployeesWithInformations")
+    public List<Employee> findEmployeeWithInformation(
+            @RequestParam(required = false) String name
+,
+            @RequestParam(required = false) String lastName
+            ,
+            @RequestParam(required = false) @Email String email
+            ,
+            @RequestParam(required = false) String phone
+            ,
+            @RequestParam(required = false) String handlerName
+
+    ){
+        return adminService.findEmployeesByOptionalInformation(name,lastName,email,phone,handlerName);
+    }
 
 }

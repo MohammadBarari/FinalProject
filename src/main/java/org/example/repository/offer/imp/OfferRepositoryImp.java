@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
+import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.repository.offer.OfferRepository;
 import org.springframework.stereotype.Repository;
@@ -72,6 +73,21 @@ public class OfferRepositoryImp implements OfferRepository {
         }catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public Employee findEmployeeByOfferId(Integer id) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+select employee.* from customtestschema.employee join customtestschema.offer o on employee.id = o.employee_id
+where o.id = ?
+""",Employee.class);
+            query.setParameter(1, id);
+            return (Employee)  query.getSingleResult();
+        }catch (Exception e) {
+            return null;
+        }
+
     }
 
 }

@@ -1,6 +1,7 @@
 package org.example.service.offer.imp;
 
 import lombok.RequiredArgsConstructor;
+import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.repository.offer.OfferRepository;
 import org.example.service.offer.OfferService;
@@ -45,5 +46,10 @@ public class OfferServiceImp implements OfferService {
     @Override
     public Offer findAcceptedOfferInOrder(Integer id) {
         return offerRepository.selectAcceptedOfferInOrder(id);
+    }
+
+    @Override
+    public Employee findEmployeeByOfferId(int id) {
+        return offerRepository.findEmployeeByOfferId(id);
     }
 }

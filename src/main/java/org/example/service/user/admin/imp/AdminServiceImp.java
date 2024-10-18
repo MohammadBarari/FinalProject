@@ -2,6 +2,7 @@ package org.example.service.user.admin.imp;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
+import org.example.domain.Customer;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
@@ -14,12 +15,14 @@ import org.example.service.exceptionHandling.NullExceptionHandling;
 import org.example.service.handler.HandlerService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.admin.AdminService;
+import org.example.service.user.customer.CustomerService;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,16 +34,19 @@ public class AdminServiceImp implements AdminService {
     private final SubHandlerService subHandlerService ;
     private final EmployeeService employeeService ;
     private final AdminRepository adminRepository;
+    private final CustomerService customerService;
     @Autowired
     public AdminServiceImp(HandlerService handlerService,
     SubHandlerService subHandlerService ,
     EmployeeService employeeService ,
-    AdminRepository adminRepository
+    AdminRepository adminRepository,
+                           CustomerService customerService
  ) {
         this.handlerService =  handlerService;
         this.subHandlerService =  subHandlerService;
         this.employeeService =  employeeService;
         this.adminRepository =  adminRepository;
+        this.customerService = customerService;
     }
     @SneakyThrows
     @Override
@@ -120,6 +126,17 @@ public class AdminServiceImp implements AdminService {
             }
             subHandlerService.updateSubHandler(subHandler);
     }
+
+    @Override
+    public List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone) {
+        return customerService.findCustomerByOptional(name, lastName, email, phone);
+    }
+
+    @Override
+    public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
+        return employeeService.findEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+    }
+
     @Override
     @SneakyThrows
     @Transactional
@@ -158,4 +175,6 @@ public class AdminServiceImp implements AdminService {
     private boolean ifEmployeeIsAccepted(Employee employee) {
         return true;
     }
+
+
 }

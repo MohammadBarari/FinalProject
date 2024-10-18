@@ -78,12 +78,13 @@ public class CreditRepositoryImp implements CreditRepository {
         try {
             Query query = entityManager.createNativeQuery("""
             select c.id from employee join credit c on c.id = employee.credit_id
-        where employee.id = 1;
+        where employee.id = ?;
             """,Integer.class);
+            query.setParameter(1, employeeId);
             List<Object> credit =  query.getResultList();
             Integer integer = (Integer) credit.get(0);
             Query query1 = entityManager.createNativeQuery("""
-            select * from testforfinalproject.credit
+            select * from credit
             where id = ?
 """,Credit.class);
             query1.setParameter(1, integer);

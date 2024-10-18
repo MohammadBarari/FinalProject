@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomerCartServiceImp implements CustomerCartService {
-    private CustomerCartRepository customerCartRepository;
+    private final CustomerCartRepository customerCartRepository;
     @Override
     @Transactional
     public CustomerCart saveCustomerCart(CustomerCart customerCart) throws WrongEntrance {

@@ -188,6 +188,12 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         return employeeRepository.employeeExistsById(employeeId);
     }
 
+    @Transactional
+    @Override
+    public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
+        return employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+    }
+
     private void addImageToEmployee(Employee employee, File file) throws IOException {
         if (file.exists()) {
             InputStream inputStream = new FileInputStream(file);

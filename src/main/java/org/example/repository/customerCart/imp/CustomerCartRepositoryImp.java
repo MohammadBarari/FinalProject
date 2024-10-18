@@ -26,7 +26,11 @@ public class CustomerCartRepositoryImp implements CustomerCartRepository {
     @Override
     public CustomerCart selectCustomerCart(Integer id) {
       try {
-          return em.find(CustomerCart.class, id);
+          Query query = em.createNativeQuery("""
+        select * from customtestschema.customer_cart where customer_id = ?
+""",CustomerCart.class);
+          query.setParameter(1, id);
+          return (CustomerCart) query.getSingleResult();
       }catch(Exception e) {
           return null;
       }

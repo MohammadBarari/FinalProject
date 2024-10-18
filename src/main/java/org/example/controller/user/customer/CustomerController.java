@@ -1,20 +1,18 @@
 package org.example.controller.user.customer;
 
-import com.vaadin.flow.component.UI;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
-import org.example.dto.HandlerDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
 import org.example.service.user.customer.CustomerService;
-import org.example.view.CustomerChargeView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.vaadin.flow.server.VaadinSession;
+
 import java.util.List;
 
 @RestController
@@ -94,6 +92,23 @@ public class CustomerController {
     }
     @GetMapping("/chargeCredit/{customerId}")
     public void getCustomerChargeCreditForm(@PathVariable Integer customerId){
+        //send to request to the view and the rest of the dto handle in view
+    }
+    @PostMapping("/customerMakeOrderStateDone/{orderId}")
+    public String customerMakeOrderStateDone(@NotNull @PathVariable @Digits(integer = 3,fraction = 0) Integer orderId
+    ){
+        return customerService.makeServiceStateToDone(orderId);
+    }
+    @PostMapping("/customerPayEmployee/{orderId}/{customerId}")
+    public String customerPayEmployee(@NotNull @PathVariable @Digits(integer = 3,fraction = 0) Integer orderId
+            ,@NotNull @PathVariable @Digits(integer = 3,fraction = 0) Integer customerId){
+        return customerService.customerPayToOrder(orderId, customerId);
     }
 
+    @PostMapping("/employeeAddingCommentAndStar/{orderId}/{star}")
+    public String addCommentAndStar( @PathVariable @Digits(integer = 1,fraction = 0) Integer orderId,
+            @RequestParam(required = false) String comment ,
+                                    @PathVariable @Digits(integer = 1,fraction = 0)  Integer star){
+        return customerService.giveComment(orderId, star, comment);
+    }
 }

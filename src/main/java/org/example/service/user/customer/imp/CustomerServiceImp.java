@@ -18,14 +18,17 @@ import org.example.service.credit.CreditService;
 import org.example.service.customerCart.CustomerCartService;
 import org.example.service.handler.HandlerService;
 import org.example.service.mainService.imp.CustomerAcceptOfferClass;
+import org.example.service.mainService.imp.CustomerMakeTheOrderDone;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
+import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 @Service
@@ -39,7 +42,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final HandlerService handlerService;
     private final CreditService creditService;
     private final CustomerCartService customerCartService;
-    public CustomerServiceImp(BaseUserRepository baseUserRepository,CustomerCartService customerCartService ,CreditService creditService,CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
+    private final CustomerMakeTheOrderDone customerMakeTheOrderDone;
+    public CustomerServiceImp(BaseUserRepository baseUserRepository,CustomerMakeTheOrderDone customerMakeTheOrderDone,CustomerCartService customerCartService ,CreditService creditService,CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
         super(baseUserRepository);
         this.customerRepository = customerRepository;
         this.subHandlerService = subHandlerService;
@@ -49,6 +53,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         this.handlerService = handlerService;
         this.creditService = creditService;
         this.customerCartService = customerCartService;
+        this.customerMakeTheOrderDone = customerMakeTheOrderDone;
     }
 
     @SneakyThrows
@@ -179,7 +184,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return false;
     }
     @SneakyThrows
-    public void giveComment(Integer ordersId, int star, String comment){
+    public String giveComment(Integer ordersId, Integer star, String comment){
         Orders orders = orderService.findById(ordersId);
         if (orders == null){
             throw new NotFoundOrder();
@@ -187,11 +192,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         if (orders.getOrderState() == OrderState.PAID){
             if (validateScore(star)){
                 orders.setScore(star);
+                customerMakeTheOrderDone.addStarToEmployee(orders.getEmployee().getId(),star);
             }else {
                 throw new StarShouldBeenBetween1To5();
             }
             orders.setComment(comment);
             orderService.update(orders);
+            return "successful";
         }else {
             throw new OrderStateIsNotCorrect();
         }
@@ -225,5 +232,62 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new DontHaveEnoughMoney();
         }
     }
+    @SneakyThrows
+    @Override
+    public String makeServiceStateToDone(Integer orderId) {
+        try {
+            customerMakeTheOrderDone.makeTheOrderDone(orderId);
+            return "successful";
+        }catch (Exception e){
+            return "failed";
+        }
+    }
+    @SneakyThrows
+    @Transactional
+    @Override
+    public String customerPayToOrder(Integer ordersId, Integer customerId){
+        try {
+            Orders orders = orderService.findById(ordersId);
+            if (orders == null) {
+                throw new NotFoundOffer();
+            }
+            Customer customer = findById(customerId, Customer.class);
+
+            Offer offer = offerService.findAcceptedOfferInOrder(ordersId);
+            //todo: validate for paying
+            if (validateCustomerCanPay(orders, customer, offer)) {
+                Credit cusromerCredit = creditService.findCreditById(customer.getCredit().getId());
+                Credit employeeCredit = creditService.findByEmployeeId(offer.getEmployee().getId());
+//            creditService.payToEmployee(cusromerCredit.getId(),employeeCredit.getId(),offer.getOfferPrice());
+                cusromerCredit.setAmount(cusromerCredit.getAmount() - offer.getOfferPrice());
+                creditService.update(cusromerCredit);
+                employeeCredit.setAmount(employeeCredit.getAmount() +  ((double) 70 / 100) * offer.getOfferPrice());
+                creditService.update(employeeCredit);
+                orders.setOrderState(OrderState.PAID);
+                orderService.update(orders);
+                return "successful";
+            }else {
+                return "failed";
+            }
+        }catch (Exception e){
+            return "failed";
+        }
+    }
+
+    @Override
+    public List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone) {
+        return customerRepository.selectCustomerByOptional(name, lastName, email, phone);
+    }
+
+    ;
+
+    public boolean validateCustomerCanPay(Orders orders, Customer customer, Offer offer) throws DontHaveEnoughMoney {
+        if(customer.getCredit().getAmount() > offer.getOfferPrice() && orders.getOrderState() == OrderState.DONE){
+            return true;
+        }else {
+            throw new DontHaveEnoughMoney();
+        }
+    }
+
 
 }

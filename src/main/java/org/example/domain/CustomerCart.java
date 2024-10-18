@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
-import org.atmosphere.config.service.Get;
 
 import java.time.LocalDate;
 @Entity

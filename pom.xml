@@ -56,12 +56,6 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-data-jpa</artifactId>
       </dependency>
-      <!-- https://mvnrepository.com/artifact/com.vaadin/vaadin-spring-boot-starter -->
-      <dependency>
-          <groupId>com.vaadin</groupId>
-          <artifactId>vaadin-spring-boot-starter</artifactId>
-          <version>24.4.13</version>
-      </dependency>
 
       <dependency>
           <groupId>org.springframework.boot</groupId>
@@ -71,10 +65,7 @@
           <groupId>org.apache.tomcat.embed</groupId>
           <artifactId>tomcat-embed-jasper</artifactId>
       </dependency>
-      <dependency>
-          <groupId>javax.servlet</groupId>
-          <artifactId>jstl</artifactId>
-      </dependency>
+
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-test</artifactId>

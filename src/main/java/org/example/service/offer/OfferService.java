@@ -1,5 +1,6 @@
 package org.example.service.offer;
 
+import org.example.domain.Employee;
 import org.example.domain.Offer;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public interface OfferService {
     List<Offer> findAllOffersForSpecificOrder(Integer orderId);
     Offer findById(int id);
     Offer findAcceptedOfferInOrder(Integer id);
+    Employee findEmployeeByOfferId(int id);
 }
