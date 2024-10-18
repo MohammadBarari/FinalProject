@@ -20,6 +20,6 @@ public class SubHandler extends BaseEntity {
     @NotNull
     private Double basePrice;
     @JsonIgnore
-    @ManyToOne(cascade = { CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToOne( fetch = FetchType.LAZY)
     private Handler handler;
 }

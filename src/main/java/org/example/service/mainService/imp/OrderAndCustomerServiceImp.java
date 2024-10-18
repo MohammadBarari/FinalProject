@@ -35,7 +35,7 @@ public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
             throw new OrderStateIsNotCorrect();
         }
         order.setOrderState(OrderState.STARTED);
-        orderService.save(order);
+        orderService.update(order);
     }
 //todo: should be deleted
     @Override

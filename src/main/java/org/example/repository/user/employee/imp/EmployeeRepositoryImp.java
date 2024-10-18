@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
@@ -20,15 +21,14 @@ import java.util.List;
 public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {
 
 
-
+@Transactional
     @Override
     public Employee login(String username, String password) {
         try {
             Query query = entityManager.createNativeQuery("""
-           select * from passanduser
-           where typeofuser = 'employee' and username = ?
-           and pass = ?
-   """);
+select employee.* from employee join pass_and_user pau on pau.id = employee.pass_and_user_id
+where  pau.username= ? and pau.pass = ?
+   """,Employee.class);
             query.setParameter(1, username);
             query.setParameter(2, password);
             Employee employee = (Employee) query.getSingleResult();

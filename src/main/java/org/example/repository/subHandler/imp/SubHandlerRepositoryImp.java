@@ -44,7 +44,7 @@ public class SubHandlerRepositoryImp implements SubHandlerRepository {
     public List<SubHandler> selectBySameHandler(Integer handlerId) {
         try {
             Query query = entityManager.createNativeQuery("""
-        select * from subhandler
+        select * from sub_handler
         where handler_id= ?
 """, SubHandler.class);
 

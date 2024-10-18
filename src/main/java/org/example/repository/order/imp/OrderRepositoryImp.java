@@ -62,7 +62,6 @@ public class OrderRepositoryImp implements OrderRepository {
             return null;
         }
     }
-
     @Override
     public List<Orders> selectOrdersByCustomer(Integer customerId) {
         try {
@@ -79,13 +78,26 @@ public class OrderRepositoryImp implements OrderRepository {
     public List<Orders> selectOrdersBySubHandlerId(Integer subHandlerId) {
         try {
             Query query = entityManager.createNativeQuery("""
-select o.* from orders as o join   sub_handler sh on sh.id = o.sub_handler_id
-where sh.id = ?
+        select o.* from orders as o join   sub_handler sh on sh.id = o.sub_handler_id
+where sh.id = ? and order_state ='UNDER_CHOOSING_EMPLOYEE' or order_state = 'WAITING_FOR_EMPLOYEE_OFFER'
 """,Orders.class);
             query.setParameter(1, subHandlerId);
             return  query.getResultList();
         }catch (Exception e){
             return null;
         }
+    }
+
+    @Override
+    public List<Orders> selectActiveOrdersForEmployee() {
+       try {
+           Query query = entityManager.createNativeQuery("""
+        select o.* from orders as o join   sub_handler sh on sh.id = o.sub_handler_id
+where sh.id = ? and order_state ='UNDER_CHOOSING_EMPLOYEE' or order_state = 'WAITING_FOR_EMPLOYEE_OFFER'
+""",Orders.class);
+       return  query.getResultList();
+       }catch (Exception e){
+           return null;
+       }
     }
 }

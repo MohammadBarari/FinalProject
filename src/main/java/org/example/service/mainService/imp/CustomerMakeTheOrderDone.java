@@ -1,6 +1,7 @@
 package org.example.service.mainService.imp;
 
 import jakarta.transaction.Transactional;
+import lombok.SneakyThrows;
 import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.domain.Orders;
@@ -10,6 +11,7 @@ import org.example.exeptions.*;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.user.employee.EmployeeService;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,8 +37,11 @@ public class CustomerMakeTheOrderDone {
         employeeService.updateUser(employee);
     }
 
+
+
     @Transactional
-    public void makeTheOrderDone(Integer orderId) throws NotFoundOffer, NotFoundEmployee, NotFoundOrder, OrderStateIsNotCorrect, ItIsNotProperTimeToSetThis {
+    @SneakyThrows
+    public void makeTheOrderDone(Integer orderId)  {
         Offer offer = offerService.findAcceptedOfferInOrder(orderId);
         if (offer == null) {
             throw new NotFoundOffer();
@@ -58,12 +63,13 @@ public class CustomerMakeTheOrderDone {
         }
         Long scoreDecreasing = offer.getWorkTimeInMinutes() / 60 - hoursBetween;
         if (scoreDecreasing < 0) {
-            employee.setScore((int) (employee.getScore() + scoreDecreasing));
-        }
-        if (employee.getScore() < 0) {
+            if ((employee.getScore() + scoreDecreasing) <0){
+            employee.setScore(0);
             employee.setEmployeeState(EmployeeState.DISABLED);
+            }
         }
-        employeeService.updateUser(employee);
+            employeeService.updateUser(employee);
+
         order.setOrderState(OrderState.DONE);
         orderService.update(order);
     }

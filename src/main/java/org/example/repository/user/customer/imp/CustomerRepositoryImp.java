@@ -22,10 +22,9 @@ public class CustomerRepositoryImp extends BaseUserRepositoryImp<Customer> imple
     public Customer login(String username, String password) {
         try {
             Query query = entityManager.createNativeQuery("""
-                   select * from passanduser
-           where typeofuser = 'customer' and username = ?
-           and pass = ?
-""");
+select customer.* from customer join pass_and_user pau on pau.id = customer.pass_and_user_id
+where  pau.username= ? and pau.pass = ?
+""",Customer.class);
             query.setParameter(1, username);
             query.setParameter(2, password);
             return (Customer) query.getSingleResult();
@@ -42,7 +41,7 @@ public class CustomerRepositoryImp extends BaseUserRepositoryImp<Customer> imple
             predicates.add(cb.like(customer.get("name"), "%" + name + "%"));
         }
         if (lastName != null && !lastName.isEmpty()) {
-            predicates.add(cb.like(customer.get("lastName"), "%" + lastName + "%"));
+            predicates.add(cb.like(customer.get("last_name"), "%" + lastName + "%"));
         }
         if (email != null && !email.isEmpty()) {
             predicates.add(cb.like(customer.get("email"), "%" + email + "%"));

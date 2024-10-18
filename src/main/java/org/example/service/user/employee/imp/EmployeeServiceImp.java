@@ -216,9 +216,16 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         return false;
     }
     //1
+
     @Override
-    public Employee login(String user, String pass) {
-        return employeeRepository.login(user,pass);
+    @SneakyThrows
+    public Employee login(String user, String pass)  {
+
+        Employee employee =  employeeRepository.login(user,pass);
+        if (employee != null) {
+            return employee;
+        }
+        throw new NotFoundEmployee();
     }
 
     @Override

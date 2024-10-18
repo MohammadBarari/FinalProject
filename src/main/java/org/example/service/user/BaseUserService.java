@@ -3,6 +3,7 @@ package org.example.service.user;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
+import org.example.exeptions.NotFoundEmployee;
 
 
 public interface BaseUserService<T extends Users> {
@@ -14,7 +15,7 @@ public interface BaseUserService<T extends Users> {
 
     void savePassAndUser(PassAndUser passAndUser);
 
-    T login(String user, String pass);
+    T login(String user, String pass) ;
 
     boolean checkIfNotDuplicateUser(String user);
 

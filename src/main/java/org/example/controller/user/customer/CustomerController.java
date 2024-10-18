@@ -80,8 +80,8 @@ public class CustomerController {
         return customerService.customerSeeAllHandlers();
     }
 
-    @GetMapping("/customerSeeAllSubHandlerForHander/{handlerId}")
-    public List<SubHandler> customerSeeAllSubHandlerForHander(@NotNull Integer handlerId){
+    @GetMapping("/customerSeeAllSubHandlerForHandler/{handlerId}")
+    public List<SubHandler> customerSeeAllSubHandlerForHander(@PathVariable @NotNull Integer handlerId){
         return customerService.findAllSubHandlerForHandler(handlerId);
     }
 
@@ -90,10 +90,7 @@ public class CustomerController {
         String response =customerService.customerChargeCart(payToCartDto);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/chargeCredit/{customerId}")
-    public void getCustomerChargeCreditForm(@PathVariable Integer customerId){
-        //send to request to the view and the rest of the dto handle in view
-    }
+
     @PostMapping("/customerMakeOrderStateDone/{orderId}")
     public String customerMakeOrderStateDone(@NotNull @PathVariable @Digits(integer = 3,fraction = 0) Integer orderId
     ){

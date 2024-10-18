@@ -69,7 +69,7 @@ public class AdminServiceImp implements AdminService {
             throw new HandlerIsNull();
     }
         SubHandler subHandler = new SubHandler();
-        subHandler.setName(handler.getName());
+        subHandler.setName(saveSubHandlerDto.name());
         subHandler.setBasePrice(saveSubHandlerDto.basePrice());
         subHandler.setDetail(saveSubHandlerDto.detail());
         subHandler.setHandler(handler);

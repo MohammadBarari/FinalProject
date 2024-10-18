@@ -6,11 +6,14 @@ import org.example.domain.Employee;
 import org.example.domain.Orders;
 import org.example.exeptions.NotFoundSomething;
 import org.example.exeptions.OrderStateIsNotCorrect;
+import org.example.exeptions.TimeOfWorkDoesntMatch;
 import org.example.repository.order.OrderRepository;
 import org.example.service.order.OrderService;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -18,7 +21,11 @@ public class OrderServiceImp implements OrderService {
     private final OrderRepository orderRepository ;
     @Override
     @Transactional
-    public void save(Orders orders) {
+    public void save(Orders orders) throws TimeOfWorkDoesntMatch {
+        if (orders.getTimeOfWork().isBefore(LocalDateTime.now()))
+        {
+            throw new TimeOfWorkDoesntMatch();
+        }
         orderRepository.save(orders);
     }
 
@@ -62,6 +69,11 @@ public class OrderServiceImp implements OrderService {
     @Override
     public List<Orders> findOrdersForSubHandler(Integer subHandlerId) {
         return orderRepository.selectOrdersBySubHandlerId(subHandlerId);
+    }
+
+    @Override
+    public List<Orders> selectActiveOrdersForEmployee() {
+        return orderRepository.selectActiveOrdersForEmployee();
     }
 
 }

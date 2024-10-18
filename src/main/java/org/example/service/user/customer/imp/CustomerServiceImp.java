@@ -171,9 +171,15 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
+    @SneakyThrows
     public Customer login(String user, String pass)
     {
-        return customerRepository.login(user,pass);
+        Customer customer =  customerRepository.login(user,pass);
+        if (customer != null)
+        {
+            return customer;
+        }
+        throw new NotFoundCustomer();
     }
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
@@ -232,15 +238,15 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new DontHaveEnoughMoney();
         }
     }
-    @SneakyThrows
+
     @Override
+
     public String makeServiceStateToDone(Integer orderId) {
-        try {
+
             customerMakeTheOrderDone.makeTheOrderDone(orderId);
+            System.out.println("what happened");
             return "successful";
-        }catch (Exception e){
-            return "failed";
-        }
+
     }
     @SneakyThrows
     @Transactional
