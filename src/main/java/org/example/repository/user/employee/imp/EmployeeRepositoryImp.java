@@ -7,7 +7,6 @@ import jakarta.persistence.criteria.*;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
-import org.example.dto.EmployeeOutPutDto;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.springframework.context.annotation.Primary;
@@ -73,22 +72,15 @@ public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> impl
 //        if (handlerName != null && !handlerName.isEmpty()) {
 //            predicates.add(cb.like(employee.join("subHandlers").join("handler").get("name"), "%" + handlerName + "%"));
 //        }
-        Join<SubHandler, Handler> handlerJoin = null;
         if (handlerName != null && !handlerName.isEmpty()) {
             if (handlerName != null && !handlerName.isEmpty()) {
-                Join<Employee, SubHandler> subHandlerJoin = employee.join("subHandlers"); // This won't trigger loading yet
-                handlerJoin = subHandlerJoin.join("handler");
+                Join<Employee, SubHandler> subHandlerJoin = employee.join("subHandlers");
+                Join<SubHandler, Handler> handlerJoin = subHandlerJoin.join("handler");
 
                 predicates.add(cb.like(handlerJoin.get("name"), "%" + handlerName + "%"));
             }
         }
-        query.select(cb.construct(EmployeeOutPutDto.class,
-                        employee.get("name"),
-                        employee.get("last_name"),
-                        employee.get("email"),
-                        employee.get("phone"),
-                        cb.coalesce(handlerJoin.get("name"), ""))) // Include handler's name if needed
-                .where(cb.and(predicates.toArray(new Predicate[0])));
+
         query.select(employee).where(cb.and(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(query).getResultList();
     }
