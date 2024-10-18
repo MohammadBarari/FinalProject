@@ -33,7 +33,6 @@
 <script>
     document.getElementById('chargeForm').onsubmit = function(event) {
         event.preventDefault();
-
         const formData = {
             customerId: document.getElementById('customerId').value,
             amount: document.getElementById('amount').value,

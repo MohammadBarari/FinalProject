@@ -6,6 +6,7 @@ import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.*;
+import org.example.dto.EmployeeOutPutDto;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.OfferDto;
 import org.example.enumirations.EmployeeState;
@@ -191,7 +192,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Transactional
     @Override
     public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
-        return employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+        List<Employee> employees =  employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+        return employees;
     }
 
     private void addImageToEmployee(Employee employee, File file) throws IOException {
