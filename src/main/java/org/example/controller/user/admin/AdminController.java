@@ -49,7 +49,7 @@ public class AdminController {
     }
 
     @PostMapping("/updatingSubHandler")
-    public void detailPriceSubHandlerChanger(@Valid ChangeSubHandlerDto changeSubHandlerDto){
+    public void detailPriceSubHandlerChanger(@Valid @RequestBody ChangeSubHandlerDto changeSubHandlerDto){
         adminService.detailPriceSubHandlerChanger(changeSubHandlerDto);
     }
 
