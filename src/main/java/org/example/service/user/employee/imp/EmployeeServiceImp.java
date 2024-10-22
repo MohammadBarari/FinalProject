@@ -1,23 +1,16 @@
 package org.example.service.user.employee.imp;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
-import jakarta.validation.Validator;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
+
 import org.example.domain.*;
-import org.example.dto.EmployeeOutPutDto;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.OfferDto;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.NotFoundEmployee;
-import org.example.exeptions.OfferPriceIsLessThanOrderPrice;
-import org.example.exeptions.OrderStateIsNotCorrect;
-import org.example.exeptions.TimeOfWorkDoesntMatch;
+import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
+import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
@@ -34,20 +27,21 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-@Service
-@Validated
+import java.util.Optional;
 
+@Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
     private final OrderService orderService ;
     private final OfferService offerService ;
     private final SubHandlerService subHandlerService;
+    private final EntityMapper entityMapper;
     //4
 
 
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository,EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
         super(baseUserRepository);
+        this.entityMapper = entityMapper;
         this.employeeRepository = employeeRepository;
         this.orderService = orderService;
         this.offerService = offerService;
@@ -56,107 +50,95 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     @Transactional
-    @SneakyThrows
-    public EmployeeSignUpDto signUpEmployee( EmployeeSignUpDto employeeSignUpDto) {
+    public EmployeeSignUpDto signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws Exception {
         File file = new File(employeeSignUpDto.imagePath());
         if (validateEmployee(employeeSignUpDto,file)) {
-            Employee employee = new Employee();
-            employee.setName(employeeSignUpDto.name());
-            employee.setEmail(employeeSignUpDto.email());
-            employee.setPhone(employeeSignUpDto.phone());
-            employee.setLast_name(employeeSignUpDto.last_name());
-            if (validateEmployee(employeeSignUpDto, file)) {
-                addImageToEmployee(employee, file);
-            }
-            employee.setTimeOfRegistration(LocalDateTime.now());
-
-            employee.setScore(0);
-
-            Credit credit = new Credit();
-
-            credit.setTypeOfEmployee(TypeOfUser.EMPLOYEE);
-
-            credit.setAmount(0.0);
+            Employee employee = getEmployee(employeeSignUpDto, file);
+            Credit credit = Credit.builder().typeOfEmployee(TypeOfUser.EMPLOYEE).amount(0.0d).build();
             employee.setCredit(credit);
-            PassAndUser passAndUser = PassAndUser.builder()
-                    .pass(employeeSignUpDto.password())
-                    .typeOfUser(TypeOfUser.EMPLOYEE)
-                    .username(employeeSignUpDto.phone()).build();
-            employee.setEmployeeState(EmployeeState.NEW);
+            PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
             employee.setPassAndUser(passAndUser);
             saveEmployee(employee);
             return employeeSignUpDto;
         }
-        return null;
+        throw new InvalidEmployeeDataException("Invalid input data for employee sign up");
     }
-    //3
-    @SneakyThrows
+
+    private static PassAndUser getPassAndUser(EmployeeSignUpDto employeeSignUpDto) {
+        return PassAndUser.builder()
+                .pass(employeeSignUpDto.password())
+                .typeOfUser(TypeOfUser.EMPLOYEE)
+                .username(employeeSignUpDto.phone()).build();
+    }
+
+    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, File file) throws Exception {
+        Employee employee =entityMapper.dtoToEmployee(employeeSignUpDto);
+        if (validateEmployee(employeeSignUpDto, file)) {
+            addImageToEmployee(employee, file);
+        }
+        employee.setEmployeeState(EmployeeState.NEW);
+        employee.setTimeOfRegistration(LocalDateTime.now());
+        employee.setScore(0);
+        return employee;
+    }
+
     @Override
     public OfferDto GiveOfferToOrder(OfferDto offerDto)
     {
+        checkemployeeExists(offerDto);
+        Orders orders = Optional.ofNullable(orderService.findById(offerDto.orderId())).orElseThrow(()-> new NotFoundOffer("Unable to find order with this ID : " + offerDto.orderId()));
+        checkForOffering(offerDto,orders);
+        Offer offer = entityMapper.dtoToOffer(offerDto);
+        Employee employee = new Employee();
+        offer.setEmployee(employee);
+        offer.setTimeOfCreate(LocalDateTime.now());
+        employee.setId(offerDto.employeeId());
+        orders.setOrderState(OrderState.UNDER_CHOOSING_EMPLOYEE);
+        offer.setOrders(orders);
+        orderService.update(orders);
+        offerService.save(offer);
+        return offerDto;
+    }
+    private void checkemployeeExists(OfferDto offerDto) {
         if (!employeeExistsByEmployeeId(offerDto.employeeId())){
             throw new NotFoundEmployee();
         }
-        Orders orders = orderService.findById(offerDto.orderId());
-        if (validateIfItCanGetOffer(orders)) {
-            Offer offer = new Offer();
-            Employee employee = new Employee();
-            employee.setId(offerDto.employeeId());
-            offer.setEmployee(employee);
-            offer.setTimeOfCreate(LocalDateTime.now());
-            if (offerDto.offerPrice()<orders.getOfferedPrice()){
-                throw new OfferPriceIsLessThanOrderPrice();
-            }
-            offer.setOfferPrice(offerDto.offerPrice());
-            if (offerDto.timeOfWork().isAfter(orders.getTimeOfWork())) {
-                offer.setTimeOfWork(offerDto.timeOfWork());
-            } else {
-                throw new TimeOfWorkDoesntMatch();
-            }
-            offer.setWorkTimeInMinutes(offerDto.workTimeInMinutes());
-            orders.setOrderState(OrderState.UNDER_CHOOSING_EMPLOYEE);
-            orderService.update(orders);
-            offer.setOrders(orders);
-            offerService.save(offer);
-            return offerDto;
-        }
-        return null;
     }
-    @SneakyThrows
-    @Override
-    public boolean validateIfItCanGetOffer(Orders orders){
-        if (orders.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER) ||
-                orders.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE)
+    private void checkForOffering(OfferDto offerDto ,Orders orders){
+        if (!(orders.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER) ||
+                orders.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE))
         ) {
-            return true;
-        }else {
             throw new OrderStateIsNotCorrect();
+        }
+        if (offerDto.timeOfWork().isAfter(orders.getTimeOfWork())){
+            throw new TimeOfWorkDoesntMatch();
+        }
+        if (offerDto.offerPrice()<orders.getOfferedPrice()){
+            throw new OfferPriceIsLessThanOrderPrice();
         }
     }
     //2
-    @SneakyThrows
     @Transactional
     public void saveEmployee( Employee employee){
          employeeRepository.save(employee);
     }
-    @SneakyThrows
     @Override
-    public  boolean validateImage(File imageFile) {
+    public  boolean validateImage(File imageFile){
         try {
-            ImageIO.read(imageFile);
+            if (ImageIO.read(imageFile) == null) {
+                throw new ImageValidationException("The file is not a valid image.");
+            }
             return true;
-        }catch (Exception e) {
-            throw new Exception("cant read file!");
+        } catch (IOException e) {
+            throw new ImageValidationException("Cannot read file: " + imageFile.getName(), e);
         }
     }
-
-    @SneakyThrows
     @Override
     public  boolean checkIfImageSizeIsOkay(File imageFile) {
         if (imageFile.length() < 300*1024){
             return true;
         }
-        throw new Exception("file is too large");
+        throw new RuntimeException("file is too large");
     }
 
     @Override
@@ -165,7 +147,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public List<Orders> findAllOrdersForEmployee(Integer employeeId) {
+    public List<Orders> getOrdersForEmployee(Integer employeeId) {
         List<Orders> orders = new ArrayList<>();
         List<SubHandler> subHandlers = findAllSubHandlersForEmployee(employeeId);
         if (subHandlers!=null && !subHandlers.isEmpty()) {
@@ -180,7 +162,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 }
             }
         }
-
         return orders;
     }
 
@@ -192,49 +173,44 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Transactional
     @Override
     public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
-        List<Employee> employees =  employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
-        return employees;
+        return employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
     }
 
     private void addImageToEmployee(Employee employee, File file) throws IOException {
-        if (file.exists()) {
-            InputStream inputStream = new FileInputStream(file);
-            byte[] photo = new byte[(int) file.length()];
-            inputStream.read(photo);
-            employee.setImage(photo);
+        if (file.exists() && file.length() > 0) {
+            try (InputStream inputStream = new FileInputStream(file)) {
+                byte[] photo = new byte[(int) file.length()];
+                int bytesRead = inputStream.read(photo);
+                if (bytesRead > 0) {
+                    employee.setImage(photo);
+                } else {
+                    throw new IOException("Failed to read the image data from file: " + file.getName());
+                }
+            } catch (IOException e) {
+                throw new IOException("Error while reading image file: " + file.getName(), e);
+            }
+        } else {
+            throw new IOException("File does not exist or is empty: " + file.getAbsolutePath());
         }
     }
 
-    @SneakyThrows
+
     @Override
     public boolean validateEmployee(EmployeeSignUpDto employee, File file) {
-        //todo: validate employee
-        if (validatePassWord(employee.password())&& checkIfNotDuplicateUser(employee.phone())
-        && checkIfImageSizeIsOkay(file) && validateImage(file)) {
-            return true;
-        }
-        return false;
+        return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())
+                && checkIfImageSizeIsOkay(file) && validateImage(file);
     }
-    //1
-
     @Override
-    @SneakyThrows
     public Employee login(String user, String pass)  {
-
         Employee employee =  employeeRepository.login(user,pass);
         if (employee != null) {
             return employee;
         }
         throw new NotFoundEmployee();
     }
-
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
-        if (Objects.isNull(employeeRepository.find(user,Employee.class)))
-        {
-            return true;
-        }
-        return false;
+        return Objects.isNull(employeeRepository.find(user, Employee.class));
     }
 
 }

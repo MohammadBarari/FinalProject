@@ -1,9 +1,7 @@
 package org.example.service.mapStruct;
 
-import org.example.domain.Customer;
-import org.example.domain.Orders;
-import org.example.dto.CustomerSignUpDto;
-import org.example.dto.OrderDto;
+import org.example.domain.*;
+import org.example.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -18,6 +16,11 @@ public interface EntityMapper {
 
     Orders dtoToOrder(OrderDto orderDto);
 
+    Employee dtoToEmployee(EmployeeSignUpDto employeeSignUpDto);
 
+    EmployeeSignUpDto employeeToDto(Employee employee);
 
+    Offer dtoToOffer(OfferDto offerDto);
+
+    SubHandler dtoToSubHandler(SubHandlerDto subHandler);
 }

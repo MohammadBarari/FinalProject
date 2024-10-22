@@ -56,7 +56,7 @@ public class CustomerController {
     public void giveComment(@PathVariable @NotNull  @Digits(integer = 3,fraction = 0)Integer ordersId,
                             @PathVariable @NotNull @Digits(integer = 3,fraction = 0) Integer star,
                             @PathVariable @NotNull  String comment){
-        customerService.giveComment(ordersId, star, comment);
+        customerService.addComment(ordersId, star, comment);
     }
 
 
@@ -99,13 +99,13 @@ public class CustomerController {
     @PostMapping("/customerPayEmployee/{orderId}/{customerId}")
     public String customerPayEmployee(@NotNull @PathVariable @Digits(integer = 3,fraction = 0) Integer orderId
             ,@NotNull @PathVariable @Digits(integer = 3,fraction = 0) Integer customerId){
-        return customerService.customerPayToOrder(orderId, customerId);
+        return customerService.customerPay(orderId, customerId);
     }
 
     @PostMapping("/employeeAddingCommentAndStar/{orderId}/{star}")
     public String addCommentAndStar( @PathVariable @Digits(integer = 1,fraction = 0) Integer orderId,
             @RequestParam(required = false) String comment ,
                                     @PathVariable @Digits(integer = 1,fraction = 0)  Integer star){
-        return customerService.giveComment(orderId, star, comment);
+        return customerService.addComment(orderId, star, comment);
     }
 }

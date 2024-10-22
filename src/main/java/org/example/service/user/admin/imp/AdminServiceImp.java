@@ -1,18 +1,16 @@
 package org.example.service.user.admin.imp;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
 import org.example.domain.Customer;
 import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
-import org.example.dto.SaveSubHandlerDto;
+import org.example.dto.SubHandlerDto;
 import org.example.enumirations.EmployeeState;
 import org.example.exeptions.*;
 import org.example.repository.user.admin.AdminRepository;
-import org.example.service.exceptionHandling.NullExceptionHandling;
 import org.example.service.handler.HandlerService;
+import org.example.service.mapStruct.EntityMapper;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.admin.AdminService;
 import org.example.service.user.customer.CustomerService;
@@ -20,10 +18,9 @@ import org.example.service.user.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -35,62 +32,43 @@ public class AdminServiceImp implements AdminService {
     private final EmployeeService employeeService ;
     private final AdminRepository adminRepository;
     private final CustomerService customerService;
+    private final EntityMapper entityMapper;
     @Autowired
     public AdminServiceImp(HandlerService handlerService,
     SubHandlerService subHandlerService ,
     EmployeeService employeeService ,
     AdminRepository adminRepository,
-                           CustomerService customerService
+    EntityMapper entityMapper,
+    CustomerService customerService
  ) {
         this.handlerService =  handlerService;
         this.subHandlerService =  subHandlerService;
         this.employeeService =  employeeService;
         this.adminRepository =  adminRepository;
         this.customerService = customerService;
+        this.entityMapper = entityMapper;
     }
-    @SneakyThrows
     @Override
     public Handler saveHandler( String handlerName)  {
-            Handler handler1 = handlerService.findHandlerByName(handlerName);
-            if (handler1 != null) {
-                throw new HandlerIsDuplicate();
-            }
-        Handler handler = new Handler();
-        handler.setName(handlerName);
+        Handler handler1 = Optional.ofNullable(handlerService.findHandlerByName(handlerName)).orElseThrow(HandlerIsDuplicate::new);
+        Handler handler = Handler.builder().name(handlerName).build();
         handlerService.save(handler);
         return handler;
    }
-
-    @SneakyThrows
     @Override
-    public SubHandler saveSubHandler( SaveSubHandlerDto saveSubHandlerDto) {
-        Handler handler = handlerService.findHandlerById(saveSubHandlerDto.handlerId());
-        if (Objects.isNull(handler)){
-            throw new HandlerIsNull();
-    }
-        SubHandler subHandler = new SubHandler();
-        subHandler.setName(saveSubHandlerDto.name());
-        subHandler.setBasePrice(saveSubHandlerDto.basePrice());
-        subHandler.setDetail(saveSubHandlerDto.detail());
+    public SubHandler saveSubHandler(SubHandlerDto subHandlerDto) {
+        Handler handler = Optional.ofNullable(handlerService.findHandlerById(subHandlerDto.handlerId())).orElseThrow(() -> new HandlerIsNull("Unable to find Handler with this id : "+ subHandlerDto.handlerId() ));
+        SubHandler subHandler = entityMapper.dtoToSubHandler(subHandlerDto);
         subHandler.setHandler(handler);
         subHandlerService.saveSubHandler(subHandler);
         return subHandler;
     }
-    @SneakyThrows
+
     @Override
     public void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId) {
-       Employee employee = employeeService.findById(employeeId,Employee.class);
-       //1
-       if (Objects.isNull(employee)){
-           throw new NotFoundEmployee();
-       }
-       //2
+       Employee employee = Optional.ofNullable(employeeService.findById(employeeId,Employee.class)).orElseThrow(()-> new NotFoundEmployee("Unable to find Employee with this id : "+ employeeId ));
        if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
-          SubHandler subHandler = subHandlerService.findSubHandlerById(subHandlerId);
-         //3
-          if (Objects.isNull(subHandler)){
-              throw new HandlerIsNull();
-          }
+          SubHandler subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()-> new HandlerIsNull("Unable to find SubHandler with this id : "+ subHandlerId ));
           if (Objects.isNull(employee.getSubHandlers()))
           {
               Set<SubHandler> handlers = Set.of(subHandler);
@@ -100,12 +78,10 @@ public class AdminServiceImp implements AdminService {
           }
           employeeService.updateUser(employee);
         }else {
-           //4
            throw new EmployeeIsNotAccepted();
         }
     }
     @Override
-    @SneakyThrows
     public void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto)  {
             SubHandler subHandler = null;
 
@@ -138,7 +114,6 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    @SneakyThrows
     @Transactional
     public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId)  {
             Employee employee = employeeService.findById(employeeId,Employee.class);
@@ -152,20 +127,9 @@ public class AdminServiceImp implements AdminService {
             adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
     }
 
-
-//    @Override
-//    public void changeEmployeeState(Integer employeeId, EmployeeState employeeState) {
-//        Employee employee = employeeService.findById(employeeId,Employee.class);
-//        employee.setEmployeeState(employeeState);
-//        employeeService.updateUser(employee);
-//    }
-
-
-    @SneakyThrows
     @Override
-    public void validateTheEmployee(Integer employeeId){
-           Employee employee = (Employee) NullExceptionHandling.getInstance().handlingNullExceptions
-                   (employeeService.findById(employeeId,Employee.class),Employee.class);
+    public void acceptEmployee(Integer employeeId){
+           Employee employee = employeeService.findById(employeeId,Employee.class);
             if (ifEmployeeIsAccepted(employee)){
                 employee.setEmployeeState(EmployeeState.ACCEPTED);
                 employeeService.updateUser(employee);

@@ -39,7 +39,7 @@ public class EmployeeController {
 
     @GetMapping("/employeeSeeAllOrders/{employeeId}")
     public List<Orders> employeeSeeAllOrders(@PathVariable @NotNull Integer employeeId){
-        return employeeService.findAllOrdersForEmployee(employeeId);
+        return employeeService.getOrdersForEmployee(employeeId);
     }
     @GetMapping("/employeeSeeAllSubHander/{employeeId}")
     public List<SubHandler> employeeSeeAllSubHander(@PathVariable @NotNull Integer employeeId){

@@ -3,7 +3,7 @@ package org.example.dto;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 
-public record SaveSubHandlerDto(
+public record SubHandlerDto(
         @NotNull
         Integer handlerId,
         @NotNull

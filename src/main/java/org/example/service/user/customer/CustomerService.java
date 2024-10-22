@@ -16,14 +16,14 @@ public interface CustomerService extends BaseUserService<Customer> {
     List<Offer> getOffersForOrder(Integer orderId);
     void startOrder(Integer orderId);
     boolean checkIfNotDuplicateUser(String user);
-    String giveComment(Integer ordersId, Integer star, String comment);
+    String addComment(Integer ordersId, Integer star, String comment);
     List<Orders> getAllOrders(@NotNull Integer customerId);
     void customerAcceptOffer(Integer offerId);
     List<Handler> getHandlersForCustomer();
     List<SubHandler> getSubHandlersForHandler(Integer handlerId);
     String customerChargeCart(PayToCartDto payToCartDto);
     String makeServiceStateToDone(Integer orderId);
-    String customerPayToOrder(Integer ordersId, Integer customerId);
+    String customerPay(Integer ordersId, Integer customerId);
     List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone);
 
 }

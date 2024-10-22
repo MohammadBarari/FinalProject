@@ -10,7 +10,7 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
-import org.example.dto.SaveSubHandlerDto;
+import org.example.dto.SubHandlerDto;
 import org.example.service.user.admin.AdminService;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class AdminController {
     }
 
     @PostMapping("/saveSubHander")
-    public SubHandler saveSubHandler(@RequestBody @Valid SaveSubHandlerDto subHandlerDto){
+    public SubHandler saveSubHandler(@RequestBody @Valid SubHandlerDto subHandlerDto){
         return adminService.saveSubHandler(subHandlerDto);
     }
 
@@ -45,7 +45,7 @@ public class AdminController {
     @GetMapping("/validateTheEmployee/{employeeId}")
     public void validateTheEmployee(@PathVariable("employeeId") @Digits(integer = 3,fraction = 0) @NotNull
                                         Integer employeeId){
-        adminService.validateTheEmployee(employeeId);
+        adminService.acceptEmployee(employeeId);
     }
 
     @PostMapping("/updatingSubHandler")

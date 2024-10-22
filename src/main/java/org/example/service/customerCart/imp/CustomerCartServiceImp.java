@@ -3,10 +3,13 @@ package org.example.service.customerCart.imp;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.CustomerCart;
+import org.example.exeptions.NotFoundUser;
 import org.example.exeptions.WrongEntrance;
 import org.example.repository.customerCart.CustomerCartRepository;
 import org.example.service.customerCart.CustomerCartService;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,6 @@ public class CustomerCartServiceImp implements CustomerCartService {
 
     @Override
     public CustomerCart findCustomerCartByCustomerId(Integer customerId) {
-        return customerCartRepository.selectCustomerCart(customerId);
+        return Optional.ofNullable(customerCartRepository.selectCustomerCart(customerId)).orElseThrow(()-> new NotFoundUser("unable to find cart with customer id : " + customerId));
     }
 }

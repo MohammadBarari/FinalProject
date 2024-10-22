@@ -3,15 +3,17 @@ package org.example.service.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.example.domain.Employee;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
-import org.example.exeptions.AllNotBeLetterOrDigits;
-import org.example.exeptions.PassNot8Digits;
+import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -34,7 +36,6 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     @Transactional
     public void signUp(T t){
         baseUserRepository.save(t);
-
     }
     @Override
     @Transactional
@@ -84,6 +85,8 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         if(newPassAndUser != null){
         newPassAndUser.setPass(changingPasswordDto.newPass());
         baseUserRepository.updatePass(newPassAndUser);
+        }else {
+            throw new UnableToChangePassWord("You should enter all field correctly ");
         }
     }
     @Override
@@ -94,6 +97,6 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     @Override
     @Transactional
     public T findById(int id , Class<T> tClass){
-        return (T) baseUserRepository.findById(id,tClass);
+            return Optional.ofNullable((T) baseUserRepository.findById(id,tClass)).orElseThrow(()-> new NotFoundUser("Unable to find Employee with this ID : "+ id));
     }
 }
