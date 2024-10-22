@@ -19,6 +19,7 @@ import org.example.service.customerCart.CustomerCartService;
 import org.example.service.handler.HandlerService;
 import org.example.service.mainService.imp.CustomerAcceptOfferClass;
 import org.example.service.mainService.imp.CustomerMakeTheOrderDone;
+import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
@@ -31,6 +32,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
 @Service
 
 public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements CustomerService {
@@ -43,7 +46,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final CreditService creditService;
     private final CustomerCartService customerCartService;
     private final CustomerMakeTheOrderDone customerMakeTheOrderDone;
-    public CustomerServiceImp(BaseUserRepository baseUserRepository,CustomerMakeTheOrderDone customerMakeTheOrderDone,CustomerCartService customerCartService ,CreditService creditService,CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
+    private final EntityMapper entityMapper;
+    public CustomerServiceImp(BaseUserRepository baseUserRepository,EntityMapper entityMapper,CustomerMakeTheOrderDone customerMakeTheOrderDone,CustomerCartService customerCartService ,CreditService creditService,CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
         super(baseUserRepository);
         this.customerRepository = customerRepository;
         this.subHandlerService = subHandlerService;
@@ -54,34 +58,50 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         this.creditService = creditService;
         this.customerCartService = customerCartService;
         this.customerMakeTheOrderDone = customerMakeTheOrderDone;
+        this.entityMapper = entityMapper;
     }
 
-    @SneakyThrows
-    public OrderDto getSubHandlerForCustomer(OrderDto orderDto) {
-        Customer customer = findById(orderDto.customerId() , Customer.class);
-        if (Objects.isNull(customer)) {
-            throw new NotFoundCustomer();
-        }
-        SubHandler subHandler =  subHandlerService.findSubHandlerById(orderDto.subHandlerId());
-        if (Objects.isNull(subHandler)) {
-            throw new HandlerIsNull();
-        }
+
+    public OrderDto createOrder(OrderDto orderDto) {
+        Customer customer = findCustomer(orderDto.customerId());
+        SubHandler subHandler = findSubHandler(orderDto.subHandlerId());
+
         if (isOrderValidated(orderDto,subHandler)) {
-            Orders orders = new Orders();
-            orders.setCustomer(customer);
-            orders.setSubHandler(subHandler);
-            orders.setAddress(orderDto.address());
-            orders.setDetail(orderDto.detail());
-            orders.setTimeOfWork(orderDto.timeOfWork());
-            orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
-            orders.setOfferedPrice(orderDto.offeredPrice());
-            orderService.save(orders);
-            return orderDto;
+            return buildOrder(orderDto,customer, subHandler);
         }
         return null;
     }
-    private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler)
-            throws TimeOfWorkDoesntMatch, OrderPriceShouldBeHigherThanBase {
+    private void validateOrder(OrderDto orderDto, SubHandler subHandler) {
+        if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
+            throw new TimeOfWorkDoesntMatch();
+        }
+        if (orderDto.offeredPrice() < subHandler.getBasePrice()) {
+            throw new OrderPriceShouldBeHigherThanBase();
+        }
+    }
+
+    private OrderDto buildOrder(OrderDto orderDto, Customer customer, SubHandler subHandler) {
+        Orders orders = new Orders();
+        orders.setCustomer(customer);
+        orders.setSubHandler(subHandler);
+        orders.setAddress(orderDto.address());
+        orders.setDetail(orderDto.detail());
+        orders.setTimeOfWork(orderDto.timeOfWork());
+        orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
+        orders.setOfferedPrice(orderDto.offeredPrice());
+        orderService.save(orders);
+        return orderDto;
+    }
+    private Customer findCustomer(Integer customerId) throws NotFoundCustomer {
+        return Optional.ofNullable(findById(customerId, Customer.class))
+                .orElseThrow(() -> new NotFoundCustomer("Customer not found with ID: " + customerId));
+    }
+
+    private SubHandler findSubHandler(Integer subHandlerId) {
+        return Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId))
+                .orElseThrow(() -> new HandlerIsNull("SubHandler not found with ID: " + subHandlerId));
+    }
+    private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler) {
         if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
             throw new TimeOfWorkDoesntMatch();
         }
@@ -91,26 +111,22 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return true;
     }
 
-    @SneakyThrows
-    public List<Offer> customerSeeAllOfferInOneOrder(Integer orderId)  {
-        try {
+
+    public List<Offer> getOffersForOrder(Integer orderId)  {
             return offerService.findAllOffersForSpecificOrder(orderId);
-        }catch (Exception e){
-            throw new ErrorWhileFindingOffers();
-        }
     }
-    @SneakyThrows
+
     public void customerAcceptOffer(Integer offerId){
         customerAcceptOfferClass.customerAcceptOffer(offerId);
     }
 
     @Override
-    public List<Handler> customerSeeAllHandlers() {
+    public List<Handler> getHandlersForCustomer() {
         return handlerService.findAllHandlers();
     }
 
     @Override
-    public List<SubHandler> findAllSubHandlerForHandler(Integer handlerId) {
+    public List<SubHandler> getSubHandlersForHandler(Integer handlerId) {
         return subHandlerService.findAllSubHandlerSameHandler(handlerId);
     }
 
@@ -120,7 +136,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return customerOrders;
     }
     @SneakyThrows
-    public void changeOrderToStart(Integer orderId) {
+    public void startOrder(Integer orderId) {
         Orders order = orderService.findById(orderId);
         if (Objects.isNull(order)){
             throw new NotFoundOrder();
@@ -135,7 +151,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @SneakyThrows
     @Override
     @Transactional
-    public CustomerSignUpDto signUpCustomer(CustomerSignUpDto customerDto){
+    public CustomerSignUpDto createCustomer(CustomerSignUpDto customerDto){
         if (validateCustomer(customerDto)) {
             Customer customer = new Customer();
             //settingCustomer from customerDto and pass it to base for saving
@@ -153,12 +169,30 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             customer.setCredit(credit);
             passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
             customer.setPassAndUser(passAndUser);
-            savePassAndUser(passAndUser);
-            //setting its value
             signUp(customer);
             return customerDto;
         }
-        return null;
+        else {
+            throw new InavlidCustomerDataException("invalid customer data for sign up");
+        }
+    }
+    private Customer createCustomerFromDto(CustomerSignUpDto customerDto) {
+        Customer customer = entityMapper.dtoToCustomer(customerDto);
+        customer.setTimeOfRegistration(LocalDateTime.now());
+        PassAndUser passAndUser = getPassAndUser(customerDto);
+        Credit credit = new Credit();
+        credit.setTypeOfEmployee(TypeOfUser.CUSTOMER);
+        credit.setAmount(0d);
+        customer.setCredit(credit);
+        customer.setPassAndUser(passAndUser);
+    }
+
+    private static PassAndUser getPassAndUser(CustomerSignUpDto customerDto) {
+        PassAndUser passAndUser = new PassAndUser();
+        passAndUser.setUsername(customerDto.phone());
+        passAndUser.setPass(customerDto.password());
+        passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
+        return passAndUser;
     }
 
     @Override
@@ -285,7 +319,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return customerRepository.selectCustomerByOptional(name, lastName, email, phone);
     }
 
-    ;
 
     public boolean validateCustomerCanPay(Orders orders, Customer customer, Offer offer) throws DontHaveEnoughMoney {
         if(customer.getCredit().getAmount() > offer.getOfferPrice() && orders.getOrderState() == OrderState.DONE){

@@ -10,17 +10,17 @@ import org.example.service.user.BaseUserService;
 import java.util.List;
 
 public interface CustomerService extends BaseUserService<Customer> {
-    CustomerSignUpDto signUpCustomer(CustomerSignUpDto customerDto);
+    CustomerSignUpDto createCustomer(CustomerSignUpDto customerDto);
     boolean validateCustomer(CustomerSignUpDto customerDto);
-    OrderDto getSubHandlerForCustomer(OrderDto orderDto);
-    List<Offer> customerSeeAllOfferInOneOrder(Integer orderId);
-    void changeOrderToStart(Integer orderId);
+    OrderDto createOrder(OrderDto orderDto);
+    List<Offer> getOffersForOrder(Integer orderId);
+    void startOrder(Integer orderId);
     boolean checkIfNotDuplicateUser(String user);
     String giveComment(Integer ordersId, Integer star, String comment);
     List<Orders> getAllOrders(@NotNull Integer customerId);
     void customerAcceptOffer(Integer offerId);
-    List<Handler> customerSeeAllHandlers();
-    List<SubHandler> findAllSubHandlerForHandler(Integer handlerId);
+    List<Handler> getHandlersForCustomer();
+    List<SubHandler> getSubHandlersForHandler(Integer handlerId);
     String customerChargeCart(PayToCartDto payToCartDto);
     String makeServiceStateToDone(Integer orderId);
     String customerPayToOrder(Integer ordersId, Integer customerId);

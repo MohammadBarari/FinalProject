@@ -22,7 +22,7 @@ public class CustomerController {
     private final CustomerService customerService;
     @PostMapping("/signUp")
     public CustomerSignUpDto signUp(@RequestBody @Valid  CustomerSignUpDto dto) {
-        return customerService.signUpCustomer(dto);
+        return customerService.createCustomer(dto);
     }
 
     @GetMapping("/login/{username}/{password}")
@@ -33,14 +33,14 @@ public class CustomerController {
 
     @PostMapping("/getSubHandlerForCustomer")
     public OrderDto getSubHandlerForCustomer(@RequestBody @Valid OrderDto dto) {
-        return customerService.getSubHandlerForCustomer(dto);
+        return customerService.createOrder(dto);
     }
 
     @PostMapping("/changeOrderToStart/{orderId}")
     public void changeOrderToStart(@PathVariable @NotNull
                                        @Digits(integer = 3,fraction = 0)
                                        Integer orderId){
-        customerService.changeOrderToStart(orderId);
+        customerService.startOrder(orderId);
     }
 
     @GetMapping("/findAllOrders/{customerId}")
@@ -63,7 +63,7 @@ public class CustomerController {
     @GetMapping("/customerSeeAllOfferInOneOrder/{orderId}")
     public List<Offer> customerSeeAllOfferInOneOrder(@PathVariable @NotNull  @Digits(integer = 3,fraction = 0)
                                                          Integer orderId){
-        return customerService.customerSeeAllOfferInOneOrder(orderId);
+        return customerService.getOffersForOrder(orderId);
     }
 
 
@@ -77,12 +77,12 @@ public class CustomerController {
 
     @GetMapping("/customerSeeAllHandlers")
     public List<Handler> customerSeeAllHandlers(){
-        return customerService.customerSeeAllHandlers();
+        return customerService.getHandlersForCustomer();
     }
 
     @GetMapping("/customerSeeAllSubHandlerForHandler/{handlerId}")
     public List<SubHandler> customerSeeAllSubHandlerForHander(@PathVariable @NotNull Integer handlerId){
-        return customerService.findAllSubHandlerForHandler(handlerId);
+        return customerService.getSubHandlersForHandler(handlerId);
     }
 
     @PostMapping("/customerChargeCredit")

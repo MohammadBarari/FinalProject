@@ -1,6 +1,6 @@
 package org.example.exeptions;
 
-public class CantRemoveEmployeeFromSubHandler extends Exception {
+public class CantRemoveEmployeeFromSubHandler extends RuntimeException {
     public CantRemoveEmployeeFromSubHandler() {
         super("can not remove employee from subHandler");
     }
