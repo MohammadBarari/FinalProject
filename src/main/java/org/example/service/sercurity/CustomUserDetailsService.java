@@ -32,13 +32,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println(passwordEncoder.encode(user.getPass()));
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
-                user.getPass(),
-                getAuthorities(user.getTypeOfUser())
+                passwordEncoder.encode(user.getPass()),
+                getAuthorities(TypeOfUser.ADMIN)
         );
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(TypeOfUser type) {
-        return List.of(new SimpleGrantedAuthority(type.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + type.name()));
     }
 
 
@@ -46,5 +46,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         user.setPass(passwordEncoder.encode(user.getPass())); // Hash password
         passAndUserRepository.save(user);
         return "User registered successfully";
+    }
+
+    private String encodingPassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
+    public boolean validatePassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword); // Check if raw password matches the encoded one
     }
 }

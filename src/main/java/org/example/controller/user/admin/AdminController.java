@@ -77,5 +77,8 @@ public class AdminController {
     ){
         return adminService.findEmployeesByOptionalInformation(name,lastName,email,phone,handlerName);
     }
-
+    @GetMapping("/hi")
+    public String hi(){
+        return "hi";
+    }
 }

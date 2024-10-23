@@ -108,4 +108,9 @@ public class CustomerController {
                                     @PathVariable @Digits(integer = 1,fraction = 0)  Integer star){
         return customerService.addComment(orderId, star, comment);
     }
+
+    @GetMapping("/hi")
+    public String hi(){
+        return "hi";
+    }
 }
