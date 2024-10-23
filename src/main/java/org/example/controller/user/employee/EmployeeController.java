@@ -22,7 +22,7 @@ public class EmployeeController {
     @PostMapping("/signUp")
     public EmployeeSignUpDto signUp(
             @RequestBody @Valid
-            EmployeeSignUpDto employeeSignUpDto) {
+            EmployeeSignUpDto employeeSignUpDto) throws Exception {
        return employeeService.signUpEmployee(employeeSignUpDto);
     }
 
