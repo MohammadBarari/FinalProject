@@ -52,4 +52,17 @@ where  pau.username= ? and pau.pass = ?
         query.select(customer).where(cb.and(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(query).getResultList();
     }
+
+    @Override
+    public Customer findByEmail(String email) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+    select * from customer where email = ?
+""",Customer.class);
+            query.setParameter(1, email);
+            return (Customer) query.getSingleResult();
+            }catch (Exception e) {
+            return null;
+        }
+    }
 }

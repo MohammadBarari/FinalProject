@@ -113,4 +113,9 @@ public class CustomerController {
     public String hi(){
         return "hi";
     }
+
+    @GetMapping("/verify")
+    public String verify(@RequestParam(required = false ,name = "token") String token){
+        return customerService.validateEmail(token);
+    }
 }

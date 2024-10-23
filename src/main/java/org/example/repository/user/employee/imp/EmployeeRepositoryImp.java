@@ -51,6 +51,19 @@ where  pau.username= ? and pau.pass = ?
             return false;
         }
     }
+    @Override
+    public Boolean employeeExistsByEmail(String mail) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+             SELECT COUNT(e) FROM Employee e WHERE e.email = ?
+""",Integer.class);
+            query.setParameter(1, mail);
+            Integer count = (Integer) query.getSingleResult();
+            return count > 0;
+        }catch (Exception e) {
+            return false;
+        }
+    }
 
     public List<Employee> selectEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -83,5 +96,19 @@ where  pau.username= ? and pau.pass = ?
 
         query.select(employee).where(cb.and(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(query).getResultList();
+    }
+
+    @Override
+    public void SetUnderReviewState(String email) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+        update employee set employee_state = 'UNDER_REVIEW' where email = ?;
+""");
+            query.setParameter(1, email);
+            query.executeUpdate();
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("failed to set under review state");
+        }
     }
 }

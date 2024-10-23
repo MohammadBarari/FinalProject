@@ -13,6 +13,7 @@ import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.customer.CustomerRepository;
 import org.example.service.credit.CreditService;
 import org.example.service.customerCart.CustomerCartService;
+import org.example.service.emailToken.EmailTokenService;
 import org.example.service.handler.HandlerService;
 import org.example.service.mainService.imp.CustomerAcceptOfferClass;
 import org.example.service.mainService.imp.CombinedUserClass;
@@ -35,19 +36,17 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final SubHandlerService subHandlerService;
     private final OrderService orderService ;
     private final OfferService offerService ;
-    private final CustomerAcceptOfferClass customerAcceptOfferClass;
     private final HandlerService handlerService;
     private final CreditService creditService;
     private final CustomerCartService customerCartService;
     private final CombinedUserClass combineUserClass;
     private final EntityMapper entityMapper;
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, EntityMapper entityMapper, CombinedUserClass combineUserClass, CustomerCartService customerCartService , CreditService creditService, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
-        super(baseUserRepository);
+    public CustomerServiceImp(BaseUserRepository baseUserRepository,EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClass combineUserClass, CustomerCartService customerCartService , CreditService creditService, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
+        super(baseUserRepository,emailTokenService);
         this.customerRepository = customerRepository;
         this.subHandlerService = subHandlerService;
         this.orderService = orderService;
         this.offerService = offerService;
-        this.customerAcceptOfferClass = customerAcceptOfferClass;
         this.handlerService = handlerService;
         this.creditService = creditService;
         this.customerCartService = customerCartService;
@@ -81,7 +80,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return orderDto;
     }
     private Customer findCustomer(Integer customerId) throws NotFoundCustomer {
-        return Optional.ofNullable(findById(customerId, Customer.class))
+        return Optional.ofNullable(customerRepository.findById(customerId, Customer.class))
                 .orElseThrow(() -> new NotFoundCustomer("Customer not found with ID: " + customerId));
     }
 
@@ -144,6 +143,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             Customer customer = entityMapper.dtoToCustomer(customerDto);
             customer.setTimeOfRegistration(LocalDateTime.now());
             addCreditAndPass(customer,customerDto);
+            sendToken(customerDto.email(),TypeOfUser.CUSTOMER);
             signUp(customer);
             return customerDto;
         }
@@ -278,6 +278,14 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     public List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone) {
         return customerRepository.selectCustomerByOptional(name, lastName, email, phone);
     }
+
+
+
+    @Override
+    public Customer findByEmail(String email) {
+        return customerRepository.findByEmail(email);
+    }
+
     public boolean validateCustomerCanPay(Orders orders, Customer customer, Offer offer) throws DontHaveEnoughMoney {
         if(customer.getCredit().getAmount() > offer.getOfferPrice() && orders.getOrderState() == OrderState.DONE){
             return true;

@@ -45,5 +45,8 @@ public class EmployeeController {
     public List<SubHandler> employeeSeeAllSubHander(@PathVariable @NotNull Integer employeeId){
         return employeeService.findAllSubHandlersForEmployee(employeeId);
     }
-
+    @GetMapping("/verify")
+    public String verify(@RequestParam(required = false ,name = "token") String token){
+        return employeeService.validateEmail(token);
+    }
 }

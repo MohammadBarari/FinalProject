@@ -5,6 +5,7 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
 
 import java.util.List;
@@ -26,4 +27,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     String customerPay(Integer ordersId, Integer customerId);
     List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone);
 
+    Customer findByEmail(String email);
+    void sendToken(String email , TypeOfUser typeOfUser);
+    String validateEmail(String email);
 }

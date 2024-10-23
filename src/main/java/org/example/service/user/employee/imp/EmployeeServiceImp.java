@@ -10,6 +10,7 @@ import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
+import org.example.service.emailToken.EmailTokenService;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -39,8 +40,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     //4
 
 
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository,EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
-        super(baseUserRepository);
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
+        super(baseUserRepository,emailTokenService);
         this.entityMapper = entityMapper;
         this.employeeRepository = employeeRepository;
         this.orderService = orderService;
@@ -58,6 +59,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setCredit(credit);
             PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
             employee.setPassAndUser(passAndUser);
+            sendToken(employeeSignUpDto.email(),TypeOfUser.EMPLOYEE);
             saveEmployee(employee);
             return employeeSignUpDto;
         }
@@ -174,6 +176,16 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
         return employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+    }
+
+    @Override
+    public void setUnderReviewState(String email) {
+        employeeRepository.SetUnderReviewState(email);
+    }
+
+    @Override
+    public Boolean employeeExistsByEmail(String email) {
+        return employeeRepository.employeeExistsByEmail(email);
     }
 
     private void addImageToEmployee(Employee employee, File file) throws IOException {

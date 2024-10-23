@@ -7,20 +7,29 @@ import org.example.domain.Employee;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
+import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.BaseUserRepositoryImp;
+import org.example.service.emailToken.EmailTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
-@RequiredArgsConstructor
+
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {
     private final BaseUserRepository baseUserRepository ;
+    private final EmailTokenService emailTokenService;
 
-
+    @Autowired
+    public BaseUserServiceImp(BaseUserRepository baseUserRepository,
+EmailTokenService emailTokenService){
+        this.baseUserRepository = baseUserRepository;
+        this.emailTokenService = emailTokenService;
+    }
     @SneakyThrows
     @Override
     public boolean validatePassWord(String pass) {
@@ -98,5 +107,15 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     @Transactional
     public T findById(int id , Class<T> tClass){
             return Optional.ofNullable((T) baseUserRepository.findById(id,tClass)).orElseThrow(()-> new NotFoundUser("Unable to find Employee with this ID : "+ id));
+    }
+    @Override
+    public void sendToken(String email , TypeOfUser typeOfUser) {
+        emailTokenService.sendEmail(email,typeOfUser);
+    }
+
+    @Override
+    public String validateEmail(String token){
+        emailTokenService.validateToken(token);
+        return "successful";
     }
 }

@@ -22,4 +22,6 @@ public interface EmployeeService  extends BaseUserService<Employee> {
     List<Orders> getOrdersForEmployee(Integer employeeId);
     Boolean employeeExistsByEmployeeId(Integer employeeId);
     List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName);
+    void setUnderReviewState(String email);
+    Boolean employeeExistsByEmail(String email);
 }

@@ -73,4 +73,5 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
             return null;
         }
     }
+
 }

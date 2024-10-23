@@ -3,6 +3,7 @@ package org.example.service.user;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
+import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.NotFoundEmployee;
 
 
@@ -22,5 +23,8 @@ public interface BaseUserService<T extends Users> {
     void changingPassword(ChangingPasswordDto changingPasswordDto);
 
     T findById(int id,Class<T> tClass);
+
+    void sendToken(String email , TypeOfUser typeOfUser);
+    String validateEmail(String email);
 }
 

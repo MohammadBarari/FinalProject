@@ -10,4 +10,6 @@ public interface EmployeeRepository extends BaseUserRepository<Employee> {
     Employee login (String username, String password);
     Boolean employeeExistsById(Integer id);
     List<Employee> selectEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName);
+    void SetUnderReviewState(String email);
+    Boolean employeeExistsByEmail(String mail);
 }

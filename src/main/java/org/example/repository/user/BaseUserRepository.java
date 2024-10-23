@@ -2,8 +2,9 @@ package org.example.repository.user;
 
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BaseUserRepository<T extends Users> {
+public interface BaseUserRepository<T extends Users>{
     void save(T user) ;
     void update(T user);
     void saveUserAndPass(PassAndUser passAndUser);
@@ -11,4 +12,5 @@ public interface BaseUserRepository<T extends Users> {
     void updatePass(PassAndUser passAndUser);
     Object find(String userName, Class<T> userType);
     T findById(int id,Class<T> tClass );
+
 }
