@@ -1,7 +1,7 @@
 package org.example.enumirations;
 
 public enum TypeOfUser {
-    USER,
+    ADMIN,
     EMPLOYEE,
     CUSTOMER
 }

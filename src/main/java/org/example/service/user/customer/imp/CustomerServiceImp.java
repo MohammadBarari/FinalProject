@@ -75,14 +75,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     private OrderDto buildOrder(OrderDto orderDto, Customer customer, SubHandler subHandler) {
-        Orders orders = new Orders();
-        orders.setCustomer(customer);
-        orders.setSubHandler(subHandler);
-        orders.setAddress(orderDto.address());
-        orders.setDetail(orderDto.detail());
-        orders.setTimeOfWork(orderDto.timeOfWork());
+        Orders orders = entityMapper.dtoToOrder(orderDto);
         orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
-        orders.setOfferedPrice(orderDto.offeredPrice());
         orderService.save(orders);
         return orderDto;
     }

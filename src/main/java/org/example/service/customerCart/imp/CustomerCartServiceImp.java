@@ -40,6 +40,6 @@ public class CustomerCartServiceImp implements CustomerCartService {
 
     @Override
     public CustomerCart findCustomerCartByCustomerId(Integer customerId) {
-        return Optional.ofNullable(customerCartRepository.selectCustomerCart(customerId)).orElseThrow(()-> new NotFoundUser("unable to find cart with customer id : " + customerId));
+        return customerCartRepository.selectCustomerCart(customerId);
     }
 }

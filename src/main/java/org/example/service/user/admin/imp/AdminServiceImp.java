@@ -50,7 +50,7 @@ public class AdminServiceImp implements AdminService {
     }
     @Override
     public Handler saveHandler( String handlerName)  {
-        Handler handler1 = Optional.ofNullable(handlerService.findHandlerByName(handlerName)).orElseThrow(HandlerIsDuplicate::new);
+        Handler handler1 = handlerService.findHandlerByName(handlerName);
         Handler handler = Handler.builder().name(handlerName).build();
         handlerService.save(handler);
         return handler;

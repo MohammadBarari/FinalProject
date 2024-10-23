@@ -40,22 +40,18 @@ public class OrderServiceImp implements OrderService {
     public void delete(int id) {
         orderRepository.delete(id);
     }
-
     @Override
     public List<Orders> findAll() {
         return List.of();
     }
-
     @Override
     public List<Orders> findOrdersForEmployee(Integer employeeId) {
         return orderRepository.selectByEmployeeSubHandler(employeeId);
     }
-
     @Override
     public Orders findById(int id) {
         return orderRepository.findById(id);
     }
-
     @Override
     public List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect {
         List<Orders> allDefiend =orderRepository.selectOrdersByCustomer(customerId);
@@ -64,10 +60,8 @@ public class OrderServiceImp implements OrderService {
         }
         return allDefiend;
     }
-
     @Override
     public List<Orders> findOrdersForSubHandler(Integer subHandlerId) {
         return orderRepository.selectOrdersBySubHandlerId(subHandlerId);
     }
-
 }

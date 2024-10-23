@@ -36,17 +36,17 @@ public class CreditServiceImp implements CreditService {
 
     @Override
     public Credit findCreditById(int id) {
-        return Optional.ofNullable(creditRepository.selectCreditById(id)).orElseThrow(()-> new NotFoundUser("Unable to find credit with id " + id));
+        return creditRepository.selectCreditById(id);
     }
 
     @Override
     public Credit findByCustomerId(int customerId) {
-        return Optional.ofNullable(creditRepository.selectByCustomerId(customerId)).orElseThrow(()-> new NotFoundUser("Unable to find customer with id " + customerId));
+        return creditRepository.selectByCustomerId(customerId);
     }
 
     @Override
     public Credit findByEmployeeId(int employeeId) {
-        return Optional.ofNullable(creditRepository.selectByEmployeeId(employeeId)).orElseThrow(()-> new NotFoundUser("Unable to find credit with employeeId " + employeeId));
+        return creditRepository.selectByEmployeeId(employeeId);
     }
 
     @Override

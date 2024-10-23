@@ -42,7 +42,7 @@ public class HandlerBaseImp implements HandlerService {
 
     @Override
     public Handler findHandlerById(Integer id) {
-        return Optional.ofNullable(handlerRepository.findById(id)).orElseThrow(()-> new NotFoundUser("Unable to find handler with id " + id));
+        return handlerRepository.findById(id);
     }
 
     @Override
