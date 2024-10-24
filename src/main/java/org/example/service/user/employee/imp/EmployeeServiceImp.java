@@ -294,7 +294,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         List<Orders> orders = orderService.optionalFindOrdersForEmployee(employeeId, orderState);
         List<OrdersOutputDtoUser> ordersOutputDtoUsers = new ArrayList<>();
         for (Orders orders1 : orders) {
-            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
+            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getId(),orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
         }
         return ordersOutputDtoUsers;
     }

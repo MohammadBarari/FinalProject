@@ -19,7 +19,7 @@ public class Offer extends BaseEntity {
     private LocalDateTime timeOfCreate;
     private Long offerPrice;
     //todo: must be after time that customer set
-    @Future
+    //todo: changing it because in update it cause propblem have to set them manualy
     private LocalDateTime timeOfWork;
     private Integer workTimeInMinutes;
     @ManyToOne

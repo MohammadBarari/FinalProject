@@ -156,7 +156,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new OrderStateIsNotCorrect();
         }
         order.setOrderState(OrderState.STARTED);
-        orderService.save(order);
+        orderService.update(order);
     }
 
 
@@ -210,14 +210,22 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     public boolean checkIfNotDuplicateUser(String user) {
         return Objects.isNull(customerRepository.find(user, Customer.class));
     }
+    @Transactional
     public String addComment(Integer ordersId, Integer star, String comment){
-        Orders orders = findOrder(ordersId);
+        Orders orders = Optional.ofNullable(findOrder(ordersId)).orElseThrow(() -> new NotFoundOrder("orders not found"));
         validateForComment(orders,star);
         orders.setComment(comment);
+        orders.setScore(star);
+        Integer employeeTotalScore = orders.getEmployee().getScore();
+        orders.getEmployee().setScore(employeeTotalScore + star);
         orderService.update(orders);
         return "successful";
     }
     private void validateForComment(Orders orders,Integer star){
+        if (orders.getScore() != null)
+        {
+            throw new DuplicateCommentException("score is set before");
+        }
         if (!(orders.getOrderState() == OrderState.PAID)){
             throw new OrderStateIsNotCorrect();
         }
@@ -271,8 +279,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Transactional
     @Override
     public String customerPay(Integer ordersId, Integer customerId){
-            Orders orders = findOrder(ordersId);
-            Customer customer = findCustomer(customerId);
+            Orders orders = Optional.ofNullable(findOrder(ordersId)).orElseThrow(() -> new NotFoundOrder("unable to find order with id : " + ordersId));
+            Customer customer = Optional.ofNullable(findCustomer(customerId)).orElseThrow(() -> new NotFoundCustomer("unable to find customer with id : " + customerId));
             Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(ordersId)).orElseThrow(() -> new NotFoundOffer("Offer not found any accepted offer with orderID: " + ordersId));
             if (validateCustomerCanPay(orders, customer, offer)) {
                 Credit cusromerCredit = creditService.findCreditById(customer.getCredit().getId());
@@ -305,7 +313,11 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return customerRepository.findByEmail(email);
     }
 
-    public boolean validateCustomerCanPay(Orders orders, Customer customer, Offer offer) throws DontHaveEnoughMoney {
+    public boolean validateCustomerCanPay(Orders orders, Customer customer, Offer offer ) throws DontHaveEnoughMoney {
+        if (!Objects.equals(orders.getCustomer().getId(), customer.getId()))
+        {
+            throw new NotFoundCustomer("order does not belong to customer");
+        }
         if(customer.getCredit().getAmount() > offer.getOfferPrice() && orders.getOrderState() == OrderState.DONE){
             return true;
         }else {
@@ -366,7 +378,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         List<Orders> orders = orderService.optionalFindOrdersForCustomer(customerId, orderState);
         List<OrdersOutputDtoUser> ordersOutputDtoUsers = new ArrayList<>();
         for (Orders orders1 : orders) {
-            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
+            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getId(),orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
         }
         return ordersOutputDtoUsers;
     }

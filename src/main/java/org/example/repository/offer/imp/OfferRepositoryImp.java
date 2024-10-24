@@ -6,9 +6,11 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.example.domain.Employee;
 import org.example.domain.Offer;
+import org.example.exeptions.TimeOfWorkDoesntMatch;
 import org.example.repository.offer.OfferRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 @Repository
 public class OfferRepositoryImp implements OfferRepository {
@@ -17,7 +19,10 @@ public class OfferRepositoryImp implements OfferRepository {
 
     @Override
     public void save(Offer offer) {
+        if (offer.getTimeOfWork().isBefore(LocalDateTime.now())){
             entityManager.persist(offer);
+        }
+        throw new TimeOfWorkDoesntMatch();
     }
 
     @Override

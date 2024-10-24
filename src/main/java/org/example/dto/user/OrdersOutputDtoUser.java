@@ -4,7 +4,8 @@ import org.example.enumirations.OrderState;
 
 import java.time.LocalDateTime;
 
-public record OrdersOutputDtoUser(Double offerPrice,
+public record OrdersOutputDtoUser(Integer orderId,
+        Double offerPrice,
                                   String detail,
                                   LocalDateTime timeOfWork,
                                   String address,

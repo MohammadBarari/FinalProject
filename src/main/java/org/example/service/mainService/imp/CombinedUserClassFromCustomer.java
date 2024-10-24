@@ -66,9 +66,9 @@ public class CombinedUserClassFromCustomer {
     @Transactional
     public void acceptOffer(Integer  offerId){
             Offer offer = Optional.ofNullable(offerService.findById(offerId)).orElseThrow(() -> new NotFoundOffer("unable to find offer with ID :" + offerId));
+            Orders orders = Optional.ofNullable(orderService.findById(offer.getOrders().getId())).orElseThrow(() -> new NotFoundOrder("unable to find order with ID :" + offer.getOrders().getId()));
             offer.setAccepted(true);
             offerService.update(offer);
-            Orders orders = Optional.ofNullable(orderService.findById(offer.getOrders().getId())).orElseThrow(() -> new NotFoundOrder("unable to find order with ID :" + offer.getOrders().getId()));
             Employee employee = Optional.ofNullable(employeeService.findById(offer.getEmployee().getId(),Employee.class)).orElseThrow(()-> new NotFoundEmployee("Unable to find any employee with this offer ID : "  + offerId));
             orders.setEmployee(employee);
             orders.setOrderState(OrderState.UNDER_REACHING_EMPLOYEE);

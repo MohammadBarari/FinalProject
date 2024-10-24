@@ -92,11 +92,11 @@ public class VaddinController extends VerticalLayout {
                     cvv,
                     expiresDate
             );
-            String response = restTemplate.postForObject("http://localhost:8080/customer/customerChargeCredit", dto, String.class);
+            String response = restTemplate.postForObject("http://localhost:8080/customer/chargeCredit", dto, String.class);
             Notification.show("Response: " + response);
 
             if ("successful".equalsIgnoreCase(response)) {
-                getElement().executeJs("window.location.href = 'http://localhost:8080/customer/charge_cart/success';");
+                getElement().executeJs("window.location.href = 'http://localhost:8080/customer/charge/success';");
             } else {
                 Notification.show("Charge was not successful: " + response, 3000, Notification.Position.MIDDLE);
             }
