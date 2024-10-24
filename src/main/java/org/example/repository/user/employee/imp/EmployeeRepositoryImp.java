@@ -106,7 +106,7 @@ where  pau.username= ? and pau.pass = ?
         }
         if (offerSentStart != null || offerSentEnd != null) {
             Root<Offer> offer = query.from(Offer.class);
-            Join<Offer, Employee> offerJoin = offer.join("employee", JoinType.INNER);
+            Join<Offer, Employee> offerJoin = offer.join("employee", JoinType.LEFT);
             offerCount = cb.count(offerJoin.get("id"));
             offerPredicate = countingOfferPredicate(offerSentStart, offerSentEnd, offer, cb);
             predicates.add(cb.equal(offerJoin.get("id"), employee.get("id")));

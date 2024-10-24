@@ -1,5 +1,6 @@
 package org.example.repository.user.customer.imp;
 
+import com.vaadin.flow.component.html.Pre;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -85,13 +86,11 @@ where  pau.username= ? and pau.pass = ?
 
         Expression<Long> worksPaid = null;
         List<Predicate> havingOrdersPaidPredicates = new ArrayList<>();
-
         Root<Orders> ordersRoot = query.from(Orders.class);
+        Join<Orders, Customer> ordersJoin = ordersRoot.join("customer", JoinType.LEFT);
+        worksPaid = getWorksPaid(cb, ordersRoot,ordersJoin,customer);
         if (doneOrderStart != null || doneOrderEnd != null) {
-            Join<Orders, Customer> ordersJoin = ordersRoot.join("customer", JoinType.INNER);
             predicates.add(cb.equal(ordersJoin.get("id"), customer.get("id")));
-            worksPaid = getWorksPaid(cb, ordersRoot);
-
             if (doneOrderStart != null) {
                 havingOrdersPaidPredicates.add(cb.greaterThanOrEqualTo(worksPaid, doneOrderStart.longValue()));
             }
@@ -99,7 +98,6 @@ where  pau.username= ? and pau.pass = ?
                 havingOrdersPaidPredicates.add(cb.lessThanOrEqualTo(worksPaid, doneOrderEnd.longValue()));
             }
         }
-
         query.groupBy(
                 customer.get("id"),
                 customer.get("name"),
@@ -107,8 +105,7 @@ where  pau.username= ? and pau.pass = ?
                 customer.get("email"),
                 customer.get("phone"),
                 customer.get("timeOfRegistration"),
-                customer.get("isActive"),
-                ordersRoot.get("orderState")
+                customer.get("isActive")
         );
         query.select(cb.construct(CustomerOutputDtoForReport.class,
                 customer.get("id"),
@@ -118,7 +115,7 @@ where  pau.username= ? and pau.pass = ?
                 customer.get("phone"),
                 customer.get("timeOfRegistration"),
                 customer.get("isActive"),
-                worksPaid == null ? cb.literal(0) : worksPaid
+                worksPaid == null ? cb.literal(null) : worksPaid
         )
         ).where(cb.and(predicates.toArray(new Predicate[0])));
         if (!havingOrdersPaidPredicates.isEmpty()) {
@@ -126,7 +123,14 @@ where  pau.username= ? and pau.pass = ?
         }
         return entityManager.createQuery(query).getResultList();
     }
-    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> ordersJoin) {
-        return cb.count(cb.selectCase().when(cb.equal(ordersJoin.get("orderState"), "PAID"), 1).otherwise(0));
+    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> orderRoot,Join<Orders, Customer> ordersJoinJoin,Root<Customer> customerRoot) {
+        Join<Orders, Customer> a = orderRoot.join("customer", JoinType.INNER);
+        Predicate isPaid = cb.equal(orderRoot.get("orderState"), "PAID");
+        Predicate customerExists =cb.equal(orderRoot.get("customer").get("id"), customerRoot.get("id"));
+        Predicate predicate2 = cb.and(isPaid,customerExists);
+        Expression<Long> caseExpression = cb.selectCase()
+                .when(customerExists, 1L)
+                .otherwise(0L).as(Long.class);
+        return cb.sum(caseExpression).as(Long.class);
     }
 }
