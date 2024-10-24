@@ -52,7 +52,7 @@ public class AdminController {
     }
 
     @GetMapping("/customers")
-    public List<Customer> findCustomers(@RequestBody FindFilteredCustomerDto input) {
+    public List<CustomerOutput> findCustomers(@RequestBody FindFilteredCustomerDto input) {
         return adminService.findCustomerByOptional(input);
     }
 
@@ -62,8 +62,8 @@ public class AdminController {
     }
 
     @GetMapping("/users/{id}/services/{typeOfUser}")
-    public List<DoneDutiesDto> findPaidServices(@PathVariable Integer id, @PathVariable TypeOfUser typeOfUser) {
-        return adminService.findPaidWorksById(id, typeOfUser);
+    public List<DoneDutiesDto> findPaidServices(@PathVariable Integer id, @PathVariable String typeOfUser) {
+        return adminService.findPaidWorksById(id, TypeOfUser.valueOf(typeOfUser));
     }
 
     @GetMapping("/orders")

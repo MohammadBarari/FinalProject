@@ -15,7 +15,10 @@ public class SubHandlerServiceImp implements SubHandlerService {
     public List<SubHandler> subHandlersForEmployee(Integer employeeId) {
         return subHandlerRepository.selectByEmployeeId(employeeId);
     }
-
+    @Override
+    public SubHandler findSubHandlerByName(String subHandlerName) {
+        return subHandlerRepository.selectByName(subHandlerName);
+    }
     private final SubHandlerRepository subHandlerRepository;
     @Override
     @Transactional

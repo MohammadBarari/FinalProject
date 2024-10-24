@@ -5,6 +5,7 @@ import org.example.dto.CustomerSignUpDto;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.admin.CustomerOutput;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
@@ -20,6 +21,7 @@ public interface EntityMapper {
     SubHandlerOutput subHandlerToDto(SubHandler subHandler);
 
     Customer dtoToCustomer(CustomerSignUpDto customerDto);
+    CustomerOutput customerToDtoAdmin(Customer customer);
 
     OrderDto orderToDto(Orders order);
 

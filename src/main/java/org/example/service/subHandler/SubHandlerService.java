@@ -11,4 +11,5 @@ public interface SubHandlerService {
     List<SubHandler> findAllSubHandlerSameHandler(Integer handlerId);
     SubHandler findSubHandlerById(Integer subHandlerId);
     List<SubHandler> subHandlersForEmployee(Integer employeeId);
+    SubHandler findSubHandlerByName(String subHandlerName);
 }

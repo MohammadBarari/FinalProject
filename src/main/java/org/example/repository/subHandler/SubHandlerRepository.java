@@ -11,4 +11,5 @@ public interface SubHandlerRepository {
     SubHandler selectById(Integer id);
     List<SubHandler> selectBySameHandler(Integer handlerId);
     List<SubHandler> selectByEmployeeId(Integer employeeId);
+    SubHandler selectByName(String name);
 }

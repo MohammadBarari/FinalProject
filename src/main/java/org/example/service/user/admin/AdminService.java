@@ -19,7 +19,7 @@ public interface AdminService {
     void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId) ;
     void acceptEmployee(Integer employeeId);
     void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto);
-    List<Customer> findCustomerByOptional(FindFilteredCustomerDto input);
+    List<CustomerOutput> findCustomerByOptional(FindFilteredCustomerDto input);
     List<EmployeeOutputDtoHandlers> findEmployeesByOptionalInformation(EmployeeInputHandlersDto input);
     List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser);
     List<OrderOutputDto> optionalFindOrders(FindFilteredOrdersDto input);

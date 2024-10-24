@@ -65,4 +65,17 @@ public class SubHandlerRepositoryImp implements SubHandlerRepository {
             return null;
         }
     }
+
+    @Override
+    public SubHandler selectByName(String name) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+        select sub_handler.* from sub_handler where name = ? 
+""",SubHandler.class);
+            query.setParameter(1, name);
+            return (SubHandler) query.getSingleResult();
+        }catch (Exception e) {
+            return null;
+        }
+    }
 }

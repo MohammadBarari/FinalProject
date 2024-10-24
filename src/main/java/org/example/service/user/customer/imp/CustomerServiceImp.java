@@ -152,6 +152,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         if (order.getOrderState() != OrderState.UNDER_REACHING_EMPLOYEE){
             throw new OrderStateIsNotCorrect();
         }
+        Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(order.getId())).orElseThrow(() -> new NotFoundOffer());
+        if (offer.getTimeOfWork().isAfter(LocalDateTime.now())) {
+            throw new TimeOfWorkDoesntMatch();
+        }
         order.setOrderState(OrderState.STARTED);
         orderService.update(order);
     }
@@ -270,7 +274,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     public String makeServiceStateToDone(Integer orderId) {
             combineUserClass.makeTheOrderDone(orderId);
-            System.out.println("what happened");
             return "successful";
     }
     @Transactional

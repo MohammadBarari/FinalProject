@@ -121,7 +121,7 @@ where sh.id = ? and order_state ='UNDER_CHOOSING_EMPLOYEE' or order_state = 'WAI
     public List<Orders> selectPaidOrdersForEmployee(Integer employeeId) {
         try {
             Query query = entityManager.createNativeQuery("""
-    select * from customtestschema.orders join customtestschema.employee e on e.id = orders.employee_id
+    select orders.* from orders join employee e on e.id = orders.employee_id
     where e.id = ? and order_state = 'PAID'
 """,Orders.class);
             query.setParameter(1, employeeId);

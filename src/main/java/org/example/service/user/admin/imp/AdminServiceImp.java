@@ -47,6 +47,9 @@ public class AdminServiceImp implements AdminService {
     @Override
     public Handler saveHandler( String handlerName)  {
         Handler handler1 = handlerService.findHandlerByName(handlerName);
+        if (handler1 != null) {
+            throw new HandlerIsDuplicate();
+        }
         Handler handler = Handler.builder().name(handlerName).build();
         handlerService.save(handler);
         return handler;
@@ -54,6 +57,10 @@ public class AdminServiceImp implements AdminService {
     @Override
     public SubHandler saveSubHandler(SubHandlerDto subHandlerDto) {
         Handler handler = Optional.ofNullable(handlerService.findHandlerById(subHandlerDto.handlerId())).orElseThrow(() -> new HandlerIsNull("Unable to find Handler with this id : "+ subHandlerDto.handlerId() ));
+        SubHandler foundInRep = subHandlerService.findSubHandlerByName(subHandlerDto.name());
+        if (foundInRep != null) {
+            throw new HandlerIsDuplicate();
+        }
         SubHandler subHandler = entityMapper.dtoToSubHandler(subHandlerDto);
         subHandler.setHandler(handler);
         subHandlerService.saveSubHandler(subHandler);
@@ -100,8 +107,13 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public List<Customer> findCustomerByOptional(FindFilteredCustomerDto input) {
-        return customerService.findCustomerByOptional(input);
+    public List<CustomerOutput> findCustomerByOptional(FindFilteredCustomerDto input) {
+        List<Customer> customers = customerService.findCustomerByOptional(input);
+        List<CustomerOutput> customerOutputs = new ArrayList<>();
+        for (Customer customer : customers) {
+            customerOutputs.add(new CustomerOutput(customer.getId(),customer.getName(),customer.getLast_name(),customer.getEmail(),customer.getPhone(),customer.getTimeOfRegistration(),customer.isActive()));
+        }
+        return customerOutputs;
     }
 
     @Override
@@ -114,8 +126,10 @@ public class AdminServiceImp implements AdminService {
     }
     public List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser) {
         switch (typeOfUser) {
-            case EMPLOYEE -> {return employeeService.findDoneWorksById(id);}
-            case CUSTOMER -> {return customerService.findDoneWorksById(id);}
+            case EMPLOYEE -> {
+                return employeeService.findDoneWorksById(id);}
+            case CUSTOMER -> {
+                return customerService.findDoneWorksById(id);}
         }
         throw new FailedDoingOperation("Unable to find DoneWorks by id : "+ id);
     }

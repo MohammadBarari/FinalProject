@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
-                        .clearAuthentication(true) 
+                        .clearAuthentication(true)
                         .permitAll()
                 )
                  .sessionManagement(session -> session

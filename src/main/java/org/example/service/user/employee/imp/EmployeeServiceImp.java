@@ -85,9 +85,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         checkForOffering(offerDto,orders);
         Offer offer = entityMapper.dtoToOffer(offerDto);
         Employee employee = new Employee();
+        employee.setId(offerDto.employeeId());
         offer.setEmployee(employee);
         offer.setTimeOfCreate(LocalDateTime.now());
-        employee.setId(offerDto.employeeId());
         orders.setOrderState(OrderState.UNDER_CHOOSING_EMPLOYEE);
         offer.setOrders(orders);
         orderService.update(orders);
@@ -105,7 +105,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         ) {
             throw new OrderStateIsNotCorrect();
         }
-        if (offerDto.timeOfWork().isAfter(orders.getTimeOfWork())){
+        if (!offerDto.timeOfWork().isAfter(orders.getTimeOfWork())){
             throw new TimeOfWorkDoesntMatch();
         }
         if (offerDto.offerPrice()<orders.getOfferedPrice()){
@@ -167,7 +167,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         List<OrderOutputEmployee> orderOutputEmployees = new ArrayList<>();
         orders.forEach(orders1 -> {
-            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
+            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getId(),orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
             orderOutputEmployees.add(o);
         });
         return orderOutputEmployees;
@@ -244,7 +244,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         List<OrderOutputEmployee> orderOutputEmployees = new ArrayList<>();
         orders.forEach(orders1 -> {
-            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
+            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getId(),orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
             orderOutputEmployees.add(o);
         });
         return orderOutputEmployees;
@@ -288,19 +288,29 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
+    @Transactional
     public List<DoneDutiesDto> findDoneWorksById(Integer id) {
         List<DoneDutiesDto> doneDutiesDtos = new ArrayList<>();
-        List<Orders> allDoneOrders = orderService.findPaidOrdersForCustomer(id);
-        for (Orders orders : allDoneOrders) {
-            Offer offer = offerService.findAcceptedOfferInOrder(orders.getId());
-            String employeeName = offer.getEmployee().getName() + " " +offer.getEmployee().getLast_name();
-            Integer customerId = orders.getCustomer().getId();
-            String customerFullName = orders.getCustomer().getName() + " " + orders.getCustomer().getLast_name();
-            Double price = Double.valueOf(offer.getOfferPrice());
-            DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(),price,new SubHandlersDtoOutput(orders.getSubHandler().getName(),orders.getSubHandler().getDetail(),orders.getSubHandler().getBasePrice()),orders.getScore(), id,employeeName,customerFullName,customerId,orders.getComment());
-            doneDutiesDtos.add(dto);
+        List<Orders> allDoneOrders = orderService.findPaidOrdersForEmployee(id);
+        if (allDoneOrders!=null && !allDoneOrders.isEmpty()) {
+            for (Orders orders : allDoneOrders) {
+                if (orders.getOrderState() == OrderState.PAID) {
+                    Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(orders.getId())).orElseThrow(() -> new NotFoundOffer("offer not found"));
+                    DoneDutiesDto dto = getDoneDutiesDto(id, orders, offer);
+                    doneDutiesDtos.add(dto);
+                }
+            }
         }
         return doneDutiesDtos;
+    }
+
+    private  DoneDutiesDto getDoneDutiesDto(Integer id, Orders orders, Offer offer) {
+        String employeeName = orders.getEmployee().getName() + " " + orders.getEmployee().getLast_name();
+        Integer customerId = orders.getCustomer().getId();
+        String customerFullName = orders.getCustomer().getName() + " " + orders.getCustomer().getLast_name();
+        Double price = Double.valueOf(offer.getOfferPrice());
+        DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(), orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore(), id, employeeName, customerFullName, customerId, orders.getComment());
+        return dto;
     }
 
     @Override

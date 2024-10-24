@@ -18,10 +18,11 @@ public class OfferRepositoryImp implements OfferRepository {
 
     @Override
     public void save(Offer offer) {
-        if (offer.getTimeOfWork().isBefore(LocalDateTime.now())){
+        if (offer.getTimeOfWork().isAfter(LocalDateTime.now())){
             entityManager.persist(offer);
+        }else {
+            throw new TimeOfWorkDoesntMatch();
         }
-        throw new TimeOfWorkDoesntMatch();
     }
 
     @Override

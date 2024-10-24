@@ -36,7 +36,8 @@ public class EmailTokenServiceImp implements EmailTokenService {
     @Override
     @Transactional
     public void sendEmail(String email , TypeOfUser typeOfUser) {
-        if (emailTokenRepository.findByEmail(email) != null){
+        EmailToken emailTokenInRep =emailTokenRepository.findByEmail(email);
+        if (emailTokenInRep.isExpired()){
             throw new InvalidTokenExceptions("Email already exists");
         }
         EmailToken emailToken = createEmailToken(typeOfUser,email);
