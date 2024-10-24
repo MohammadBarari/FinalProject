@@ -3,10 +3,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.atmosphere.config.service.Get;
-import org.example.domain.*;
 import org.example.dto.*;
 import org.example.dto.customer.*;
+import org.example.dto.subHandlers.SubHandlersDtoOutputId;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.FailedDoingOperation;
@@ -28,7 +27,7 @@ public class CustomerController {
     }
 
     @GetMapping("/login/{username}/{password}")
-    public Customer login(@PathVariable @NotNull String username,
+    public CustomerLoginDtoOutput login(@PathVariable @NotNull String username,
                           @PathVariable @NotNull  String password) {
         return customerService.login(username, password);
     }
@@ -83,7 +82,7 @@ public class CustomerController {
     }
 
     @GetMapping("/customerSeeAllSubHandlerForHandler/{handlerId}")
-    public List<SubHandler> customerSeeAllSubHandlerForHander(@PathVariable @NotNull Integer handlerId){
+    public List<SubHandlersDtoOutputId> customerSeeAllSubHandlerForHandler(@PathVariable @NotNull Integer handlerId){
         return customerService.getSubHandlersForHandler(handlerId);
     }
 

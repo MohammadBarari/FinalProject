@@ -1,8 +1,7 @@
 package org.example.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.example.enumirations.OrderState;
@@ -22,7 +21,6 @@ public class Orders extends BaseEntity {
     private String detail;
     @ManyToOne(fetch = FetchType.LAZY)
     private SubHandler subHandler;
-    @Future
     private LocalDateTime timeOfWork;
     @NotNull
     private String address;

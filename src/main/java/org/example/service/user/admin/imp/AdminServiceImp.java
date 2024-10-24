@@ -2,10 +2,7 @@ package org.example.service.user.admin.imp;
 import org.example.domain.*;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SubHandlerDto;
-import org.example.dto.admin.CustomerOutputDtoForReport;
-import org.example.dto.admin.EmployeeInputHandlersDto;
-import org.example.dto.admin.EmployeeOutputDtoHandlers;
-import org.example.dto.admin.EmployeeOutputDtoReport;
+import org.example.dto.admin.*;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.EmployeeState;
@@ -103,8 +100,8 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone) {
-        return customerService.findCustomerByOptional(name, lastName, email, phone);
+    public List<Customer> findCustomerByOptional(FindFilteredCustomerDto input) {
+        return customerService.findCustomerByOptional(input);
     }
 
     @Override
@@ -124,9 +121,10 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public List<OrderOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
+    @Transactional
+    public List<OrderOutputDto> optionalFindOrders(FindFilteredOrdersDto input) {
         List<OrderOutputDto> ordersOutputDtos = new ArrayList<>();
-        employeeService.optionalFindOrders(startDate, endDate, subHandlers, handlersName).forEach(orders -> {
+        employeeService.optionalFindOrders(input).forEach(orders -> {
             ordersOutputDtos.add(new OrderOutputDto(orders.getOfferedPrice(),orders.getDetail()
                     ,orders.getSubHandler().getName(),orders.getTimeOfWork()
                     ,orders.getAddress(),orders.getOrderState()
@@ -136,8 +134,8 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration, LocalDate endDateRegistration, Integer doneWorksStart, Integer doneWorksEnd, Integer offerSentStart, Integer offerSentEnd) {
-        return employeeService.findEmployeeByReports(startDateRegistration,endDateRegistration,doneWorksStart,doneWorksEnd,offerSentStart,offerSentEnd);
+    public List<EmployeeOutputDtoReport> findEmployeeByReports(FindFilteredEmployeeDto input) {
+        return employeeService.findEmployeeByReports(input);
     }
 
     @Override
@@ -161,8 +159,8 @@ public class AdminServiceImp implements AdminService {
         return true;
     }
     @Override
-    public List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
-        return customerService.findCustomerByReports(startDate,endDate,doneOrderStart,doneOrderEnd);
+    public List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input) {
+        return customerService.findCustomerByReports(input);
     }
 
 }

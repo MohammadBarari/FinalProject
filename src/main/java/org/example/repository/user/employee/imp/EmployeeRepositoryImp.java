@@ -120,15 +120,16 @@ where  pau.username= ? and pau.pass = ?
                 employee.get("timeOfRegistration"),
                 employee.get("employeeState")
         );
+        List<Predicate> havingOrdersPredicates = new ArrayList<>();
         if (doneWorksStart != null || doneWorksEnd != null) {
-            Predicate havingOrdersPredicate = countingOrders(doneWorksStart, doneWorksEnd, worksCountSubquery, cb, employee);
-            query.having(havingOrdersPredicate);
+            havingOrdersPredicates.add(countingOrders(doneWorksStart, doneWorksEnd, worksCountSubquery, cb, employee));
         }
         if (offerSentStart != null || offerSentEnd != null) {
-            Predicate havingOffersPredicate = countingOfferPredicate(cb, offerSentStart, offerSentEnd, offersCountSubquery);
-            query.having(havingOffersPredicate);
+            havingOrdersPredicates.add(countingOfferPredicate(cb, offerSentStart, offerSentEnd, offersCountSubquery));
         }
-
+        if (havingOrdersPredicates.size() > 0) {
+            query.having(havingOrdersPredicates.toArray(new Predicate[0]));
+        }
         return entityManager.createQuery(query).getResultList();
     }
 

@@ -8,6 +8,7 @@ import org.example.domain.Orders;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
+import org.example.dto.admin.FindFilteredOrdersDto;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
@@ -123,8 +124,8 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     }
 
     @Override
-    public List<Orders> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers){
-        return orderService.optionalFindOrders(startDate, endDate, handlersName, subHandlers);
+    public List<Orders> optionalFindOrders(FindFilteredOrdersDto input){
+        return orderService.optionalFindOrders(input.startDate(), input.endDate(), input.handlersName(), input.subHandlersName());
     }
 
 }

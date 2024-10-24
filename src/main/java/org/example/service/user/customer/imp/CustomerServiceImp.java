@@ -7,9 +7,12 @@ import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
+import org.example.dto.admin.FindCustomerByFilterDto;
+import org.example.dto.admin.FindFilteredCustomerDto;
 import org.example.dto.customer.*;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.subHandlers.SubHandlersDtoOutput;
+import org.example.dto.subHandlers.SubHandlersDtoOutputId;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
@@ -31,6 +34,7 @@ import org.example.service.user.customer.CustomerService;
 import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -123,8 +127,18 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
-    public List<SubHandler> getSubHandlersForHandler(Integer handlerId) {
-        return subHandlerService.findAllSubHandlerSameHandler(handlerId);
+    public List<SubHandlersDtoOutputId> getSubHandlersForHandler(Integer handlerId) {
+        List<SubHandler> subHandlers = subHandlerService.findAllSubHandlerSameHandler(handlerId);
+        List<SubHandlersDtoOutputId> subHandlersDtoOutputIds = new ArrayList<>();
+        if (subHandlers!= null){
+            for (SubHandler subHandler : subHandlers) {
+                subHandlersDtoOutputIds.add(
+                        new SubHandlersDtoOutputId(subHandler.getId(),subHandler.getName(),subHandler.getDetail(),subHandler.getBasePrice())
+                );
+            }
+            return subHandlersDtoOutputIds;
+        }
+        return null;
     }
     @Transactional
     public List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId){
@@ -187,14 +201,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
-    public Customer login(String user, String pass)
+    public CustomerLoginDtoOutput login(String user, String pass)
     {
-        Customer customer =  customerRepository.login(user,pass);
-        if (customer != null)
-        {
-            return customer;
-        }
-        throw new NotFoundCustomer();
+        Customer customer =  Optional.ofNullable(customerRepository.login(user,pass)).orElseThrow(() -> new NotFoundCustomer("user or password may be incorrect! "));
+        return new CustomerLoginDtoOutput(customer.getId(),customer.getName(),customer.getLast_name(),customer.getPhone(),customer.getCredit().getAmount());
     }
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
@@ -284,8 +294,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
-    public List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone) {
-        return customerRepository.selectCustomerByOptional(name, lastName, email, phone);
+    public List<Customer> findCustomerByOptional(FindFilteredCustomerDto input) {
+        return customerRepository.selectCustomerByOptional(input.name(), input.lastName(), input.email(), input.phone());
     }
 
 
@@ -326,26 +336,29 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
+    @Transactional
     public List<DoneDutiesDto> findDoneWorksById(Integer id) {
-        List<DoneDutiesDto> doneDutiesDtos = new ArrayList<>();
-        List<Orders> allDoneOrders = orderService.findPaidOrdersForCustomer(id);
+        List<DoneDutiesDto> doneDutiesDos = new ArrayList<>();
+        List<Orders> allDoneOrders = Optional.ofNullable(orderService.findPaidOrdersForCustomer(id)).orElseThrow(()-> new NotFoundOrder("no paid order was found for this customer "));
         for (Orders orders : allDoneOrders) {
             Offer offer = offerService.findAcceptedOfferInOrder(orders.getId());
-            Integer employeeId = offer.getEmployee().getId();
-            String employeeName = offer.getEmployee().getName() + " " +offer.getEmployee().getLast_name();
-            Customer customer = customerRepository.findById(orders.getCustomer().getId(), Customer.class);
-            Integer customerId = customer.getId();
-            String customerFullName = customer.getName() + " " + customer.getLast_name();
-            Double price = Double.valueOf(offer.getOfferPrice());
-            DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(),price,new SubHandlersDtoOutput(orders.getSubHandler().getName(),orders.getSubHandler().getDetail(),orders.getSubHandler().getBasePrice()),orders.getScore(),employeeId,employeeName,customerFullName,customerId,orders.getComment());
-            doneDutiesDtos.add(dto);
+            if (offer!= null) {
+                Integer employeeId = offer.getEmployee().getId();
+                String employeeName = offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name();
+                Customer customer = customerRepository.findById(orders.getCustomer().getId(), Customer.class);
+                Integer customerId = customer.getId();
+                String customerFullName = customer.getName() + " " + customer.getLast_name();
+                Double price = Double.valueOf(offer.getOfferPrice());
+                DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(), orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore() != null ? orders.getScore() : 0, employeeId, employeeName, customerFullName, customerId, orders.getComment());
+                doneDutiesDos.add(dto);
+            }
         }
-        return doneDutiesDtos;
+        return doneDutiesDos;
     }
 
     @Override
-    public List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
-        return customerRepository.selectCustomerByReports(startDate,endDate,doneOrderStart,doneOrderEnd);
+    public List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input) {
+        return customerRepository.selectCustomerByReports(input.startDate(),input.endDate(),input.doneOrderStart(),input.doneOrderEnd());
     }
 
     @Override

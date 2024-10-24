@@ -6,6 +6,9 @@ import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
+import org.example.dto.admin.FindFilteredEmployeeDto;
+import org.example.dto.customer.CustomerLoginDtoOutput;
+import org.example.dto.employee.EmployeeLoginDtoOutput;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
@@ -36,12 +39,8 @@ public interface EmployeeService  extends BaseUserService<Employee> {
     String validateEmployeeEmail(String token);
     List<Orders> findPaidOrders(Integer employeeId);
     List<DoneDutiesDto> findDoneWorksById(Integer id);
-    List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration,
-                                                        LocalDate endDateRegistration,
-                                                        Integer doneWorksStart,
-                                                        Integer doneWorksEnd,
-                                                        Integer offerSentStart,
-                                                        Integer  offerSentEnd);
+    List<EmployeeOutputDtoReport> findEmployeeByReports(FindFilteredEmployeeDto input);
     List<OrdersOutputDtoUser> optionalSelectOrdersForEmployee(Integer employeeId, String orderState);
     Double getCreditAmount(Integer id);
+    EmployeeLoginDtoOutput login(String user, String pass) ;
 }

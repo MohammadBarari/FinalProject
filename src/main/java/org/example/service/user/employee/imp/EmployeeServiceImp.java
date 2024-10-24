@@ -4,6 +4,8 @@ import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
+import org.example.dto.admin.FindFilteredEmployeeDto;
+import org.example.dto.employee.EmployeeLoginDtoOutput;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
@@ -234,12 +236,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 && checkIfImageSizeIsOkay(file) && validateImage(file);
     }
     @Override
-    public Employee login(String user, String pass)  {
-        Employee employee =  employeeRepository.login(user,pass);
-        if (employee != null) {
-            return employee;
-        }
-        throw new NotFoundEmployee();
+    public EmployeeLoginDtoOutput login(String user, String pass)  {
+        Employee employee =  Optional.ofNullable(employeeRepository.login(user,pass)).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
+        return new EmployeeLoginDtoOutput(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getCredit().getAmount(),employee.getImage(),employee.getScore());
     }
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
@@ -286,8 +285,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration, LocalDate endDateRegistration, Integer doneWorksStart, Integer doneWorksEnd, Integer offerSentStart, Integer offerSentEnd) {
-        return employeeRepository.selectEmployeeByReports(startDateRegistration,endDateRegistration,doneWorksStart,doneWorksEnd,offerSentStart,offerSentEnd);
+    public List<EmployeeOutputDtoReport> findEmployeeByReports(FindFilteredEmployeeDto input) {
+        return employeeRepository.selectEmployeeByReports(input.startDateRegistration(),input.endDateRegistration(),input.doneWorksStart(),input.doneWorksEnd(),input.offerSentStart(),input.offerSentEnd());
     }
 
     @Override

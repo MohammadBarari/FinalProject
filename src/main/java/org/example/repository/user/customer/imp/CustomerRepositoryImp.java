@@ -129,7 +129,7 @@ where  pau.username= ? and pau.pass = ?
         Predicate customerExists =cb.equal(orderRoot.get("customer").get("id"), customerRoot.get("id"));
         Predicate predicate2 = cb.and(isPaid,customerExists);
         Expression<Long> caseExpression = cb.selectCase()
-                .when(customerExists, 1L)
+                .when(predicate2, 1L)
                 .otherwise(0L).as(Long.class);
         return cb.sum(caseExpression).as(Long.class);
     }

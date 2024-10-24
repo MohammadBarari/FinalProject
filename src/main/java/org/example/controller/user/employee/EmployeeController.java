@@ -7,6 +7,7 @@ import org.example.domain.Employee;
 import org.example.dto.ChangingPasswordDto;
 import org.example.dto.changingPasswordDtoController;
 import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.employee.EmployeeLoginDtoOutput;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
@@ -33,7 +34,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/login/{username}/{password}")
-    public Employee login(
+    public EmployeeLoginDtoOutput login(
             @PathVariable @NotNull String username, @PathVariable @NotNull String password) {
         return employeeService.login(username, password);
     }
