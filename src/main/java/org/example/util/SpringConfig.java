@@ -29,7 +29,7 @@ public class SpringConfig {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.ssl.enable", "true");
-        props.put("mail.debug", "true"); // Enable debugging for more information
+        props.put("mail.debug", "true");
 
         return mailSender;
     }

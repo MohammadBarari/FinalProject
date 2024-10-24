@@ -19,10 +19,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/customer/signUp", "/employee/signUp").permitAll()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
-//                        .requestMatchers("/employee/**").hasRole("EMPLOYEE")
-                        .anyRequest().permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
+                        .requestMatchers("/employee/**").hasRole("EMPLOYEE")
+//                        .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .permitAll()
