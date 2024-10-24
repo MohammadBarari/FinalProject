@@ -17,11 +17,16 @@ import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
-    private PassAndUserRepository passAndUserRepository;
+
+    private final PassAndUserRepository passAndUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public CustomUserDetailsService(PassAndUserRepository passAndUserRepository, PasswordEncoder passwordEncoder) {
+        this.passAndUserRepository = passAndUserRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -43,7 +48,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     public String registerUser(PassAndUser user) {
-        user.setPass(passwordEncoder.encode(user.getPass())); // Hash password
+        user.setPass(passwordEncoder.encode(user.getPass()));
         passAndUserRepository.save(user);
         return "User registered successfully";
     }
@@ -53,6 +58,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public boolean validatePassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword); // Check if raw password matches the encoded one
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }
