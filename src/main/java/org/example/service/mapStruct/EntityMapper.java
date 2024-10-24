@@ -1,11 +1,14 @@
 package org.example.service.mapStruct;
 
 import org.example.domain.*;
-import org.example.dto.*;
+import org.example.dto.CustomerSignUpDto;
+import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.OrderDto;
+import org.example.dto.SubHandlerDto;
 import org.example.dto.employee.OfferDto;
+import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
 import org.example.dto.orders.OrderOutputDto;
-import org.example.dto.employee.OrderOutputEmployee;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

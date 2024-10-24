@@ -2,7 +2,6 @@ package org.example.repository.user;
 
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BaseUserRepository<T extends Users>{
     void save(T user) ;

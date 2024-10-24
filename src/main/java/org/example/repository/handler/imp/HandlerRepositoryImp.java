@@ -3,11 +3,9 @@ package org.example.repository.handler.imp;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import org.example.domain.Handler;
 import org.example.repository.handler.HandlerRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.List;
 @Repository

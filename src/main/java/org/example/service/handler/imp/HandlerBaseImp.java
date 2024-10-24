@@ -2,15 +2,12 @@ package org.example.service.handler.imp;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Handler;
-import org.example.exeptions.NotFoundUser;
 import org.example.repository.handler.HandlerRepository;
 import org.example.service.handler.HandlerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

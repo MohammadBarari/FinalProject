@@ -1,7 +1,7 @@
 package org.example.service.user.customer;
 
-import jakarta.validation.constraints.NotNull;
-import org.example.domain.*;
+import org.example.domain.Customer;
+import org.example.domain.Orders;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
@@ -12,12 +12,10 @@ import org.example.dto.customer.*;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.subHandlers.SubHandlersDtoOutputId;
 import org.example.dto.user.OrdersOutputDtoUser;
-import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 @Service
 public interface CustomerService extends BaseUserService<Customer> {
@@ -32,7 +30,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     void customerAcceptOffer(Integer offerId);
     List<HandlerCustomerDto> getHandlersForCustomer();
     List<SubHandlersDtoOutputId> getSubHandlersForHandler(Integer handlerId);
-    String customerChargeCart(PayToCartDto payToCartDto);
+    String customerChargeCart(PayToCartDto payToCartDto );
     String makeServiceStateToDone(Integer orderId);
     String customerPay(Integer ordersId, Integer customerId);
     List<Customer> findCustomerByOptional(FindFilteredCustomerDto input);

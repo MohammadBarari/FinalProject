@@ -1,6 +1,5 @@
 package org.example.service.customerCart;
 
-import jakarta.transaction.Transactional;
 import org.example.domain.CustomerCart;
 import org.example.exeptions.WrongEntrance;
 import org.springframework.stereotype.Service;

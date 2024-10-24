@@ -1,11 +1,8 @@
 package org.example.service.order;
 
-import org.example.domain.Employee;
 import org.example.domain.Orders;
-import org.example.enumirations.OrderState;
 import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.exeptions.TimeOfWorkDoesntMatch;
-import org.hibernate.query.Order;
 
 import java.time.LocalDate;
 import java.util.List;

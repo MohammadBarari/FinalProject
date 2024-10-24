@@ -3,7 +3,6 @@ package org.example.repository.offer.imp;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.exeptions.TimeOfWorkDoesntMatch;

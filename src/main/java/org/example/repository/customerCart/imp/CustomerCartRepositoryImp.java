@@ -3,7 +3,6 @@ package org.example.repository.customerCart.imp;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import lombok.RequiredArgsConstructor;
 import org.example.domain.CustomerCart;
 import org.example.repository.customerCart.CustomerCartRepository;
 import org.springframework.stereotype.Repository;

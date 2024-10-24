@@ -9,7 +9,6 @@ import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.service.mainService.OrderAndCustomerService;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
-import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

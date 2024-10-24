@@ -1,6 +1,5 @@
 package org.example.repository.subHandler;
 
-import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 
 import java.util.List;

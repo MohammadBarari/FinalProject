@@ -3,7 +3,6 @@ package org.example.repository.credit.imp;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import org.example.domain.Credit;
 import org.example.repository.credit.CreditRepository;
 import org.springframework.stereotype.Repository;

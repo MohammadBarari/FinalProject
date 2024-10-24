@@ -28,17 +28,15 @@ import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+
 @Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
@@ -48,10 +46,10 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
     @Override
     @Transactional
-    public EmployeeSignUpDto signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws Exception {
-        File file = new File(employeeSignUpDto.imagePath());
-        if (validateEmployee(employeeSignUpDto,file)) {
-            Employee employee = getEmployee(employeeSignUpDto, file);
+    public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws Exception {
+
+        if (validateEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64())) {
+            Employee employee = getEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64());
             Credit credit = Credit.builder().typeOfEmployee(TypeOfUser.EMPLOYEE).amount(0.0d).build();
             employee.setCredit(credit);
             PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
@@ -70,11 +68,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 .username(employeeSignUpDto.phone()).build();
     }
 
-    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, File file) throws Exception {
+    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, String file) throws Exception {
         Employee employee =entityMapper.dtoToEmployee(employeeSignUpDto);
-        if (validateEmployee(employeeSignUpDto, file)) {
-            addImageToEmployee(employee, file);
-        }
+        employee.setImage(decodeImage(file));
         employee.setEmployeeState(EmployeeState.NEW);
         employee.setTimeOfRegistration(LocalDateTime.now());
         employee.setScore(0);
@@ -119,7 +115,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     //2
     @Transactional
     public void saveEmployee( Employee employee){
-         employeeRepository.save(employee);
+        employeeRepository.save(employee);
     }
     @Override
     public  boolean validateImage(File imageFile){
@@ -254,9 +250,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         return orderOutputEmployees;
     }
     @Override
-    public boolean validateEmployee(EmployeeSignUpDto employee, File file) {
+    public boolean validateEmployee(EmployeeSignUpDto employee, String file) throws IOException {
         return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())
-                && checkIfImageSizeIsOkay(file) && validateImage(file);
+                && validateImageJpg (file) && checkImageSize(file);
     }
     @Override
     public EmployeeLoginDtoOutput login(String user, String pass)  {
@@ -327,4 +323,32 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         return Optional.ofNullable(creditService.findByEmployeeId(id).getAmount()).orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
     }
 
+    private boolean validateImageJpg(String file) throws IOException {
+        byte[] imageBytes = decodeImage(file);
+        // Check if the image has enough bytes to be a JPEG
+        if (imageBytes.length < 4) { // At least 4 bytes needed for header and footer
+            throw new ItIsNotJpgFile("File is too short to be a valid image");
+        }
+
+        // Check for JPEG signature (FF D8 at start and FF D9 at end)
+        if (imageBytes[0] != (byte) 0xFF || imageBytes[1] != (byte) 0xD8) {
+            throw new ItIsNotJpgFile("The file is not a JPG image");
+        }
+
+        if (imageBytes[imageBytes.length - 2] != (byte) 0xFF || imageBytes[imageBytes.length - 1] != (byte) 0xD9) {
+            throw new ItIsNotJpgFile("The file is not a valid JPG image (missing footer)");
+        }
+        return true;
+    }
+    private boolean checkImageSize (String file) throws IOException {
+        long sizeInKb = decodeImage(file).length /1024;
+        return sizeInKb < 300;
+    }
+    public byte[] decodeImage(String base64Image) {
+        try {
+            return Base64.getDecoder().decode(base64Image);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Base64 input", e);
+        }
+    }
 }

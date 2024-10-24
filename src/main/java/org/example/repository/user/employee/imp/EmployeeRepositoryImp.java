@@ -1,18 +1,16 @@
 package org.example.repository.user.employee.imp;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.example.domain.*;
-import org.example.dto.EmployeeOutPutDto;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

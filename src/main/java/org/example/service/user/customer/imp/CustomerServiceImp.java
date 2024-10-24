@@ -1,7 +1,7 @@
 package org.example.service.user.customer.imp;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.SneakyThrows;
 import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
@@ -23,19 +23,16 @@ import org.example.service.credit.CreditService;
 import org.example.service.customerCart.CustomerCartService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.handler.HandlerService;
-import org.example.service.mainService.imp.CustomerAcceptOfferClass;
 import org.example.service.mainService.imp.CombinedUserClassFromCustomer;
+import org.example.service.mainService.imp.CustomerAcceptOfferClass;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
-import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;

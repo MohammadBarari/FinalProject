@@ -1,18 +1,17 @@
 package org.example.service.user;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.example.domain.Employee;
 import org.example.domain.Orders;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
 import org.example.dto.admin.FindFilteredOrdersDto;
-import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.*;
+import org.example.exeptions.AllNotBeLetterOrDigits;
+import org.example.exeptions.NotFoundUser;
+import org.example.exeptions.PassNot8Digits;
+import org.example.exeptions.UnableToChangePassWord;
 import org.example.repository.user.BaseUserRepository;
-import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.service.credit.CreditService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.mapStruct.EntityMapper;
@@ -20,13 +19,9 @@ import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 
 
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {

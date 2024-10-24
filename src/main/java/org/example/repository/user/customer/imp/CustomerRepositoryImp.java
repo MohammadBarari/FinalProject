@@ -1,8 +1,5 @@
 package org.example.repository.user.customer.imp;
 
-import com.vaadin.flow.component.html.Pre;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import org.example.domain.Customer;

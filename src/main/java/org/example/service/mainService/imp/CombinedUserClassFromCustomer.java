@@ -1,7 +1,6 @@
 package org.example.service.mainService.imp;
 
 import jakarta.transaction.Transactional;
-import org.example.domain.Customer;
 import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.domain.Orders;

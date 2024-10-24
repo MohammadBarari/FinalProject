@@ -6,13 +6,12 @@ import org.example.exeptions.InvalidTokenExceptions;
 import org.example.repository.emailToken.EmailTokenRepository;
 import org.example.service.emailToken.EmailTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,6 +36,9 @@ public class EmailTokenServiceImp implements EmailTokenService {
     @Override
     @Transactional
     public void sendEmail(String email , TypeOfUser typeOfUser) {
+        if (emailTokenRepository.findByEmail(email) != null){
+            throw new InvalidTokenExceptions("Email already exists");
+        }
         EmailToken emailToken = createEmailToken(typeOfUser,email);
         String token = generateToken();
         emailToken.setToken(token);
@@ -49,13 +51,8 @@ public class EmailTokenServiceImp implements EmailTokenService {
     }
     @Override
     public void validateToken(String token) {
-        //find token in database and make sure its valid
-        //find time
-        //find token is not expired
-        //find if person is existing and person is validated
         EmailToken emailToken = Optional.ofNullable(findByToken(token)).orElseThrow(() -> new InvalidTokenExceptions("Token is invalid"));
         validateTokenProperties(emailToken);
-
     }
 
     private String generateToken() {
@@ -63,6 +60,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
     }
 
     private void sendingMail(String email, String token ,EmailToken emailToken,TypeOfUser typeOfUser) {
+        emailTokenRepository.findByEmail(email);
         String activationLink = "http://localhost:8080/"+(typeOfUser == TypeOfUser.CUSTOMER? "customer" : "employee") +"/verify?token=" + token;
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);

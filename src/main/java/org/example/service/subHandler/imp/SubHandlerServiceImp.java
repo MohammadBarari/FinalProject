@@ -1,7 +1,6 @@
 package org.example.service.subHandler.imp;
 
 import lombok.RequiredArgsConstructor;
-import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.repository.subHandler.SubHandlerRepository;
 import org.example.service.subHandler.SubHandlerService;

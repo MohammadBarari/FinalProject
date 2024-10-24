@@ -1,12 +1,9 @@
 package org.example.repository.user.employee;
 
-import jakarta.persistence.metamodel.ListAttribute;
 import org.example.domain.Employee;
-import org.example.dto.EmployeeOutPutDto;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.repository.user.BaseUserRepository;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
