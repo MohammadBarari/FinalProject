@@ -28,10 +28,10 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // URL to trigger logout
-                        .logoutSuccessUrl("/login?logout") // Redirect URL after logout
-                        .invalidateHttpSession(true) // Invalidate session
-                        .clearAuthentication(true) // Clear authentication
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true) 
                         .permitAll()
                 )
                  .sessionManagement(session -> session
@@ -42,7 +42,7 @@ public class SecurityConfig {
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Use BCrypt for password encoding
+        return new BCryptPasswordEncoder();
     }
 
 }
