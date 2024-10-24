@@ -40,7 +40,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
         EmailToken emailToken = createEmailToken(typeOfUser,email);
         String token = generateToken();
         emailToken.setToken(token);
-        sendingMail(email,token,emailToken);
+        sendingMail(email,token,emailToken,typeOfUser);
         emailTokenRepository.save(emailToken);
     }
     @Override
@@ -62,8 +62,8 @@ public class EmailTokenServiceImp implements EmailTokenService {
         return UUID.randomUUID().toString();
     }
 
-    private void sendingMail(String email, String token ,EmailToken emailToken) {
-        String activationLink = "http://localhost:8080/customer/verify?token=" + token;// Replace with your actual domain
+    private void sendingMail(String email, String token ,EmailToken emailToken,TypeOfUser typeOfUser) {
+        String activationLink = "http://localhost:8080/"+(typeOfUser == TypeOfUser.CUSTOMER? "customer" : "employee") +"/verify?token=" + token;
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Email Activation");

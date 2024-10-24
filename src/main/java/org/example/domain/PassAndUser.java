@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 @Entity
 @Table
 public class PassAndUser extends BaseEntity {
-    @Column(length = 8,  nullable = false)
+    @Column(nullable = false)
     private String pass;
     private String username;
     @Enumerated(EnumType.STRING)

@@ -147,7 +147,9 @@ where sh.id = ? and order_state ='UNDER_CHOOSING_EMPLOYEE' or order_state = 'WAI
     }
 
     @Override
-    public List<Orders> optionalSelectOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
+    public List<Orders> optionalSelectOrders
+            (LocalDate startDate, LocalDate endDate,
+             List<String> handlersName, List<String> subHandlers) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Orders> cq = cb.createQuery(Orders.class);
         Root<Orders> ordersRoot = cq.from(Orders.class);
@@ -157,25 +159,27 @@ where sh.id = ? and order_state ='UNDER_CHOOSING_EMPLOYEE' or order_state = 'WAI
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
             predicates.add(cb.between(ordersRoot.get("timeOfWork"), startDateTime, endDateTime));
         }
+
         if (subHandlers != null && !subHandlers.isEmpty()) {
             List<Predicate> subHandlerPredicates = new ArrayList<>();
-            Join<Orders, SubHandler> subHandlerJoin = ordersRoot.join("subHandler");
-
+            Join<Orders, SubHandler> subHandlerJoin = ordersRoot.join("subHandler", JoinType.LEFT);
             for (String subHandlerName : subHandlers) {
-                subHandlerPredicates.add(cb.like(cb.lower(subHandlerJoin.get("name")), "%" + subHandlerName.toLowerCase() + "%"));
+                System.out.println(subHandlerName);
+                subHandlerPredicates.add(cb.like(cb.lower(subHandlerJoin.get("name")),
+                        "%" + subHandlerName.toLowerCase() + "%"));
             }
-
             if (!subHandlerPredicates.isEmpty()) {
                 predicates.add(cb.or(subHandlerPredicates.toArray(new Predicate[0])));
             }
         }
         if (handlersName != null && !handlersName.isEmpty()) {
             List<Predicate> handlerPredicates = new ArrayList<>();
-            Join<Orders, SubHandler> subHandlerJoin = ordersRoot.join("subHandler");
-            Join<SubHandler, Handler> handlerJoin = subHandlerJoin.join("handler");
+            Join<Orders, SubHandler> subHandlerJoin = ordersRoot.join("subHandler", JoinType.LEFT);
+            Join<SubHandler, Handler> handlerJoin = subHandlerJoin.join("handler", JoinType.LEFT);
 
             for (String handlerName : handlersName) {
-                handlerPredicates.add(cb.like(cb.lower(handlerJoin.get("name")), "%" + handlerName.toLowerCase() + "%"));
+                handlerPredicates.add(cb.like(cb.lower(handlerJoin.get("name")), "%" +
+                        handlerName.toLowerCase() + "%"));
             }
             if (!handlerPredicates.isEmpty()) {
                 predicates.add(cb.or(handlerPredicates.toArray(new Predicate[0])));

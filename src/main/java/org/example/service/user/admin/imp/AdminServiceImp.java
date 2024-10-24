@@ -1,8 +1,8 @@
 package org.example.service.user.admin.imp;
 import org.example.domain.*;
 import org.example.dto.ChangeSubHandlerDto;
-import org.example.dto.OrdersOutputDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.TypeOfUser;
@@ -123,10 +123,15 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public List<OrdersOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
-        employeeService.optionalFindOrders(startDate, endDate, handlersName, subHandlers).stream().forEach(orders -> {
-
+    public List<OrderOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
+        List<OrderOutputDto> ordersOutputDtos = new ArrayList<>();
+        employeeService.optionalFindOrders(startDate, endDate, subHandlers, handlersName).forEach(orders -> {
+            ordersOutputDtos.add(new OrderOutputDto(orders.getOfferedPrice(),orders.getDetail()
+                    ,orders.getSubHandler().getName(),orders.getTimeOfWork()
+                    ,orders.getAddress(),orders.getOrderState()
+                    ,orders.getCustomer().getName()+ " " + orders.getCustomer().getLast_name(),orders.getCustomer().getId(),orders.getEmployee() != null?orders.getEmployee().getName():null,orders.getEmployee()!=null?orders.getEmployee().getId():null,orders.getScore(),orders.getComment()));
         });
+        return ordersOutputDtos;
     }
 
     @Override

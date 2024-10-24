@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Employee;
-import org.example.domain.Orders;
-import org.example.domain.SubHandler;
 import org.example.dto.EmployeeSignUpDto;
-import org.example.dto.OfferDto;
+import org.example.dto.employee.OfferDto;
+import org.example.dto.employee.OrderOutputEmployee;
+import org.example.dto.employee.SubHandlerOutput;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,11 +38,11 @@ public class EmployeeController {
     }
 
     @GetMapping("/employeeSeeAllOrders/{employeeId}")
-    public List<Orders> employeeSeeAllOrders(@PathVariable @NotNull Integer employeeId){
-        return employeeService.getOrdersForEmployee(employeeId);
+    public List<OrderOutputEmployee> employeeSeeAllOrders(@PathVariable @NotNull Integer employeeId){
+         return employeeService.getOrdersForEmployee(employeeId);
     }
     @GetMapping("/employeeSeeAllSubHander/{employeeId}")
-    public List<SubHandler> employeeSeeAllSubHander(@PathVariable @NotNull Integer employeeId){
+    public List<SubHandlerOutput> employeeSeeAllSubHander(@PathVariable @NotNull Integer employeeId){
         return employeeService.findAllSubHandlersForEmployee(employeeId);
     }
     @GetMapping("/verify")

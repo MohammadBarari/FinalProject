@@ -7,8 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
+import org.example.dto.HandlerDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.dto.customer.HandlerCustomerDto;
+import org.example.dto.customer.OfferDtoForCustomer;
+import org.example.dto.customer.OrdersOutputDtoCustomer;
 import org.example.service.user.customer.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +48,7 @@ public class CustomerController {
     }
 
     @GetMapping("/findAllOrders/{customerId}")
-    public List<Orders> findAllOrders(@PathVariable
+    public List<OrdersOutputDtoCustomer> findAllOrders(@PathVariable
           @NotNull
           @Digits(integer = 3,fraction = 0)
                                           Integer customerId)
@@ -61,7 +65,7 @@ public class CustomerController {
 
 
     @GetMapping("/customerSeeAllOfferInOneOrder/{orderId}")
-    public List<Offer> customerSeeAllOfferInOneOrder(@PathVariable @NotNull  @Digits(integer = 3,fraction = 0)
+    public List<OfferDtoForCustomer> customerSeeAllOfferInOneOrder(@PathVariable @NotNull  @Digits(integer = 3,fraction = 0)
                                                          Integer orderId){
         return customerService.getOffersForOrder(orderId);
     }
@@ -76,7 +80,7 @@ public class CustomerController {
     }
 
     @GetMapping("/customerSeeAllHandlers")
-    public List<Handler> customerSeeAllHandlers(){
+    public List<HandlerCustomerDto> customerSeeAllHandlers(){
         return customerService.getHandlersForCustomer();
     }
 

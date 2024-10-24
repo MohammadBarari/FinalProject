@@ -1,4 +1,4 @@
-package org.example.dto.handlres;
+package org.example.dto.customer;
 
 import org.example.domain.SubHandler;
 

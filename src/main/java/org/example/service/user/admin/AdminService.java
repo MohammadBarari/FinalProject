@@ -5,8 +5,8 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
-import org.example.dto.OrdersOutputDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.TypeOfUser;
 
@@ -23,5 +23,5 @@ public interface AdminService {
     List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone);
     List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName);
     List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser);
-    List<OrdersOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers);
+    List<OrderOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers);
 }

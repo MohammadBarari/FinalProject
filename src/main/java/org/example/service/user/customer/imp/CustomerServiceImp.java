@@ -6,6 +6,10 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.dto.customer.HandlerCustomerDto;
+import org.example.dto.customer.OfferDtoForCustomer;
+import org.example.dto.customer.OrdersOutputDtoCustomer;
+import org.example.dto.employee.SubHandlerOutput;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.subHandlers.SubHandlersDtoOutput;
 import org.example.enumirations.OrderState;
@@ -70,6 +74,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private OrderDto buildOrder(OrderDto orderDto, Customer customer, SubHandler subHandler) {
         Orders orders = entityMapper.dtoToOrder(orderDto);
         orders.setOrderState(OrderState.WAITING_FOR_EMPLOYEE_OFFER);
+        orders.setCustomer(customer);
+        orders.setSubHandler(subHandler);
         orderService.save(orders);
         return orderDto;
     }
@@ -93,8 +99,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
 
-    public List<Offer> getOffersForOrder(Integer orderId)  {
-            return offerService.findAllOffersForSpecificOrder(orderId);
+    public List<OfferDtoForCustomer> getOffersForOrder(Integer orderId)  {
+             List<Offer> offers = offerService.findAllOffersForSpecificOrder(orderId);
+             List<OfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
+             offers.forEach(offer -> {
+                 offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes()));
+             });
+             return offerDtoForCustomers;
     }
 
     public void customerAcceptOffer(Integer offerId){
@@ -102,8 +113,14 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
-    public List<Handler> getHandlersForCustomer() {
-        return handlerService.findAllHandlers();
+    public List<HandlerCustomerDto> getHandlersForCustomer() {
+         List<Handler> handlers =  handlerService.findAllHandlers();
+         List<HandlerCustomerDto> handlerCustomerDtos = new ArrayList<>();
+         handlers.forEach(handler -> {
+
+            handlerCustomerDtos.add(new HandlerCustomerDto(handler.getId(),handler.getName()));
+         });
+         return handlerCustomerDtos;
     }
 
     @Override
@@ -112,9 +129,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @SneakyThrows
-    public List<Orders> getAllOrders(@NotNull Integer customerId){
+    public List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId){
         List<Orders> customerOrders = orderService.findAllOrdersThatHaveSameCustomer(customerId);
-        return customerOrders;
+        List<OrdersOutputDtoCustomer> ordersOutputDtoCustomers = new ArrayList<>();
+        customerOrders.forEach(orders -> {
+            ordersOutputDtoCustomers.add(new OrdersOutputDtoCustomer(orders.getOfferedPrice(),orders.getDetail(),orders.getSubHandler().getName(),orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState()));
+        });
+        return ordersOutputDtoCustomers;
     }
     @SneakyThrows
     public void startOrder(Integer orderId) {

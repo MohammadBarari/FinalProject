@@ -21,7 +21,6 @@ public class Orders extends BaseEntity {
 
     private String detail;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
     private SubHandler subHandler;
     @Future
     private LocalDateTime timeOfWork;
@@ -30,13 +29,11 @@ public class Orders extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderState orderState;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
     @JoinColumn(name = "customer_id")
     private Customer customer;
     //todo: it doesnt save to database for two initial state of order
     @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
-    @JsonIgnore
     private Employee employee;
     //todo: these should be store in database last ones
     private Integer score;

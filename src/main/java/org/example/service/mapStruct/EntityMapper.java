@@ -2,13 +2,19 @@ package org.example.service.mapStruct;
 
 import org.example.domain.*;
 import org.example.dto.*;
+import org.example.dto.employee.OfferDto;
+import org.example.dto.employee.SubHandlerOutput;
+import org.example.dto.orders.OrderOutputDto;
+import org.example.dto.employee.OrderOutputEmployee;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface EntityMapper {
-
+    OrderOutputDto toOrderOutputDto(Orders order);
+    OrderOutputEmployee toOrderOutputEmployee(Orders order);
     CustomerSignUpDto customerToDto(Customer customer);
+
+    SubHandlerOutput subHandlerToDto(SubHandler subHandler);
 
     Customer dtoToCustomer(CustomerSignUpDto customerDto);
 

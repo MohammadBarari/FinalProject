@@ -1,7 +1,7 @@
-//package org.example.java.org.example;
+package org.example.java.org.example;//package org.example.java.org.example;
 //
 //import org.example.domain.*;
-//import org.example.dto.OfferDto;
+//import org.example.dto.employee.OfferDto;
 //import org.example.dto.OrderDto;
 //import org.example.enumirations.OrderState;
 //import org.example.exeptions.*;

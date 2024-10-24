@@ -1,4 +1,4 @@
-//package org.example.java.org.example;
+package org.example.java.org.example;//package org.example.java.org.example;
 //
 //
 //import org.example.domain.Offer;

@@ -10,12 +10,15 @@ import org.example.domain.Employee;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
+import org.example.dto.OrderDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.admin.AdminService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -82,6 +85,20 @@ public class AdminController {
     @GetMapping("/findAllServicesForUser")
     public List<DoneDutiesDto> findAllServicesForUser(@PathVariable Integer id , @PathVariable TypeOfUser typeOfUser){
         return adminService.findPaidWorksById(id,typeOfUser);
+    }
+
+    @GetMapping("/findOrdersCustom")
+    public List<OrderOutputDto> findOrdersCustom(
+            @RequestParam(required = false) LocalDate startDate
+            ,
+           @RequestParam(required = false) LocalDate endDate
+            ,
+           @RequestParam(required = false) List<String> subHandlersName
+            ,
+           @RequestParam(required = false) List<String> handlersName
+
+           ){
+        return adminService.optionalFindOrders(startDate,endDate,subHandlersName,handlersName);
     }
     @GetMapping("/hi")
     public String hi(){

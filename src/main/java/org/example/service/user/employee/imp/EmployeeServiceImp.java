@@ -1,9 +1,11 @@
 package org.example.service.user.employee.imp;
-import jakarta.transaction.Transactional;
+
 
 import org.example.domain.*;
 import org.example.dto.EmployeeSignUpDto;
-import org.example.dto.OfferDto;
+import org.example.dto.employee.OfferDto;
+import org.example.dto.employee.OrderOutputEmployee;
+import org.example.dto.employee.SubHandlerOutput;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.subHandlers.SubHandlersDtoOutput;
 import org.example.enumirations.EmployeeState;
@@ -13,7 +15,6 @@ import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.example.service.emailToken.EmailTokenService;
-import org.example.service.mainService.imp.CombinedUserClassFromEmployee;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -21,7 +22,8 @@ import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,14 +38,14 @@ import java.util.Optional;
 @Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
-    private final CombinedUserClassFromEmployee combinedUserClassFromEmployee;
+
     //4
 
 
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, CombinedUserClassFromEmployee combinedUserClassFromEmploye,EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
         super(baseUserRepository,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.employeeRepository = employeeRepository;
-        this.combinedUserClassFromEmployee = combinedUserClassFromEmploye;
+
     }
     @Override
     @Transactional
@@ -140,17 +142,25 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public List<SubHandler> findAllSubHandlersForEmployee(Integer employeeId) {
-        return subHandlerService.subHandlersForEmployee(employeeId);
+    public List<SubHandlerOutput> findAllSubHandlersForEmployee(Integer employeeId) {
+        List<SubHandler> subHandlers =  subHandlerService.subHandlersForEmployee(employeeId);
+        List<SubHandlerOutput> subHandlerOutputs = new ArrayList<>();
+        subHandlers.forEach(subHandler -> {
+            SubHandlerOutput s = entityMapper.subHandlerToDto(subHandler);
+            subHandlerOutputs.add(s);
+        });
+        return subHandlerOutputs;
     }
 
+    @Transactional
     @Override
-    public List<Orders> getOrdersForEmployee(Integer employeeId) {
+    public List<OrderOutputEmployee> getOrdersForEmployee(Integer employeeId) {
         List<Orders> orders = new ArrayList<>();
-        List<SubHandler> subHandlers = findAllSubHandlersForEmployee(employeeId);
+        List<SubHandler> subHandlers = subHandlerService.subHandlersForEmployee(employeeId);
         if (subHandlers!=null && !subHandlers.isEmpty()) {
             for (SubHandler subHandler : subHandlers) {
                 List<Orders> ordersPerSubHandler = orderService.findOrdersForSubHandler(subHandler.getId());
+                ordersPerSubHandler.forEach(orders1 -> System.out.println(orders1.getCustomer().getId()));
                 if (!orderService.findOrdersForSubHandler(subHandler.getId()).isEmpty()) {
                     if (!orders.isEmpty()) {
                         orders.addAll(orderService.findOrdersForSubHandler(subHandler.getId()));
@@ -160,7 +170,12 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 }
             }
         }
-        return orders;
+        List<OrderOutputEmployee> orderOutputEmployees = new ArrayList<>();
+        orders.forEach(orders1 -> {
+            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
+            orderOutputEmployees.add(o);
+        });
+        return orderOutputEmployees;
     }
 
     @Override
@@ -250,13 +265,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         List<Orders> allDoneOrders = orderService.findPaidOrdersForCustomer(id);
         for (Orders orders : allDoneOrders) {
             Offer offer = offerService.findAcceptedOfferInOrder(orders.getId());
-            Integer employeeId = id;
             String employeeName = offer.getEmployee().getName() + " " +offer.getEmployee().getLast_name();
-            Customer customer = combinedUserClassFromEmployee.getCustomer(id);
-            Integer customerId = customer.getId();
-            String customerFullName = customer.getName() + " " + customer.getLast_name();
+            Integer customerId = orders.getCustomer().getId();
+            String customerFullName = orders.getCustomer().getName() + " " + orders.getCustomer().getLast_name();
             Double price = Double.valueOf(offer.getOfferPrice());
-            DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(),price,new SubHandlersDtoOutput(orders.getSubHandler().getName(),orders.getSubHandler().getDetail(),orders.getSubHandler().getBasePrice()),orders.getScore(),employeeId,employeeName,customerFullName,customerId,orders.getComment());
+            DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(),price,new SubHandlersDtoOutput(orders.getSubHandler().getName(),orders.getSubHandler().getDetail(),orders.getSubHandler().getBasePrice()),orders.getScore(), id,employeeName,customerFullName,customerId,orders.getComment());
             doneDutiesDtos.add(dto);
         }
         return doneDutiesDtos;

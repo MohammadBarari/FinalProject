@@ -1,4 +1,4 @@
-//package org.example.util;
+package org.example.util;//package org.example.util;
 //
 //import jakarta.persistence.EntityManager;
 //import jakarta.persistence.EntityManagerFactory;
