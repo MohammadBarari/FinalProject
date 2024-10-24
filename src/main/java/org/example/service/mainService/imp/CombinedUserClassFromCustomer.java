@@ -1,6 +1,7 @@
 package org.example.service.mainService.imp;
 
 import jakarta.transaction.Transactional;
+import org.example.domain.Customer;
 import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.domain.Orders;
@@ -17,24 +18,21 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
-public class CombinedUserClass {
+public class CombinedUserClassFromCustomer {
     private final OrderService orderService;
     private final EmployeeService employeeService;
     private final OfferService offerService;
-
-    public CombinedUserClass(OrderService orderService, EmployeeService employeeService, OfferService offerService) {
+    public CombinedUserClassFromCustomer(OrderService orderService, EmployeeService employeeService, OfferService offerService) {
         this.orderService = orderService;
         this.employeeService = employeeService;
         this.offerService = offerService;
     }
-
     @Transactional
     public void addStarToEmployee(Integer employeeId, Integer starId) {
         Employee employee = employeeService.findById(employeeId, Employee.class);
         employee.setScore(employee.getScore() + starId);
         employeeService.updateUser(employee);
     }
-
     @Transactional
     public void makeTheOrderDone(Integer orderId)  {
         Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(orderId)).orElseThrow(() ->  new NotFoundOffer("unable to find offer in order with ID :" + orderId));
@@ -45,7 +43,6 @@ public class CombinedUserClass {
         order.setOrderState(OrderState.DONE);
         orderService.update(order);
     }
-
     private void updateEmployee(Offer offer, Employee employee) {
         long hoursBetween = ChronoUnit.HOURS.between(offer.getTimeOfWork(), LocalDateTime.now());
         Long scoreDecreasing = offer.getWorkTimeInMinutes() / 60 - hoursBetween;
@@ -57,7 +54,6 @@ public class CombinedUserClass {
         }
         employeeService.updateUser(employee);
     }
-
     private static void validateOrderDone(Orders order, Offer offer){
         if (order.getOrderState() != OrderState.STARTED){
             throw new OrderStateIsNotCorrect();

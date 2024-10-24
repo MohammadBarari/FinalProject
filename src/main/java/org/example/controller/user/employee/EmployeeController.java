@@ -34,7 +34,7 @@ public class EmployeeController {
 
     @GetMapping("/giveOfferToOrder")
     public OfferDto offerToOrder(@RequestBody  @Valid OfferDto offerDto){
-        return employeeService.GiveOfferToOrder(offerDto);
+        return employeeService.giveOfferToOrder(offerDto);
     }
 
     @GetMapping("/employeeSeeAllOrders/{employeeId}")
@@ -47,6 +47,6 @@ public class EmployeeController {
     }
     @GetMapping("/verify")
     public String verify(@RequestParam(required = false ,name = "token") String token){
-        return employeeService.validateEmail(token);
+        return employeeService.validateEmployeeEmail(token);
     }
 }

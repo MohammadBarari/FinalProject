@@ -11,6 +11,8 @@ import org.example.domain.Handler;
 import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.servisesDone.DoneDutiesDto;
+import org.example.enumirations.TypeOfUser;
 import org.example.service.user.admin.AdminService;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,6 +78,10 @@ public class AdminController {
 
     ){
         return adminService.findEmployeesByOptionalInformation(name,lastName,email,phone,handlerName);
+    }
+    @GetMapping("/findAllServicesForUser")
+    public List<DoneDutiesDto> findAllServicesForUser(@PathVariable Integer id , @PathVariable TypeOfUser typeOfUser){
+        return adminService.findPaidWorksById(id,typeOfUser);
     }
     @GetMapping("/hi")
     public String hi(){

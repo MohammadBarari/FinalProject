@@ -5,7 +5,6 @@ import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.InvalidTokenExceptions;
 import org.example.repository.emailToken.EmailTokenRepository;
 import org.example.service.emailToken.EmailTokenService;
-import org.example.service.mainService.imp.CustomerTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -20,14 +19,14 @@ import java.util.UUID;
 @Service
 public class EmailTokenServiceImp implements EmailTokenService {
     private final EmailTokenRepository emailTokenRepository;
-    private final CustomerTokenService customerTokenService;
+
     private final JavaMailSender javaMailSender;
     @Autowired
     public EmailTokenServiceImp( EmailTokenRepository emailTokenRepository,
-                                 CustomerTokenService customerTokenService,
+
                                  JavaMailSender javaMailSender) {
         this.emailTokenRepository = emailTokenRepository;
-        this.customerTokenService = customerTokenService;
+
         this.javaMailSender = javaMailSender;
     }
     @Transactional
@@ -44,6 +43,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
         sendingMail(email,token,emailToken);
         emailTokenRepository.save(emailToken);
     }
+    @Override
     public EmailToken findByToken(String token) {
         return emailTokenRepository.findByToken(token);
     }
@@ -55,7 +55,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
         //find if person is existing and person is validated
         EmailToken emailToken = Optional.ofNullable(findByToken(token)).orElseThrow(() -> new InvalidTokenExceptions("Token is invalid"));
         validateTokenProperties(emailToken);
-        customerTokenService.validateUser(emailToken);
+
     }
 
     private String generateToken() {
@@ -72,7 +72,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
     }
 
     private void validateTokenProperties(EmailToken emailToken){
-        if (emailToken.getExpiresAt().isAfter(LocalDateTime.now())) {
+        if (emailToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new InvalidTokenExceptions("Time of Token is expired");
         }
         if (emailToken.isExpired()){

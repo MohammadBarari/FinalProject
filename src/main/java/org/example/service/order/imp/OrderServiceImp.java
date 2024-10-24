@@ -12,6 +12,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 @Service
@@ -48,6 +49,12 @@ public class OrderServiceImp implements OrderService {
     public List<Orders> findOrdersForEmployee(Integer employeeId) {
         return orderRepository.selectByEmployeeSubHandler(employeeId);
     }
+
+    @Override
+    public List<Orders> findGotOrdersForEmployee(Integer employeeId) {
+        return orderRepository.selectGotOrdersByEmployeeId(employeeId);
+    }
+
     @Override
     public Orders findById(int id) {
         return orderRepository.findById(id);
@@ -63,5 +70,21 @@ public class OrderServiceImp implements OrderService {
     @Override
     public List<Orders> findOrdersForSubHandler(Integer subHandlerId) {
         return orderRepository.selectOrdersBySubHandlerId(subHandlerId);
+    }
+
+    @Override
+    public List<Orders> findPaidOrdersForEmployee(Integer employeeId) {
+        return orderRepository.selectPaidOrdersForEmployee(employeeId);
+    }
+
+    @Override
+    public List<Orders> findPaidOrdersForCustomer(Integer employeeId) {
+        return orderRepository.selectPaidOrdersForCustomer(employeeId);
+
+    }
+
+    @Override
+    public List<Orders> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
+        return orderRepository.optionalSelectOrders(startDate, endDate, handlersName, subHandlers);
     }
 }

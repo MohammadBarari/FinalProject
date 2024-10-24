@@ -2,7 +2,10 @@ package org.example.repository.order;
 
 import org.example.domain.Employee;
 import org.example.domain.Orders;
+import org.example.domain.SubHandler;
+import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Integers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderRepository {
@@ -15,4 +18,8 @@ public interface OrderRepository {
     List<Orders> selectOrdersByCustomer(Integer customerId);
     List<Orders> selectOrdersBySubHandlerId(Integer subHandlerId);
     List<Orders> selectActiveOrdersForEmployee();
+    List<Orders> selectGotOrdersByEmployeeId(Integer employeeId);
+    List<Orders> selectPaidOrdersForEmployee(Integer employeeId);
+    List<Orders> selectPaidOrdersForCustomer(Integer employeeId);
+    List<Orders> optionalSelectOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers);
 }

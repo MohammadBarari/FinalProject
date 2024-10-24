@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Route("customer/customer-charge")
+@Route("/customer/customer-charge")
 public class VaddinController extends VerticalLayout {
     private final RestTemplate restTemplate;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);

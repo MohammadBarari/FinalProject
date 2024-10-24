@@ -17,6 +17,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/customer/signUp", "/employee/signUp").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/employee/**").hasRole("EMPLOYEE")
@@ -26,6 +27,10 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/logout") // URL to trigger logout
+                        .logoutSuccessUrl("/login?logout") // Redirect URL after logout
+                        .invalidateHttpSession(true) // Invalidate session
+                        .clearAuthentication(true) // Clear authentication
                         .permitAll()
                 );
 

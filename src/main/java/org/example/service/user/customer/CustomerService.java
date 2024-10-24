@@ -5,11 +5,13 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public interface CustomerService extends BaseUserService<Customer> {
     CustomerSignUpDto createCustomer(CustomerSignUpDto customerDto);
     boolean validateCustomer(CustomerSignUpDto customerDto);
@@ -26,8 +28,9 @@ public interface CustomerService extends BaseUserService<Customer> {
     String makeServiceStateToDone(Integer orderId);
     String customerPay(Integer ordersId, Integer customerId);
     List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone);
-
     Customer findByEmail(String email);
     void sendToken(String email , TypeOfUser typeOfUser);
-    String validateEmail(String email);
+    String validateCustomerEmail(String token);
+    List<Orders> findPaidOrders(Integer employeeId);
+    List<DoneDutiesDto> findDoneWorksById(Integer id);
 }

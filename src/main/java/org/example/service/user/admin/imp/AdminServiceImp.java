@@ -1,12 +1,11 @@
 package org.example.service.user.admin.imp;
-import lombok.SneakyThrows;
-import org.example.domain.Customer;
-import org.example.domain.Employee;
-import org.example.domain.Handler;
-import org.example.domain.SubHandler;
+import org.example.domain.*;
 import org.example.dto.ChangeSubHandlerDto;
+import org.example.dto.OrdersOutputDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.EmployeeState;
+import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.admin.AdminRepository;
 import org.example.service.handler.HandlerService;
@@ -18,10 +17,9 @@ import org.example.service.user.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 
@@ -111,6 +109,24 @@ public class AdminServiceImp implements AdminService {
     @Override
     public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
         return employeeService.findEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+    }
+    public List<Orders> findOptionalOrdersByEmployeeId(Integer employeeId){
+        //todo: have to be done
+        return null;
+    }
+    public List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser) {
+        switch (typeOfUser) {
+            case EMPLOYEE -> {return employeeService.findDoneWorksById(id);}
+            case CUSTOMER -> {return customerService.findDoneWorksById(id);}
+        }
+        throw new FailedDoingOperation("Unable to find DoneWorks by id : "+ id);
+    }
+
+    @Override
+    public List<OrdersOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
+        employeeService.optionalFindOrders(startDate, endDate, handlersName, subHandlers).stream().forEach(orders -> {
+
+        });
     }
 
     @Override

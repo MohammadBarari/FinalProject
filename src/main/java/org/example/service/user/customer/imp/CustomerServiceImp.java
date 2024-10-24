@@ -6,6 +6,8 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.dto.servisesDone.DoneDutiesDto;
+import org.example.dto.subHandlers.SubHandlersDtoOutput;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
@@ -16,7 +18,7 @@ import org.example.service.customerCart.CustomerCartService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.handler.HandlerService;
 import org.example.service.mainService.imp.CustomerAcceptOfferClass;
-import org.example.service.mainService.imp.CombinedUserClass;
+import org.example.service.mainService.imp.CombinedUserClassFromCustomer;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -25,33 +27,25 @@ import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
-
 public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements CustomerService {
     private final CustomerRepository customerRepository ;
-    private final SubHandlerService subHandlerService;
-    private final OrderService orderService ;
-    private final OfferService offerService ;
     private final HandlerService handlerService;
     private final CreditService creditService;
     private final CustomerCartService customerCartService;
-    private final CombinedUserClass combineUserClass;
-    private final EntityMapper entityMapper;
-    public CustomerServiceImp(BaseUserRepository baseUserRepository,EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClass combineUserClass, CustomerCartService customerCartService , CreditService creditService, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
-        super(baseUserRepository,emailTokenService);
+    private final CombinedUserClassFromCustomer combineUserClass;
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CreditService creditService, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
+        super(baseUserRepository,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.customerRepository = customerRepository;
-        this.subHandlerService = subHandlerService;
-        this.orderService = orderService;
-        this.offerService = offerService;
         this.handlerService = handlerService;
         this.creditService = creditService;
         this.customerCartService = customerCartService;
         this.combineUserClass = combineUserClass;
-        this.entityMapper = entityMapper;
     }
 
 
@@ -293,6 +287,44 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new DontHaveEnoughMoney();
         }
     }
+    @Override
+    public void sendToken(String email , TypeOfUser typeOfUser) {
+        emailTokenService.sendEmail(email,typeOfUser);
+    }
+    @Override
+    @Transactional
+    public String validateCustomerEmail(String token) {
+        EmailToken emailToken = Optional.ofNullable(emailTokenService.findByToken(token)).orElseThrow(()-> new InvalidTokenExceptions("not found token"));
+        emailTokenService.validateToken(token);
+        validateCustomerToken(emailToken);
+        return "successful";
+    }
 
+    private void validateCustomerToken(EmailToken emailToken) {
+        Customer customer = Optional.ofNullable(findByEmail(emailToken.getEmail())).orElseThrow(() -> new InvalidTokenExceptions("The token is not from the user"));
+        customer.setActive(true);
+        emailToken.setExpired(true);
+    }
+    @Override
+    public List<Orders> findPaidOrders(Integer customerId) {
+        return orderService.findPaidOrdersForCustomer(customerId);
+    }
 
+    @Override
+    public List<DoneDutiesDto> findDoneWorksById(Integer id) {
+        List<DoneDutiesDto> doneDutiesDtos = new ArrayList<>();
+        List<Orders> allDoneOrders = orderService.findPaidOrdersForCustomer(id);
+        for (Orders orders : allDoneOrders) {
+            Offer offer = offerService.findAcceptedOfferInOrder(orders.getId());
+            Integer employeeId = offer.getEmployee().getId();
+            String employeeName = offer.getEmployee().getName() + " " +offer.getEmployee().getLast_name();
+            Customer customer = customerRepository.findById(orders.getCustomer().getId(), Customer.class);
+            Integer customerId = customer.getId();
+            String customerFullName = customer.getName() + " " + customer.getLast_name();
+            Double price = Double.valueOf(offer.getOfferPrice());
+            DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(),price,new SubHandlersDtoOutput(orders.getSubHandler().getName(),orders.getSubHandler().getDetail(),orders.getSubHandler().getBasePrice()),orders.getScore(),employeeId,employeeName,customerFullName,customerId,orders.getComment());
+            doneDutiesDtos.add(dto);
+        }
+        return doneDutiesDtos;
+    }
 }

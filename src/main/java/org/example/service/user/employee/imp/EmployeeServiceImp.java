@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import org.example.domain.*;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.OfferDto;
+import org.example.dto.servisesDone.DoneDutiesDto;
+import org.example.dto.subHandlers.SubHandlersDtoOutput;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
@@ -11,6 +13,7 @@ import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.example.service.emailToken.EmailTokenService;
+import org.example.service.mainService.imp.CombinedUserClassFromEmployee;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -33,22 +36,15 @@ import java.util.Optional;
 @Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
-    private final OrderService orderService ;
-    private final OfferService offerService ;
-    private final SubHandlerService subHandlerService;
-    private final EntityMapper entityMapper;
+    private final CombinedUserClassFromEmployee combinedUserClassFromEmployee;
     //4
 
 
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
-        super(baseUserRepository,emailTokenService);
-        this.entityMapper = entityMapper;
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, CombinedUserClassFromEmployee combinedUserClassFromEmploye,EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
+        super(baseUserRepository,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.employeeRepository = employeeRepository;
-        this.orderService = orderService;
-        this.offerService = offerService;
-        this.subHandlerService = subHandlerService;
+        this.combinedUserClassFromEmployee = combinedUserClassFromEmploye;
     }
-
     @Override
     @Transactional
     public EmployeeSignUpDto signUpEmployee( EmployeeSignUpDto employeeSignUpDto) throws Exception {
@@ -85,7 +81,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public OfferDto GiveOfferToOrder(OfferDto offerDto)
+    public OfferDto giveOfferToOrder(OfferDto offerDto)
     {
         checkemployeeExists(offerDto);
         Orders orders = Optional.ofNullable(orderService.findById(offerDto.orderId())).orElseThrow(()-> new NotFoundOffer("Unable to find order with this ID : " + offerDto.orderId()));
@@ -224,5 +220,45 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public boolean checkIfNotDuplicateUser(String user) {
         return Objects.isNull(employeeRepository.find(user, Employee.class));
     }
+    @Override
+    public void sendToken(String email , TypeOfUser typeOfUser) {
+        emailTokenService.sendEmail(email,typeOfUser);
+    }
+    @Override
+    @Transactional
+    public String validateEmployeeEmail(String token) {
+        EmailToken emailToken = Optional.ofNullable(emailTokenService.findByToken(token)).orElseThrow(()-> new InvalidTokenExceptions("not found token"));
+        emailTokenService.validateToken(token);
+        validateEmployeeToken(emailToken);
+        return "successful";
+    }
 
+    private void validateEmployeeToken(EmailToken emailToken) {
+        if (employeeExistsByEmail(emailToken.getEmail())){
+            setUnderReviewState(emailToken.getEmail());
+            emailToken.setExpired(true);
+        }
+    }
+    @Override
+    public List<Orders> findPaidOrders(Integer employeeId) {
+        return orderService.findPaidOrdersForEmployee(employeeId);
+    }
+
+    @Override
+    public List<DoneDutiesDto> findDoneWorksById(Integer id) {
+        List<DoneDutiesDto> doneDutiesDtos = new ArrayList<>();
+        List<Orders> allDoneOrders = orderService.findPaidOrdersForCustomer(id);
+        for (Orders orders : allDoneOrders) {
+            Offer offer = offerService.findAcceptedOfferInOrder(orders.getId());
+            Integer employeeId = id;
+            String employeeName = offer.getEmployee().getName() + " " +offer.getEmployee().getLast_name();
+            Customer customer = combinedUserClassFromEmployee.getCustomer(id);
+            Integer customerId = customer.getId();
+            String customerFullName = customer.getName() + " " + customer.getLast_name();
+            Double price = Double.valueOf(offer.getOfferPrice());
+            DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(),price,new SubHandlersDtoOutput(orders.getSubHandler().getName(),orders.getSubHandler().getDetail(),orders.getSubHandler().getBasePrice()),orders.getScore(),employeeId,employeeName,customerFullName,customerId,orders.getComment());
+            doneDutiesDtos.add(dto);
+        }
+        return doneDutiesDtos;
+    }
 }

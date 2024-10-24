@@ -1,10 +1,12 @@
 package org.example.service.user;
 
+import org.example.domain.Orders;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
-import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.NotFoundEmployee;
+
+import java.time.LocalDate;
+import java.util.List;
 
 
 public interface BaseUserService<T extends Users> {
@@ -24,7 +26,7 @@ public interface BaseUserService<T extends Users> {
 
     T findById(int id,Class<T> tClass);
 
-    void sendToken(String email , TypeOfUser typeOfUser);
-    String validateEmail(String email);
+    List<Orders> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers);
+
 }
 
