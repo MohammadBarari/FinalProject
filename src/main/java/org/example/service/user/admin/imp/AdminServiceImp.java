@@ -2,6 +2,8 @@ package org.example.service.user.admin.imp;
 import org.example.domain.*;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.admin.CustomerOutputDtoForReport;
+import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.EmployeeState;
@@ -17,12 +19,9 @@ import org.example.service.user.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.*;
-
 @Service
-
 public class AdminServiceImp implements AdminService {
 
     private final HandlerService handlerService ;
@@ -135,6 +134,11 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
+    public List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration, LocalDate endDateRegistration, Integer doneWorksStart, Integer doneWorksEnd, Integer offerSentStart, Integer offerSentEnd) {
+        return employeeService.findEmployeeByReports(startDateRegistration,endDateRegistration,doneWorksStart,doneWorksEnd,offerSentStart,offerSentEnd);
+    }
+
+    @Override
     @Transactional
     public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId)  {
             Employee employee = employeeService.findById(employeeId,Employee.class);
@@ -160,6 +164,9 @@ public class AdminServiceImp implements AdminService {
     private boolean ifEmployeeIsAccepted(Employee employee) {
         return true;
     }
-
+    @Override
+    public List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
+        return customerService.findCustomerByReports(startDate,endDate,doneOrderStart,doneOrderEnd);
+    }
 
 }

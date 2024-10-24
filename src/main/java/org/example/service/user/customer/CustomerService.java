@@ -5,6 +5,7 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.dto.customer.HandlerCustomerDto;
 import org.example.dto.customer.OfferDtoForCustomer;
 import org.example.dto.customer.OrdersOutputDtoCustomer;
@@ -13,6 +14,7 @@ import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 @Service
 public interface CustomerService extends BaseUserService<Customer> {
@@ -36,4 +38,5 @@ public interface CustomerService extends BaseUserService<Customer> {
     String validateCustomerEmail(String token);
     List<Orders> findPaidOrders(Integer employeeId);
     List<DoneDutiesDto> findDoneWorksById(Integer id);
+    List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd);
 }

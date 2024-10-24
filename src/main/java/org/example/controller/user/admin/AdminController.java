@@ -12,6 +12,8 @@ import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.OrderDto;
 import org.example.dto.SubHandlerDto;
+import org.example.dto.admin.CustomerOutputDtoForReport;
+import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.TypeOfUser;
@@ -99,6 +101,23 @@ public class AdminController {
 
            ){
         return adminService.optionalFindOrders(startDate,endDate,subHandlersName,handlersName);
+    }
+
+    @GetMapping("/employeeReports")
+   public List<EmployeeOutputDtoReport> employeeReports(@RequestParam(required = false) LocalDate startDateRegistration,
+                                                  @RequestParam(required = false) LocalDate endDateRegistration,
+                                                  @RequestParam(required = false) Integer doneWorksStart,
+                                                  @RequestParam(required = false) Integer doneWorksEnd,
+                                                  @RequestParam(required = false) Integer offerSentStart,
+                                                  @RequestParam(required = false) Integer  offerSentEnd){
+        return adminService.findEmployeeByReports(startDateRegistration,endDateRegistration,doneWorksStart,doneWorksEnd,offerSentStart,offerSentEnd);
+    }
+    @GetMapping("/customerReports")
+    public List<CustomerOutputDtoForReport> customerReports(@RequestParam(required = false) LocalDate startDateRegistration,
+                                                            @RequestParam(required = false) LocalDate endDateRegistration,
+                                                            @RequestParam(required = false) Integer paidWorksStart,
+                                                            @RequestParam(required = false) Integer paidWorksEnd){
+        return adminService.findCustomerByReports(startDateRegistration,endDateRegistration,paidWorksStart,paidWorksEnd);
     }
     @GetMapping("/hi")
     public String hi(){

@@ -3,6 +3,7 @@ package org.example.service.user.employee.imp;
 
 import org.example.domain.*;
 import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -273,5 +275,10 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             doneDutiesDtos.add(dto);
         }
         return doneDutiesDtos;
+    }
+
+    @Override
+    public List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration, LocalDate endDateRegistration, Integer doneWorksStart, Integer doneWorksEnd, Integer offerSentStart, Integer offerSentEnd) {
+        return employeeRepository.selectEmployeeByReports(startDateRegistration,endDateRegistration,doneWorksStart,doneWorksEnd,offerSentStart,offerSentEnd);
     }
 }

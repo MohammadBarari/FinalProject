@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.example.enumirations.EmployeeState;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter

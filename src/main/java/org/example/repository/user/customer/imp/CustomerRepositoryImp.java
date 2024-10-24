@@ -3,15 +3,16 @@ package org.example.repository.user.customer.imp;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.example.domain.Customer;
+import org.example.domain.Orders;
+import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.customer.CustomerRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,5 +65,68 @@ where  pau.username= ? and pau.pass = ?
             }catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public List<CustomerOutputDtoForReport> selectCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CustomerOutputDtoForReport> query = cb.createQuery(CustomerOutputDtoForReport.class);
+        Root<Customer> customer = query.from(Customer.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (startDate != null) {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            predicates.add(cb.greaterThanOrEqualTo(customer.get("timeOfRegistration"), startDateTime));
+        }
+        if (endDate != null) {
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+            predicates.add(cb.lessThanOrEqualTo(customer.get("timeOfRegistration"), endDateTime));
+        }
+
+        Expression<Long> worksPaid = null;
+        List<Predicate> havingOrdersPaidPredicates = new ArrayList<>();
+
+        Root<Orders> ordersRoot = query.from(Orders.class);
+        if (doneOrderStart != null || doneOrderEnd != null) {
+            Join<Orders, Customer> ordersJoin = ordersRoot.join("customer", JoinType.INNER);
+            predicates.add(cb.equal(ordersJoin.get("id"), customer.get("id")));
+            worksPaid = getWorksPaid(cb, ordersRoot);
+
+            if (doneOrderStart != null) {
+                havingOrdersPaidPredicates.add(cb.greaterThanOrEqualTo(worksPaid, doneOrderStart.longValue()));
+            }
+            if (doneOrderEnd != null) {
+                havingOrdersPaidPredicates.add(cb.lessThanOrEqualTo(worksPaid, doneOrderEnd.longValue()));
+            }
+        }
+
+        query.groupBy(
+                customer.get("id"),
+                customer.get("name"),
+                customer.get("last_name"),
+                customer.get("email"),
+                customer.get("phone"),
+                customer.get("timeOfRegistration"),
+                customer.get("isActive"),
+                ordersRoot.get("orderState")
+        );
+        query.select(cb.construct(CustomerOutputDtoForReport.class,
+                customer.get("id"),
+                customer.get("name"),
+                customer.get("last_name"),
+                customer.get("email"),
+                customer.get("phone"),
+                customer.get("timeOfRegistration"),
+                customer.get("isActive"),
+                worksPaid == null ? cb.literal(0) : worksPaid
+        )
+        ).where(cb.and(predicates.toArray(new Predicate[0])));
+        if (!havingOrdersPaidPredicates.isEmpty()) {
+            query.having(havingOrdersPaidPredicates.toArray(new Predicate[0]));
+        }
+        return entityManager.createQuery(query).getResultList();
+    }
+    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> ordersJoin) {
+        return cb.count(cb.selectCase().when(cb.equal(ordersJoin.get("orderState"), "PAID"), 1).otherwise(0));
     }
 }

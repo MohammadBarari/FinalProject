@@ -3,6 +3,7 @@ package org.example.service.user.employee;
 import org.example.domain.Employee;
 import org.example.domain.Orders;
 import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
@@ -11,6 +12,7 @@ import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface EmployeeService  extends BaseUserService<Employee> {
@@ -30,4 +32,10 @@ public interface EmployeeService  extends BaseUserService<Employee> {
     String validateEmployeeEmail(String token);
     List<Orders> findPaidOrders(Integer employeeId);
     List<DoneDutiesDto> findDoneWorksById(Integer id);
+    List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration,
+                                                        LocalDate endDateRegistration,
+                                                        Integer doneWorksStart,
+                                                        Integer doneWorksEnd,
+                                                        Integer offerSentStart,
+                                                        Integer  offerSentEnd);
 }

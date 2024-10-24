@@ -6,6 +6,7 @@ import org.example.domain.*;
 import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
+import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.dto.customer.HandlerCustomerDto;
 import org.example.dto.customer.OfferDtoForCustomer;
 import org.example.dto.customer.OrdersOutputDtoCustomer;
@@ -30,6 +31,8 @@ import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -347,5 +350,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             doneDutiesDtos.add(dto);
         }
         return doneDutiesDtos;
+    }
+
+    @Override
+    public List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
+        return customerRepository.selectCustomerByReports(startDate,endDate,doneOrderStart,doneOrderEnd);
     }
 }
