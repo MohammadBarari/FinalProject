@@ -6,6 +6,8 @@ import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.example.domain.*;
+import org.example.enumirations.OrderState;
+import org.example.exeptions.FailedDoingOperation;
 import org.example.repository.order.OrderRepository;
 import org.springframework.stereotype.Repository;
 
@@ -187,6 +189,44 @@ where sh.id = ? and order_state ='UNDER_CHOOSING_EMPLOYEE' or order_state = 'WAI
         }
         cq.select(ordersRoot).where(cb.and(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(cq).getResultList();
+    }
+
+    @Override
+    public List<Orders> optionalSelectOrdersForEmployee(Integer employeeId, String orderState) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Orders> query = cb.createQuery(Orders.class);
+        Root<Orders> ordersRoot = query.from(Orders.class);
+        List<Predicate> predicates = new ArrayList<>();
+        if (orderState != null) {
+            predicates.add(cb.equal(ordersRoot.get("orderState"), orderState));
+        }
+        if (employeeId == null) {
+            throw new FailedDoingOperation("employeeId is null");
+        }else {
+            Join<Orders,Employee> employeeJoin = ordersRoot.join("employee", JoinType.INNER);
+            predicates.add(cb.equal(employeeJoin.get("id"), employeeId));
+        }
+        query.select(ordersRoot).where(cb.and(predicates.toArray(new Predicate[0])));
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<Orders> optionalSelectOrdersForCustomer(Integer customerId, String orderState) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Orders> query = cb.createQuery(Orders.class);
+        Root<Orders> ordersRoot = query.from(Orders.class);
+        List<Predicate> predicates = new ArrayList<>();
+        if (orderState != null) {
+            predicates.add(cb.equal(ordersRoot.get("orderState"), orderState));
+        }
+        if (customerId == null) {
+            throw new FailedDoingOperation("customerId is null");
+        }else {
+            Join<Orders,Customer> employeeJoin = ordersRoot.join("customer", JoinType.INNER);
+            predicates.add(cb.equal(employeeJoin.get("id"), customerId));
+        }
+        query.select(ordersRoot).where(cb.and(predicates.toArray(new Predicate[0])));
+        return entityManager.createQuery(query).getResultList();
     }
 
 }

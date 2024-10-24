@@ -46,8 +46,9 @@ public class OfferRepositoryImp implements OfferRepository {
 
         try {
             Query query = entityManager.createNativeQuery("""
-        select * from offer
+        select * from offer where order_id = ?
 """, Offer.class);
+            query.setParameter(1, orderId);
             return query.getResultList();
         }catch (Exception e) {
             return null;

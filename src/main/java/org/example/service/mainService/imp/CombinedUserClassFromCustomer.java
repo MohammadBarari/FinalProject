@@ -43,13 +43,14 @@ public class CombinedUserClassFromCustomer {
         order.setOrderState(OrderState.DONE);
         orderService.update(order);
     }
+
     private void updateEmployee(Offer offer, Employee employee) {
         long hoursBetween = ChronoUnit.HOURS.between(offer.getTimeOfWork(), LocalDateTime.now());
         Long scoreDecreasing = offer.getWorkTimeInMinutes() / 60 - hoursBetween;
         if (scoreDecreasing < 0) {
             if ((employee.getScore() + scoreDecreasing) <0){
-            employee.setScore(0);
             employee.setEmployeeState(EmployeeState.DISABLED);
+            employee.setScore((int) (employee.getScore() + scoreDecreasing));
             }
         }
         employeeService.updateUser(employee);

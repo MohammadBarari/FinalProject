@@ -2,9 +2,11 @@ package org.example.dto.customer;
 
 import java.time.LocalDateTime;
 
-public record OfferDtoForCustomer(Long offerPrice,
+public record OfferDtoForCustomer(Integer id,
+        Long offerPrice,
                                   Integer employeeScore,
                                   String employeeName,
                                   LocalDateTime timeOfWork,
-                                  Integer workInMinutes) {
+                                  Integer workInMinutes,
+                                  boolean accepted) {
 }

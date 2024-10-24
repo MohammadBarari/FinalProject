@@ -23,7 +23,7 @@ public class AdminRepositoryImp implements AdminRepository {
     public void deleteEmployeeFromSubHandler(Employee employee, Integer subHandlerId) {
 
             Query query = entityManager.createNativeQuery("""
-    delete from finalproject.employee_subhandler where employee_id = ?
+    delete from employee_sub_handlers where employee_id = ?
     and subhandlers_id = ?
 """);
             query.setParameter(1, employee.getId());

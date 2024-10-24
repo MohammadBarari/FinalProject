@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.domain.Employee;
 import org.example.domain.Orders;
+import org.example.enumirations.OrderState;
 import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.exeptions.TimeOfWorkDoesntMatch;
 import org.example.repository.order.OrderRepository;
@@ -86,5 +87,15 @@ public class OrderServiceImp implements OrderService {
     @Override
     public List<Orders> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
         return orderRepository.optionalSelectOrders(startDate, endDate, handlersName, subHandlers);
+    }
+
+    @Override
+    public List<Orders> optionalFindOrdersForEmployee(Integer employeeId, String orderState) {
+        return orderRepository.optionalSelectOrdersForEmployee(employeeId, orderState);
+    }
+
+    @Override
+    public List<Orders> optionalFindOrdersForCustomer(Integer employeeId, String orderState) {
+        return orderRepository.optionalSelectOrdersForCustomer(employeeId, orderState);
     }
 }

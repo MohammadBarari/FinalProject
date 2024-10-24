@@ -7,12 +7,10 @@ import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
-import org.example.dto.customer.HandlerCustomerDto;
-import org.example.dto.customer.OfferDtoForCustomer;
-import org.example.dto.customer.OrdersOutputDtoCustomer;
-import org.example.dto.employee.SubHandlerOutput;
+import org.example.dto.customer.*;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.subHandlers.SubHandlersDtoOutput;
+import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
@@ -30,27 +28,24 @@ import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
+import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements CustomerService {
     private final CustomerRepository customerRepository ;
     private final HandlerService handlerService;
-    private final CreditService creditService;
     private final CustomerCartService customerCartService;
     private final CombinedUserClassFromCustomer combineUserClass;
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CreditService creditService, CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
-        super(baseUserRepository,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService,EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService ,  CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
+        super(baseUserRepository,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;
-        this.creditService = creditService;
         this.customerCartService = customerCartService;
         this.combineUserClass = combineUserClass;
     }
@@ -101,12 +96,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return true;
     }
 
-
+    @Transactional
     public List<OfferDtoForCustomer> getOffersForOrder(Integer orderId)  {
-             List<Offer> offers = offerService.findAllOffersForSpecificOrder(orderId);
+             Orders orders = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(()-> new NotFoundOrder("unable to find order with id : " + orderId));
+             List<Offer> offers = Optional.ofNullable(offerService.findAllOffersForSpecificOrder(orderId)).orElseThrow(() -> new NotFoundOffer("no offers found in this order with id : " + orderId));
              List<OfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
              offers.forEach(offer -> {
-                 offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes()));
+                 offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getId(),offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes(),offer.isAccepted()));
              });
              return offerDtoForCustomers;
     }
@@ -130,22 +126,18 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     public List<SubHandler> getSubHandlersForHandler(Integer handlerId) {
         return subHandlerService.findAllSubHandlerSameHandler(handlerId);
     }
-
-    @SneakyThrows
+    @Transactional
     public List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId){
         List<Orders> customerOrders = orderService.findAllOrdersThatHaveSameCustomer(customerId);
         List<OrdersOutputDtoCustomer> ordersOutputDtoCustomers = new ArrayList<>();
         customerOrders.forEach(orders -> {
-            ordersOutputDtoCustomers.add(new OrdersOutputDtoCustomer(orders.getOfferedPrice(),orders.getDetail(),orders.getSubHandler().getName(),orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState()));
+            ordersOutputDtoCustomers.add(new OrdersOutputDtoCustomer(orders.getId(),orders.getEmployee()!= null? orders.getEmployee().getId(): null, orders.getEmployee()!=null?orders.getEmployee().getName() + " " + orders.getEmployee().getLast_name() : null,orders.getOfferedPrice(),orders.getDetail(),Objects.isNull(orders.getSubHandler().getName()) ? "" : orders.getSubHandler().getName(),orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState()));
         });
         return ordersOutputDtoCustomers;
     }
-    @SneakyThrows
+    @Transactional
     public void startOrder(Integer orderId) {
-        Orders order = orderService.findById(orderId);
-        if (Objects.isNull(order)){
-            throw new NotFoundOrder();
-        }
+        Orders order = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(() -> new NotFoundOrder());
         if (order.getOrderState() != OrderState.UNDER_REACHING_EMPLOYEE){
             throw new OrderStateIsNotCorrect();
         }
@@ -260,7 +252,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         customerCart.setMoney(payToCartDto.amount() + 1000d);
         return customerCart;
     }
-
     @Override
     public String makeServiceStateToDone(Integer orderId) {
             combineUserClass.makeTheOrderDone(orderId);
@@ -355,5 +346,58 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     public List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
         return customerRepository.selectCustomerByReports(startDate,endDate,doneOrderStart,doneOrderEnd);
+    }
+
+    @Override
+    public List<OrdersOutputDtoUser> optionalSelectOrdersForCustomer(Integer customerId, String orderState) {
+        List<Orders> orders = orderService.optionalFindOrdersForCustomer(customerId, orderState);
+        List<OrdersOutputDtoUser> ordersOutputDtoUsers = new ArrayList<>();
+        for (Orders orders1 : orders) {
+            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
+        }
+        return ordersOutputDtoUsers;
+    }
+
+    @Override
+    public Double getCreditAmount(Integer id) {
+        return Optional.ofNullable(creditService.findByCustomerId(id).getAmount()).orElseThrow(()-> new NotFoundCustomer("unable to find customer with id : "+id ));
+    }
+
+    @Override
+    @Transactional
+    public List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOfferInput input) {
+        Orders order = Optional.ofNullable(orderService.findById(input.orderId())).orElseThrow(()-> new NotFoundOrder("unable to find order with id : "+input.orderId()));
+        if (Objects.equals(order.getCustomer().getId(), input.customerId())) {
+            List<Offer> offers = offerService.findAllOffersForSpecificOrder(input.orderId());
+            if (input.sortByScore() && !input.ascending()) {
+                List<Offer> sortedOffer =  offers.stream().sorted(Comparator.comparingInt(e -> e.getEmployee().getScore())).collect(Collectors.toList());
+                return getOfferDtoForCustomers(input.sortByScore(), true, sortedOffer);
+            } else if (!input.sortByScore() && !input.ascending()) {
+                List<Offer> sortedOffer =  offers.stream().sorted(Comparator.comparingLong(Offer::getOfferPrice)).collect(Collectors.toList());
+                return getOfferDtoForCustomers(input.sortByScore(), true, sortedOffer);
+            } else if (input.sortByScore() && input.ascending()) {
+                List<Offer> sortedOffer = offers.stream()
+                        .sorted((e1, e2) -> Integer.compare(e2.getEmployee().getScore(), e1.getEmployee().getScore()))
+                        .collect(Collectors.toList());
+
+                return getOfferDtoForCustomers(input.sortByScore(), false, sortedOffer);
+            }else {
+                List<Offer> sortedOffer = offers.stream()
+                        .sorted((e1, e2) -> Long.compare(e2.getOfferPrice(), e1.getOfferPrice()))
+                        .collect(Collectors.toList());
+
+                return getOfferDtoForCustomers(input.sortByScore(), false, sortedOffer);
+            }
+        }else {
+            throw new NotFoundOrder("Unable to find order with id : "+input.orderId());
+        }
+    }
+
+    private List<SortedOfferDtoForCustomer> getOfferDtoForCustomers(Boolean sortByScore, Boolean ascending, List<Offer> sortedOffer) {
+        List<SortedOfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
+        for (Offer offer : sortedOffer) {
+            offerDtoForCustomers.add(new SortedOfferDtoForCustomer(offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes(), ascending, sortByScore));
+        }
+        return offerDtoForCustomers;
     }
 }

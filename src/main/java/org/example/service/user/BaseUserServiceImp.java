@@ -12,6 +12,7 @@ import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.BaseUserRepositoryImp;
+import org.example.service.credit.CreditService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
@@ -34,14 +35,16 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     protected final SubHandlerService subHandlerService;
     protected final EntityMapper entityMapper;
     protected final EmailTokenService emailTokenService ;
+    protected final CreditService creditService ;
     @Autowired
-    public BaseUserServiceImp(BaseUserRepository baseUserRepository,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ){
+    public BaseUserServiceImp(BaseUserRepository baseUserRepository,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ){
         this.baseUserRepository = baseUserRepository;
         this.orderService = orderService;
         this.offerService = offerService;
         this.subHandlerService = subHandlerService;
         this.entityMapper = entityMapper;
         this.emailTokenService = emailTokenService;
+        this.creditService = creditService;
     }
     @SneakyThrows
     @Override
@@ -99,17 +102,14 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     }
     @Override
     @Transactional
-    public void changingPassword(ChangingPasswordDto changingPasswordDto){
+    public String changingPassword(ChangingPasswordDto changingPasswordDto){
         PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user())
                 .typeOfUser(changingPasswordDto.typeOfUser())
                 .pass(changingPasswordDto.oldPass()).build();
-        PassAndUser newPassAndUser = baseUserRepository.findPass(passAndUser);
-        if(newPassAndUser != null){
+        PassAndUser newPassAndUser = Optional.ofNullable(baseUserRepository.findPass(passAndUser)).orElseThrow(()-> new UnableToChangePassWord("You should enter all field correctly "));
         newPassAndUser.setPass(changingPasswordDto.newPass());
         baseUserRepository.updatePass(newPassAndUser);
-        }else {
-            throw new UnableToChangePassWord("You should enter all field correctly ");
-        }
+        return "successful";
     }
     @Override
     @Transactional

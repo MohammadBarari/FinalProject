@@ -6,10 +6,10 @@ import org.example.dto.CustomerSignUpDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PayToCartDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
-import org.example.dto.customer.HandlerCustomerDto;
-import org.example.dto.customer.OfferDtoForCustomer;
-import org.example.dto.customer.OrdersOutputDtoCustomer;
+import org.example.dto.customer.*;
 import org.example.dto.servisesDone.DoneDutiesDto;
+import org.example.dto.user.OrdersOutputDtoUser;
+import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     void startOrder(Integer orderId);
     boolean checkIfNotDuplicateUser(String user);
     String addComment(Integer ordersId, Integer star, String comment);
-    List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId);
+    List<OrdersOutputDtoCustomer> getAllOrders( Integer customerId);
     void customerAcceptOffer(Integer offerId);
     List<HandlerCustomerDto> getHandlersForCustomer();
     List<SubHandler> getSubHandlersForHandler(Integer handlerId);
@@ -39,4 +39,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     List<Orders> findPaidOrders(Integer employeeId);
     List<DoneDutiesDto> findDoneWorksById(Integer id);
     List<CustomerOutputDtoForReport> findCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd);
+    List<OrdersOutputDtoUser> optionalSelectOrdersForCustomer(Integer employeeId, String orderState);
+    Double getCreditAmount(Integer id);
+    List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOfferInput input);
 }

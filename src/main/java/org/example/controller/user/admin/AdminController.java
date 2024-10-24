@@ -13,6 +13,8 @@ import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.OrderDto;
 import org.example.dto.SubHandlerDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
+import org.example.dto.admin.EmployeeInputHandlersDto;
+import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
@@ -70,19 +72,10 @@ public class AdminController {
     }
 
     @GetMapping("/findEmployeesWithInformations")
-    public List<Employee> findEmployeeWithInformation(
-            @RequestParam(required = false) String name
-,
-            @RequestParam(required = false) String lastName
-            ,
-            @RequestParam(required = false) @Email String email
-            ,
-            @RequestParam(required = false) String phone
-            ,
-            @RequestParam(required = false) String handlerName
-
+    public List<EmployeeOutputDtoHandlers> findEmployeeWithInformation(
+           @RequestBody @Valid EmployeeInputHandlersDto input
     ){
-        return adminService.findEmployeesByOptionalInformation(name,lastName,email,phone,handlerName);
+        return adminService.findEmployeesByOptionalInformation(input);
     }
     @GetMapping("/findAllServicesForUser")
     public List<DoneDutiesDto> findAllServicesForUser(@PathVariable Integer id , @PathVariable TypeOfUser typeOfUser){
@@ -98,7 +91,6 @@ public class AdminController {
            @RequestParam(required = false) List<String> subHandlersName
             ,
            @RequestParam(required = false) List<String> handlersName
-
            ){
         return adminService.optionalFindOrders(startDate,endDate,subHandlersName,handlersName);
     }

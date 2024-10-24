@@ -22,7 +22,7 @@ public interface BaseUserService<T extends Users> {
 
     boolean checkIfNotDuplicateUser(String user);
 
-    void changingPassword(ChangingPasswordDto changingPasswordDto);
+    String changingPassword(ChangingPasswordDto changingPasswordDto);
 
     T findById(int id,Class<T> tClass);
 

@@ -2,6 +2,7 @@ package org.example.service.order;
 
 import org.example.domain.Employee;
 import org.example.domain.Orders;
+import org.example.enumirations.OrderState;
 import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.exeptions.TimeOfWorkDoesntMatch;
 import org.hibernate.query.Order;
@@ -22,4 +23,7 @@ public interface OrderService {
     List<Orders> findPaidOrdersForEmployee(Integer employeeId);
     List<Orders> findPaidOrdersForCustomer(Integer employeeId);
     List<Orders> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers);
+    List<Orders> optionalFindOrdersForEmployee(Integer employeeId, String orderState);
+    List<Orders> optionalFindOrdersForCustomer(Integer employeeId, String orderState);
+
 }

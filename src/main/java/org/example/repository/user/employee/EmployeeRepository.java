@@ -1,7 +1,9 @@
 package org.example.repository.user.employee;
 
+import jakarta.persistence.metamodel.ListAttribute;
 import org.example.domain.Employee;
 import org.example.dto.EmployeeOutPutDto;
+import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.repository.user.BaseUserRepository;
 import org.springframework.stereotype.Repository;
@@ -12,7 +14,7 @@ import java.util.List;
 public interface EmployeeRepository extends BaseUserRepository<Employee> {
     Employee login (String username, String password);
     Boolean employeeExistsById(Integer id);
-    List<Employee> selectEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName);
+    List<Employee> selectEmployeesByOptionalInformation(EmployeeInputHandlersDto input);
     void SetUnderReviewState(String email);
     Boolean employeeExistsByEmail(String mail);
     List<EmployeeOutputDtoReport> selectEmployeeByReports(LocalDate startDateRegistration,
@@ -21,4 +23,5 @@ public interface EmployeeRepository extends BaseUserRepository<Employee> {
                                                           Integer doneWorksEnd,
                                                           Integer offerSentStart,
                                                           Integer  offerSentEnd);
+
 }

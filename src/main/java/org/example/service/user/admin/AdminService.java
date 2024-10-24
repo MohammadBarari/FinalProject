@@ -7,6 +7,8 @@ import org.example.domain.SubHandler;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SubHandlerDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
+import org.example.dto.admin.EmployeeInputHandlersDto;
+import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
@@ -23,7 +25,7 @@ public interface AdminService {
     void acceptEmployee(Integer employeeId);
     void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto);
     List<Customer> findCustomerByOptional(String name, String lastName, String email, String phone);
-    List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName);
+    List<EmployeeOutputDtoHandlers> findEmployeesByOptionalInformation(EmployeeInputHandlersDto input);
     List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser);
     List<OrderOutputDto> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers);
     List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration,

@@ -3,17 +3,18 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.atmosphere.config.service.Get;
 import org.example.domain.*;
-import org.example.dto.CustomerSignUpDto;
-import org.example.dto.OrderDto;
-import org.example.dto.PayToCartDto;
-import org.example.dto.customer.HandlerCustomerDto;
-import org.example.dto.customer.OfferDtoForCustomer;
-import org.example.dto.customer.OrdersOutputDtoCustomer;
+import org.example.dto.*;
+import org.example.dto.customer.*;
+import org.example.dto.user.OrdersOutputDtoUser;
+import org.example.enumirations.TypeOfUser;
+import org.example.exeptions.FailedDoingOperation;
 import org.example.service.user.customer.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController
@@ -118,5 +119,29 @@ public class CustomerController {
     @GetMapping("/verify")
     public String verify(@RequestParam(required = false ,name = "token") String token){
         return customerService.validateCustomerEmail(token);
+    }
+    @GetMapping("/getOrders/{customerId}")
+    public List<OrdersOutputDtoUser> getOrders(@PathVariable @NotNull Integer customerId , @RequestParam(required = false) String orderState){
+        if (Objects.isNull(customerId)){
+            throw new FailedDoingOperation("customerId is null");
+        }
+        return customerService.optionalSelectOrdersForCustomer(customerId,orderState);
+
+    }
+    @GetMapping("/creit/getCredit/{customerId}")
+    public Double getCredit(@PathVariable  @NotNull  Integer customerId ){
+        return customerService.getCreditAmount(customerId);
+    }
+    @PostMapping("/passWord/change")
+    public String changePassword(@Valid @RequestBody changingPasswordDtoController changingPasswordDto){
+        return customerService.changingPassword(new ChangingPasswordDto(changingPasswordDto.user(),changingPasswordDto.oldPass(),changingPasswordDto.newPass(), TypeOfUser.CUSTOMER));
+    }
+    @GetMapping("/offer/getSortedOffer")
+    public List<SortedOfferDtoForCustomer> getSortedOffer(@Valid @RequestBody SortingOfferInput input){
+        return customerService.sortedOfferForCustomer(input);
+    }
+    @GetMapping("/charge_cart/success")
+    public String chargeCartSuccess(){
+        return "success";
     }
 }

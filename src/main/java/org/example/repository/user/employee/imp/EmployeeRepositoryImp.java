@@ -1,5 +1,4 @@
 package org.example.repository.user.employee.imp;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -7,26 +6,22 @@ import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.example.domain.*;
 import org.example.dto.EmployeeOutPutDto;
+import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoReport;
-import org.example.enumirations.OrderState;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.employee.EmployeeRepository;
-import org.example.service.offer.OfferService;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 @Repository
 @Primary
 public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {
 
-
-@Transactional
+    @Transactional
     @Override
     public Employee login(String username, String password) {
         try {
@@ -69,7 +64,6 @@ where  pau.username= ? and pau.pass = ?
             return false;
         }
     }
-
     @Override
     public List<EmployeeOutputDtoReport> selectEmployeeByReports(
             LocalDate startDateRegistration,
@@ -83,7 +77,6 @@ where  pau.username= ? and pau.pass = ?
         CriteriaQuery<EmployeeOutputDtoReport> query = cb.createQuery(EmployeeOutputDtoReport.class);
         Root<Employee> employee = query.from(Employee.class);
         List<Predicate> predicates = new ArrayList<>();
-
         if (startDateRegistration != null) {
             LocalDateTime registerTime = startDateRegistration.atStartOfDay();
             predicates.add(cb.greaterThanOrEqualTo(employee.get("timeOfRegistration"), registerTime));
@@ -92,25 +85,32 @@ where  pau.username= ? and pau.pass = ?
             LocalDateTime endDate = endDateRegistration.atTime(23, 59, 59);
             predicates.add(cb.lessThanOrEqualTo(employee.get("timeOfRegistration"), endDate));
         }
-        Predicate orderPredicate = cb.conjunction();
-        Predicate offerPredicate = cb.conjunction();
+        Subquery<Long> worksCountSubquery = query.subquery(Long.class);
+        Root<Orders> orders = worksCountSubquery.from(Orders.class);
+        worksCountSubquery.select(cb.count(orders.get("id")));
+        worksCountSubquery.where(
+                cb.equal(orders.get("employee").get("id"), employee.get("id")),
+                cb.equal(orders.get("orderState"), "PAID")
+        );
 
-        Expression<Long> worksCount = null;
-        Expression<Long> offerCount = null;
-        if (doneWorksStart != null || doneWorksEnd != null) {
-            Root<Orders> orders = query.from(Orders.class);
-            Join<Orders, Employee> ordersJoin = orders.join("employee", JoinType.INNER);
-            worksCount = getOrderCount(orders, cb);
-            orderPredicate = countingOrders(doneWorksStart, doneWorksEnd, orders, cb);
-            predicates.add(cb.equal(ordersJoin.get("id"), employee.get("id")));
-        }
-        if (offerSentStart != null || offerSentEnd != null) {
-            Root<Offer> offer = query.from(Offer.class);
-            Join<Offer, Employee> offerJoin = offer.join("employee", JoinType.LEFT);
-            offerCount = cb.count(offerJoin.get("id"));
-            offerPredicate = countingOfferPredicate(offerSentStart, offerSentEnd, offer, cb);
-            predicates.add(cb.equal(offerJoin.get("id"), employee.get("id")));
-        }
+        Subquery<Long> offersCountSubquery = query.subquery(Long.class);
+        Root<Offer> offers = offersCountSubquery.from(Offer.class);
+        offersCountSubquery.select(cb.count(offers.get("id")));
+        offersCountSubquery.where(
+                cb.equal(offers.get("employee").get("id"), employee.get("id"))
+        );
+        query.select(cb.construct(EmployeeOutputDtoReport.class,
+                employee.get("id"),
+                employee.get("name"),
+                employee.get("last_name"),
+                employee.get("email"),
+                employee.get("phone"),
+                employee.get("timeOfRegistration"),
+                employee.get("employeeState"),
+                worksCountSubquery,
+                offersCountSubquery
+        ));
+        query.where(cb.and(predicates.toArray(new Predicate[0])));
         query.groupBy(
                 employee.get("id"),
                 employee.get("name"),
@@ -120,35 +120,21 @@ where  pau.username= ? and pau.pass = ?
                 employee.get("timeOfRegistration"),
                 employee.get("employeeState")
         );
-        query.select(cb.construct(EmployeeOutputDtoReport.class,
-                        employee.get("id"),
-                        employee.get("name"),
-                        employee.get("last_name"),
-                        employee.get("email"),
-                        employee.get("phone"),
-                        employee.get("timeOfRegistration"),
-                        employee.get("employeeState"),
-                        worksCount == null ? cb.literal(null) : worksCount,
-                        offerCount == null ? cb.literal(null) : offerCount
-                ))
-                .where(cb.and(predicates.toArray(new Predicate[0])));
-        List<Predicate> havingPredicates = new ArrayList<>();
-        if (orderPredicate != null) {
-            havingPredicates.add(orderPredicate);
+        if (doneWorksStart != null || doneWorksEnd != null) {
+            Predicate havingOrdersPredicate = countingOrders(doneWorksStart, doneWorksEnd, worksCountSubquery, cb, employee);
+            query.having(havingOrdersPredicate);
         }
-        if (offerPredicate != null) {
-            havingPredicates.add(offerPredicate);
+        if (offerSentStart != null || offerSentEnd != null) {
+            Predicate havingOffersPredicate = countingOfferPredicate(cb, offerSentStart, offerSentEnd, offersCountSubquery);
+            query.having(havingOffersPredicate);
         }
-        if (!havingPredicates.isEmpty()) {
-            query.having(cb.and(havingPredicates.toArray(new Predicate[0])));
-        }
+
         return entityManager.createQuery(query).getResultList();
     }
 
-    private Predicate countingOrders(Integer start, Integer end, Root<Orders> ordersJoin, CriteriaBuilder cb) {
-        Predicate predicate = cb.conjunction();
-        Expression<Long> orderCount = getOrderCount(ordersJoin, cb);
 
+    private Predicate countingOrders(Integer start, Integer end, Subquery<Long> orderCount, CriteriaBuilder cb, Root<Employee> employeeRoot) {
+        Predicate predicate = cb.conjunction();
         if (start != null) {
             predicate = cb.and(predicate, cb.greaterThanOrEqualTo(orderCount, start.longValue()));
         }
@@ -158,16 +144,8 @@ where  pau.username= ? and pau.pass = ?
         return predicate;
     }
 
-    private Expression<Long> getOrderCount(Root<Orders> ordersJoin, CriteriaBuilder cb) {
-        return cb.count(cb.selectCase()
-                .when(cb.equal(ordersJoin.get("orderState"), "PAID"), 1)
-                .otherwise(0));
-    }
-
-    private Predicate countingOfferPredicate(Integer start, Integer end, Root<Offer> offerJoin, CriteriaBuilder cb) {
+    private Predicate countingOfferPredicate(CriteriaBuilder cb, Integer start, Integer end, Subquery<Long> offerCount) {
         Predicate predicate = cb.conjunction();
-        Expression<Long> offerCount = cb.count(offerJoin.get("id")); // Ensure you're counting the right attribute
-
         if (start != null) {
             predicate = cb.and(predicate, cb.greaterThanOrEqualTo(offerCount, start.longValue()));
         }
@@ -176,36 +154,64 @@ where  pau.username= ? and pau.pass = ?
         }
         return predicate;
     }
+    public List<Employee> selectEmployeesByOptionalInformation(
+            EmployeeInputHandlersDto input) {
 
-    public List<Employee> selectEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
         Root<Employee> employee = query.from(Employee.class);
         List<Predicate> predicates = new ArrayList<>();
-        if (name != null && !name.isEmpty()) {
-            predicates.add(cb.like(employee.get("name"), "%" + name + "%"));
+
+        if (input.name() != null && !input.name().isEmpty()) {
+            predicates.add(cb.like(employee.get("name"), "%" + input.name() + "%"));
         }
-        if (lastName != null && !lastName.isEmpty()) {
-            predicates.add(cb.like(employee.get("last_name"), "%" + lastName + "%"));
+        if (input.lastName() != null && !input.lastName().isEmpty()) {
+            predicates.add(cb.like(employee.get("last_name"), "%" + input.lastName() + "%"));
         }
-        if (email != null && !email.isEmpty()) {
-            predicates.add(cb.like(employee.get("email"), "%" + email + "%"));
+        if (input.email() != null && !input.email().isEmpty()) {
+            predicates.add(cb.like(employee.get("email"), "%" + input.email() + "%"));
         }
-        if (phone != null && !phone.isEmpty()) {
-            predicates.add(cb.like(employee.get("phone"), "%" + phone + "%"));
+        if (input.phone() != null && !input.phone().isEmpty()) {
+            predicates.add(cb.like(employee.get("phone"), "%" + input.phone() + "%"));
         }
-//        if (handlerName != null && !handlerName.isEmpty()) {
-//            predicates.add(cb.like(employee.join("subHandlers").join("handler").get("name"), "%" + handlerName + "%"));
-//        }
-        if (handlerName != null && !handlerName.isEmpty()) {
+        if (input.minScore() != null ){
+            predicates.add(cb.greaterThanOrEqualTo(employee.get("score"), input.minScore()));
+        }
+        if (input.maxScore() != null){
+            predicates.add(cb.lessThanOrEqualTo(employee.get("score"), input.maxScore()));
+        }
+        List<Predicate> handlerPredicates = new ArrayList<>();
+        if (input.handlersName() != null && !input.handlersName().isEmpty()) {
+            for (String handlerName : input.handlersName()) {
                 Join<Employee, SubHandler> subHandlerJoin = employee.join("subHandlers");
                 Join<SubHandler, Handler> handlerJoin = subHandlerJoin.join("handler");
-                predicates.add(cb.like(handlerJoin.get("name"), "%" + handlerName + "%"));
+                handlerPredicates.add(cb.like(handlerJoin.get("name"), "%" + handlerName + "%"));
+            }
+        }
+
+        List<Predicate> subHandlerPredicates = new ArrayList<>();
+        if (input.subHandlerName() != null && !input.subHandlerName().isEmpty()) {
+            for (String subHandler : input.subHandlerName()) {
+                Join<Employee, SubHandler> subHandlerJoin = employee.join("subHandlers");
+                subHandlerPredicates.add(cb.like(subHandlerJoin.get("name"), "%" + subHandler + "%"));
+            }
+        }
+
+        Predicate combineHandler = cb.or(handlerPredicates.toArray(new Predicate[0]));
+        Predicate combineSubHandler = cb.or(subHandlerPredicates.toArray(new Predicate[0]));
+        if (!combineHandler.getExpressions().isEmpty() || !combineSubHandler.getExpressions().isEmpty()) {
+            predicates.add(cb.or(combineHandler, combineSubHandler));
         }
 
         query.select(employee).where(cb.and(predicates.toArray(new Predicate[0])));
-        return entityManager.createQuery(query).getResultList();
+        if (input.ascending()) {
+            query.orderBy(cb.desc(employee.get("score")));
+        }else {
+            query.orderBy(cb.asc(employee.get("score")));
+        }
+          return entityManager.createQuery(query).getResultList();
     }
+
 
     @Override
     public void SetUnderReviewState(String email) {

@@ -1,20 +1,22 @@
 package org.example.service.user.employee.imp;
-
-
 import org.example.domain.*;
 import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.admin.EmployeeInputHandlersDto;
+import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.employee.OfferDto;
 import org.example.dto.employee.OrderOutputEmployee;
 import org.example.dto.employee.SubHandlerOutput;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.subHandlers.SubHandlersDtoOutput;
+import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
+import org.example.service.credit.CreditService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
@@ -24,7 +26,6 @@ import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,18 +37,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 @Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
-
-    //4
-
-
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
-        super(baseUserRepository,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
+        super(baseUserRepository,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.employeeRepository = employeeRepository;
-
     }
     @Override
     @Transactional
@@ -187,8 +182,21 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Transactional
     @Override
-    public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
-        return employeeRepository.selectEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+    public List<EmployeeOutputDtoHandlers> findEmployeesByOptionalInformation(EmployeeInputHandlersDto input) {
+        List<Employee> employees =  employeeRepository.selectEmployeesByOptionalInformation(input);
+        List<EmployeeOutputDtoHandlers> employeeOutputDtoHandlers = new ArrayList<>();
+        if (employees!=null && !employees.isEmpty()) {
+            for (Employee employee : employees) {
+                List<String> subHandlersNameString = new ArrayList<>();
+                if (employee.getSubHandlers() != null && !employee.getSubHandlers().isEmpty()) {
+                    for (SubHandler subHandler : employee.getSubHandlers()) {
+                        subHandlersNameString.add("name : " + subHandler.getName() + "||| handlerName : " + subHandler.getHandler().getName());
+                    }
+                }
+                employeeOutputDtoHandlers.add(new EmployeeOutputDtoHandlers(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getTimeOfRegistration(),employee.getEmployeeState(),employee.getScore(),subHandlersNameString));
+            }
+        }
+        return employeeOutputDtoHandlers;
     }
 
     @Override
@@ -281,4 +289,20 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public List<EmployeeOutputDtoReport> findEmployeeByReports(LocalDate startDateRegistration, LocalDate endDateRegistration, Integer doneWorksStart, Integer doneWorksEnd, Integer offerSentStart, Integer offerSentEnd) {
         return employeeRepository.selectEmployeeByReports(startDateRegistration,endDateRegistration,doneWorksStart,doneWorksEnd,offerSentStart,offerSentEnd);
     }
+
+    @Override
+    public List<OrdersOutputDtoUser> optionalSelectOrdersForEmployee(Integer employeeId, String orderState) {
+        List<Orders> orders = orderService.optionalFindOrdersForEmployee(employeeId, orderState);
+        List<OrdersOutputDtoUser> ordersOutputDtoUsers = new ArrayList<>();
+        for (Orders orders1 : orders) {
+            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
+        }
+        return ordersOutputDtoUsers;
+    }
+
+    @Override
+    public Double getCreditAmount(Integer id) {
+        return Optional.ofNullable(creditService.findByEmployeeId(id).getAmount()).orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
+    }
+
 }

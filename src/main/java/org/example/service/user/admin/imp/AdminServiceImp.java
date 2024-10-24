@@ -3,6 +3,8 @@ import org.example.domain.*;
 import org.example.dto.ChangeSubHandlerDto;
 import org.example.dto.SubHandlerDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
+import org.example.dto.admin.EmployeeInputHandlersDto;
+import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
@@ -106,8 +108,8 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public List<Employee> findEmployeesByOptionalInformation(String name, String lastName, String email, String phone, String handlerName) {
-        return employeeService.findEmployeesByOptionalInformation(name, lastName, email, phone, handlerName);
+    public List<EmployeeOutputDtoHandlers> findEmployeesByOptionalInformation(EmployeeInputHandlersDto input) {
+        return employeeService.findEmployeesByOptionalInformation(input);
     }
     public List<Orders> findOptionalOrdersByEmployeeId(Integer employeeId){
         //todo: have to be done
@@ -141,14 +143,8 @@ public class AdminServiceImp implements AdminService {
     @Override
     @Transactional
     public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId)  {
-            Employee employee = employeeService.findById(employeeId,Employee.class);
-            if (Objects.isNull(employee)){
-                throw new NotFoundEmployee();
-            }
-            SubHandler  subHandler = subHandlerService.findSubHandlerById(subHandlerId);
-            if (Objects.isNull(subHandler)){
-                throw new SubHandlerNull();
-            }
+            Employee employee = Optional.ofNullable(employeeService.findById(employeeId,Employee.class)).orElseThrow(()->  new NotFoundEmployee());
+            SubHandler  subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()->new SubHandlerNull());
             adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
     }
 
