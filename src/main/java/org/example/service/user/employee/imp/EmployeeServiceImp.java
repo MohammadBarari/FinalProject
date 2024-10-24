@@ -229,7 +229,30 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
     }
 
-
+    @Override
+    @Transactional
+    public List<OrderOutputEmployee> findOrdersForEmployee(Integer employeeId) {
+        List<Orders> orders = new ArrayList<>();
+        List<SubHandler> subHandlers =subHandlerService.subHandlersForEmployee(employeeId);
+        if (subHandlers!=null && !subHandlers.isEmpty()) {
+            for (SubHandler subHandler : subHandlers) {
+                List<Orders> ordersPerSubHandler = orderService.findOrdersForSubHandler(subHandler.getId());
+                if (!ordersPerSubHandler.isEmpty()) {
+                    for (Orders order : ordersPerSubHandler) {
+                        if (order.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE) || order.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER)) {
+                            orders.add(order);
+                        }
+                    }
+                }
+            }
+        }
+        List<OrderOutputEmployee> orderOutputEmployees = new ArrayList<>();
+        orders.forEach(orders1 -> {
+            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
+            orderOutputEmployees.add(o);
+        });
+        return orderOutputEmployees;
+    }
     @Override
     public boolean validateEmployee(EmployeeSignUpDto employee, File file) {
         return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())

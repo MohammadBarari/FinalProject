@@ -24,49 +24,52 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmployeeController {
     private final EmployeeService employeeService;
-    private final ServerProperties serverProperties;
 
     @PostMapping("/signUp")
     public EmployeeSignUpDto signUp(
             @RequestBody @Valid
             EmployeeSignUpDto employeeSignUpDto) throws Exception {
-       return employeeService.signUpEmployee(employeeSignUpDto);
+        return employeeService.signUpEmployee(employeeSignUpDto);
     }
 
-    @GetMapping("/login/{username}/{password}")
+    @PostMapping("/login") // Changed to POST for better practice
     public EmployeeLoginDtoOutput login(
-            @PathVariable @NotNull String username, @PathVariable @NotNull String password) {
+            @RequestParam @NotNull String username, @RequestParam @NotNull String password) {
         return employeeService.login(username, password);
     }
 
-    @GetMapping("/giveOfferToOrder")
-    public OfferDto offerToOrder(@RequestBody  @Valid OfferDto offerDto){
+    @PostMapping("/offer") // Shortened URL
+    public OfferDto createOffer(@RequestBody @Valid OfferDto offerDto) {
         return employeeService.giveOfferToOrder(offerDto);
     }
 
-    @GetMapping("/employeeSeeAllOrders/{employeeId}")
-    public List<OrderOutputEmployee> employeeSeeAllOrders(@PathVariable @NotNull Integer employeeId){
-         return employeeService.getOrdersForEmployee(employeeId);
-    }
-    @GetMapping("/employeeSeeAllSubHander/{employeeId}")
-    public List<SubHandlerOutput> employeeSeeAllSubHander(@PathVariable @NotNull Integer employeeId){
-        return employeeService.findAllSubHandlersForEmployee(employeeId);
-    }
-    @GetMapping("/verify")
-    public String verify(@RequestParam(required = false ,name = "token") String token){
-        return employeeService.validateEmployeeEmail(token);
-    }
-    @GetMapping("/getOrders/{employeeId}")
-    public List<OrdersOutputDtoUser> getOrders(@PathVariable  @NotNull  Integer employeeId , @RequestParam(required = false) String orderState){
-        return employeeService.optionalSelectOrdersForEmployee(employeeId,orderState);
+    @GetMapping(("/orders/all/{employeeId}")) // Shortened URL
+    public List<OrderOutputEmployee> getAllOrders(@PathVariable @NotNull Integer employeeId) {
+        return employeeService.findOrdersForEmployee(employeeId);
     }
 
-    @GetMapping("/creit/getCredit/{employeeId}")
-    public Double getCredit(@PathVariable  @NotNull  Integer employeeId ){
+    @GetMapping("/subHandlers/{employeeId}") // Shortened URL
+    public List<SubHandlerOutput> getSubHandler(@PathVariable @NotNull Integer employeeId) {
+        return employeeService.findAllSubHandlersForEmployee(employeeId);
+    }
+
+    @GetMapping("/verify")
+    public String verify(@RequestParam(required = false, name = "token") String token) {
+        return employeeService.validateEmployeeEmail(token);
+    }
+
+    @GetMapping("/orders/{employeeId}") // Shortened URL
+    public List<OrdersOutputDtoUser> getOrders(@PathVariable @NotNull Integer employeeId, @RequestParam(required = false) String orderState) {
+        return employeeService.optionalSelectOrdersForEmployee(employeeId, orderState);
+    }
+
+    @GetMapping("/credit/{employeeId}") // Shortened URL
+    public Double getCredit(@PathVariable @NotNull Integer employeeId) {
         return employeeService.getCreditAmount(employeeId);
     }
-    @PostMapping("/passWord/change")
-    public String changePassword(@Valid @RequestBody changingPasswordDtoController changingPasswordDto){
-       return employeeService.changingPassword(new ChangingPasswordDto(changingPasswordDto.user(),changingPasswordDto.oldPass(),changingPasswordDto.newPass(), TypeOfUser.EMPLOYEE));
+
+    @PostMapping("/password/change") // Shortened URL
+    public String changePassword(@Valid @RequestBody changingPasswordDtoController changingPasswordDto) {
+        return employeeService.changingPassword(new ChangingPasswordDto(changingPasswordDto.user(), changingPasswordDto.oldPass(), changingPasswordDto.newPass(), TypeOfUser.EMPLOYEE));
     }
 }

@@ -43,4 +43,5 @@ public interface EmployeeService  extends BaseUserService<Employee> {
     List<OrdersOutputDtoUser> optionalSelectOrdersForEmployee(Integer employeeId, String orderState);
     Double getCreditAmount(Integer id);
     EmployeeLoginDtoOutput login(String user, String pass) ;
+    List<OrderOutputEmployee> findOrdersForEmployee(Integer employeeId);
 }
