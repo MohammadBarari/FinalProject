@@ -19,6 +19,19 @@
 
   <label for="cvv2">CVV2 (3 digits):</label>
   <input type="text" id="cvv2" placeholder="Enter CVV2" required>
+
+  <label for="expiresDate">Expires Date:</label>
+  <input type="date" id="expiresDate" required>
+
+  <label for="captcha">CAPTCHA:</label>
+  <div id="captchaDisplay">[CAPTCHA will be displayed here]</div>
+  <input type="text" id="captcha" placeholder="Enter CAPTCHA" required>
+
+  <button id="refreshCaptchaButton">Refresh CAPTCHA</button>
+  <button id="submitButton">Charge Credit</button>
+
+  <div id="timer">Remaining Time: 10:00</div>
+  <div id="notification" class="notification"></div>
   
 </div>
 </body>
