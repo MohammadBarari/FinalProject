@@ -208,7 +208,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     public CustomerLoginDtoOutput login(String user, String pass)
     {
-        Customer customer =  Optional.ofNullable(customerRepository.login(user,passwordEncoder.encode(pass))).orElseThrow(() -> new NotFoundCustomer("user or password may be incorrect! "));
+        Customer customer = Optional.ofNullable(customerRepository.findByUser(user)).orElseThrow(() -> new NotFoundCustomer());
+        if (passwordEncoder.matches(customer.getPassAndUser().getPass(),passwordEncoder.encode(pass))) {
+        throw new PasswordNotCorrect();
+    }
         return new CustomerLoginDtoOutput(customer.getId(),customer.getName(),customer.getLast_name(),customer.getPhone(),customer.getCredit().getAmount());
     }
     @Override

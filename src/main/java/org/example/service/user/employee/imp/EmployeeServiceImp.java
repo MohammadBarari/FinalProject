@@ -257,7 +257,10 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
     @Override
     public EmployeeLoginDtoOutput login(String user, String pass)  {
-        Employee employee =  Optional.ofNullable(employeeRepository.login(user,passwordEncoder.encode(pass))).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
+        Employee employee =  Optional.ofNullable(employeeRepository.findByUser(user)).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
+        if (passwordEncoder.matches(employee.getPassAndUser().getPass(),passwordEncoder.encode(pass))){
+            throw new PasswordNotCorrect();
+        }
         return new EmployeeLoginDtoOutput(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getCredit().getAmount(),employee.getImage(),employee.getScore());
     }
     @Override

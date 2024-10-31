@@ -3,6 +3,7 @@ package org.example.repository.user.customer.imp;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import org.example.domain.Customer;
+import org.example.domain.Employee;
 import org.example.domain.Orders;
 import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.repository.user.BaseUserRepositoryImp;
@@ -120,6 +121,21 @@ where  pau.username= ? and pau.pass = ?
         }
         return entityManager.createQuery(query).getResultList();
     }
+
+    @Override
+    public Customer findByUser(String user) {
+        try {
+            Query query = entityManager.createNativeQuery("""
+        select customer.* from customer where phone = ?
+""", Customer.class);
+            query.setParameter(1, user);
+            return (Customer) query.getSingleResult();
+        }catch (Exception e) {
+            return null;
+        }
+    }
+
+
     private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> orderRoot,Join<Orders, Customer> ordersJoinJoin,Root<Customer> customerRoot) {
         Join<Orders, Customer> a = orderRoot.join("customer", JoinType.INNER);
         Predicate isPaid = cb.equal(orderRoot.get("orderState"), "PAID");

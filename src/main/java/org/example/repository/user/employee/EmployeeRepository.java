@@ -20,5 +20,6 @@ public interface EmployeeRepository extends BaseUserRepository<Employee> {
                                                           Integer doneWorksEnd,
                                                           Integer offerSentStart,
                                                           Integer  offerSentEnd);
+    Employee findByUser(String user);
 
 }

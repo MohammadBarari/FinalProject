@@ -30,13 +30,13 @@ public class EmployeeController {
         return employeeService.signUpEmployee(employeeSignUpDto);
     }
 
-    @PostMapping("/login") // Changed to POST for better practice
+    @PostMapping("/login")
     public EmployeeLoginDtoOutput login(
             @RequestParam @NotNull String username, @RequestParam @NotNull String password) {
         return employeeService.login(username, password);
     }
 
-    @PostMapping("/offer") // Shortened URL
+    @PostMapping("/offer")
     public OfferDto createOffer(@RequestBody @Valid OfferDto offerDto) {
         return employeeService.giveOfferToOrder(offerDto);
     }

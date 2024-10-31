@@ -131,6 +131,19 @@ where  pau.username= ? and pau.pass = ?
         return entityManager.createQuery(query).getResultList();
     }
 
+    @Override
+    public Employee findByUser(String user) {
+       try {
+           Query query = entityManager.createNativeQuery("""
+        select employee.* from employee where phone = ?
+""",Employee.class);
+           query.setParameter(1, user);
+           return (Employee) query.getSingleResult();
+       }catch (Exception e) {
+           return null;
+       }
+    }
+
 
     private Predicate countingOrders(Integer start, Integer end, Subquery<Long> orderCount, CriteriaBuilder cb, Root<Employee> employeeRoot) {
         Predicate predicate = cb.conjunction();
