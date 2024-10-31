@@ -4,28 +4,33 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.atmosphere.config.service.Post;
 import org.example.dto.*;
 import org.example.dto.customer.*;
 import org.example.dto.subHandlers.SubHandlersDtoOutputId;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.FailedDoingOperation;
+import org.example.service.captcha.CaptchaService;
 import org.example.service.user.customer.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
-
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/customer")
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+    private final CaptchaService captchaService;
+    private String captcha;
 
     @PostMapping("/signup")
     public CustomerSignUpDto signUp(@RequestBody @Valid CustomerSignUpDto dto) {
         return customerService.createCustomer(dto);
     }
+
 
     @GetMapping("/login/{username}/{password}")
     public CustomerLoginDtoOutput login(@PathVariable @NotNull String username,
@@ -33,10 +38,12 @@ public class CustomerController {
         return customerService.login(username, password);
     }
 
+
     @PostMapping("/subhandler/get")
     public OrderDto getSubHandlerForCustomer(@RequestBody @Valid OrderDto dto) {
         return customerService.createOrder(dto);
     }
+
 
     @PostMapping("/order/start/{orderId}")
     public void changeOrderToStart(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer orderId) {
@@ -48,6 +55,7 @@ public class CustomerController {
     public List<OrdersOutputDtoCustomer> findAllOrders(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer customerId) {
         return customerService.getAllOrders(customerId);
     }
+
 
     @PostMapping("/order/comment/{ordersId}/{star}/{comment}")
     public void giveComment(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer ordersId,
@@ -68,7 +76,6 @@ public class CustomerController {
         customerService.customerAcceptOffer(offerId);
     }
 
-
     @GetMapping("/handlers")
     public List<HandlerCustomerDto> customerSeeAllHandlers() {
         return customerService.getHandlersForCustomer();
@@ -80,10 +87,10 @@ public class CustomerController {
         return customerService.getSubHandlersForHandler(handlerId);
     }
 
-
     @PostMapping("/chargeCredit")
-    public ResponseEntity<String> customerChargeCredit(@RequestBody @Valid PayToCartDto payToCartDto) {
-        String response = customerService.customerChargeCart(payToCartDto);
+    public ResponseEntity<String> customerChargeCredit(@RequestBody @Valid PayToCartDto payToCartDto , @RequestParam String captcha) {
+        System.out.println(this.captcha + " : " +captcha);
+        String response = customerService.customerChargeCart(payToCartDto,this.captcha,captcha);
         return ResponseEntity.ok(response);
     }
 
@@ -103,7 +110,7 @@ public class CustomerController {
 
     @PostMapping("/order/{orderId}/commentAndStar/{star}")
     public String addCommentAndStar(@PathVariable @Digits(integer = 5, fraction = 0) Integer orderId,
-                                   @RequestBody CommentDto comment,
+                                    @RequestBody CommentDto comment,
                                     @PathVariable @Digits(integer = 5, fraction = 0) Integer star) {
         return customerService.addComment(orderId, star, comment.comment());
     }
@@ -153,4 +160,12 @@ public class CustomerController {
     public String chargeCartSuccess() {
         return "success";
     }
+    @CrossOrigin(origins = "http://localhost:63342")
+    @PostMapping("/captcha/generate")
+    public String generateCaptcha() {
+        captcha = captchaService.generateCaptcha();
+        System.out.println(captcha);
+        return captcha;
+    }
+
 }
