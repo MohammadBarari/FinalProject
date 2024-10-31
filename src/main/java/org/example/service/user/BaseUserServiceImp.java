@@ -19,6 +19,7 @@ import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +33,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     protected final EntityMapper entityMapper;
     protected final EmailTokenService emailTokenService ;
     protected final CreditService creditService ;
+    protected final PasswordEncoder passwordEncoder;
     @Autowired
-    public BaseUserServiceImp(BaseUserRepository baseUserRepository,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ){
+    public BaseUserServiceImp(BaseUserRepository baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ){
         this.baseUserRepository = baseUserRepository;
         this.orderService = orderService;
         this.offerService = offerService;
@@ -41,6 +43,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         this.entityMapper = entityMapper;
         this.emailTokenService = emailTokenService;
         this.creditService = creditService;
+        this.passwordEncoder =passwordEncoder;
     }
     @SneakyThrows
     @Override
@@ -101,9 +104,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     public String changingPassword(ChangingPasswordDto changingPasswordDto){
         PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user())
                 .typeOfUser(changingPasswordDto.typeOfUser())
-                .pass(changingPasswordDto.oldPass()).build();
+                .pass(passwordEncoder.encode(changingPasswordDto.oldPass())).build();
         PassAndUser newPassAndUser = Optional.ofNullable(baseUserRepository.findPass(passAndUser)).orElseThrow(()-> new UnableToChangePassWord("You should enter all field correctly "));
-        newPassAndUser.setPass(changingPasswordDto.newPass());
+        newPassAndUser.setPass(passwordEncoder.encode(changingPasswordDto.newPass()));
         baseUserRepository.updatePass(newPassAndUser);
         return "successful";
     }

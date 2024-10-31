@@ -31,6 +31,7 @@ import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,8 +44,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final HandlerService handlerService;
     private final CustomerCartService customerCartService;
     private final CombinedUserClassFromCustomer combineUserClass;
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService,EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService ,  CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService) {
-        super(baseUserRepository,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
+
+
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService, PasswordEncoder passwordEncoder) {
+        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;
         this.customerCartService = customerCartService;
@@ -178,6 +181,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
     private void addCreditAndPass(Customer customer,CustomerSignUpDto customerDto){
         PassAndUser passAndUser = getPassAndUser(customerDto);
+        passAndUser.setPass(passwordEncoder.encode(passAndUser.getPass()));
         Credit credit = new Credit();
         credit.setTypeOfEmployee(TypeOfUser.CUSTOMER);
         credit.setAmount(0d);
@@ -204,7 +208,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     public CustomerLoginDtoOutput login(String user, String pass)
     {
-        Customer customer =  Optional.ofNullable(customerRepository.login(user,pass)).orElseThrow(() -> new NotFoundCustomer("user or password may be incorrect! "));
+        Customer customer =  Optional.ofNullable(customerRepository.login(user,passwordEncoder.encode(pass))).orElseThrow(() -> new NotFoundCustomer("user or password may be incorrect! "));
         return new CustomerLoginDtoOutput(customer.getId(),customer.getName(),customer.getLast_name(),customer.getPhone(),customer.getCredit().getAmount());
     }
     @Override

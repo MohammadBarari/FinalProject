@@ -26,6 +26,7 @@ import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,8 +41,8 @@ import java.util.*;
 @Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
     private final EmployeeRepository employeeRepository ;
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
-        super(baseUserRepository,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
+        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.employeeRepository = employeeRepository;
     }
     @Override
@@ -61,9 +62,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         throw new InvalidEmployeeDataException("Invalid input data for employee sign up");
     }
 
-    private static PassAndUser getPassAndUser(EmployeeSignUpDto employeeSignUpDto) {
+    private  PassAndUser getPassAndUser(EmployeeSignUpDto employeeSignUpDto) {
         return PassAndUser.builder()
-                .pass(employeeSignUpDto.password())
+                .pass(passwordEncoder.encode(employeeSignUpDto.password()))
                 .typeOfUser(TypeOfUser.EMPLOYEE)
                 .username(employeeSignUpDto.phone()).build();
     }
@@ -256,7 +257,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
     @Override
     public EmployeeLoginDtoOutput login(String user, String pass)  {
-        Employee employee =  Optional.ofNullable(employeeRepository.login(user,pass)).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
+        Employee employee =  Optional.ofNullable(employeeRepository.login(user,passwordEncoder.encode(pass))).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
         return new EmployeeLoginDtoOutput(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getCredit().getAmount(),employee.getImage(),employee.getScore());
     }
     @Override
