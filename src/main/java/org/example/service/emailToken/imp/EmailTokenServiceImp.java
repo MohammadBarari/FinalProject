@@ -32,7 +32,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
     public void remove(EmailToken emailToken) {
         emailTokenRepository.delete(emailToken);
     }
-
+    //update
     @Override
     @Transactional
     public void sendEmail(String email , TypeOfUser typeOfUser) {
