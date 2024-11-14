@@ -7,16 +7,19 @@ Validation includes unique email checks and password requirements (8 characters,
 Specialists' status changes from "New" to "Pending Approval" or "Approved" based on admin verification.
 Customers can request services with specific requirements (price, date, address).
 Order status tracking: "Waiting for Specialist Proposals," "In Progress," "Completed," and "Paid."
+
 Phase 2: Spring Boot & Spring Data
 Reimplemented Features:
 All Phase 1 features are adapted to Spring Boot with unit tests for each service method.
 Specialists can propose bids on open orders.
 Orders can be viewed, organized, and assigned to specialists based on customer preferences.
+
 Phase 3: MVC & API Testing
 Enhancements:
 System refactored using Spring MVC.
 Customer payment options: account balance or online payment with validation.
 Post-service feedback: customers rate specialists on a 1-5 scale and can add comments.
+
 Phase 4: Security & User Management
 Security:
 Spring Security implemented with role-based access control.
