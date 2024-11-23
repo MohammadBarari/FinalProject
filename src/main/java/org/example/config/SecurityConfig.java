@@ -17,7 +17,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/customer/signup", "/employee/signUp").permitAll()
+                        .requestMatchers("/customer/signup", "/employee/signUp","customer/verify","employee/verify").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/employee/**").hasRole("EMPLOYEE")
@@ -37,9 +37,5 @@ public class SecurityConfig {
         ;
 
         return http.build();
-    }
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
