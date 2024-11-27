@@ -9,7 +9,6 @@ import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.customer.CustomerRepository;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ where  pau.username= ? and pau.pass = ?
         }catch (Exception e) {
             return null;
         }
-        }
+    }
     public List<Customer> selectCustomerByOptional(String name, String lastName, String email, String phone) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Customer> query = cb.createQuery(Customer.class);
@@ -52,7 +51,6 @@ where  pau.username= ? and pau.pass = ?
         query.select(customer).where(cb.and(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(query).getResultList();
     }
-
     @Override
     public Customer findByEmail(String email) {
         try {
@@ -65,7 +63,6 @@ where  pau.username= ? and pau.pass = ?
             return null;
         }
     }
-
     @Override
     public List<CustomerOutputDtoForReport> selectCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

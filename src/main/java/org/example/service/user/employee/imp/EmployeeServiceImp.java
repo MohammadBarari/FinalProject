@@ -81,7 +81,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     public OfferDto giveOfferToOrder(OfferDto offerDto)
     {
-        checkemployeeExists(offerDto);
+        checkEmployeeExists(offerDto);
         Orders orders = Optional.ofNullable(orderService.findById(offerDto.orderId())).orElseThrow(()-> new NotFoundOffer("Unable to find order with this ID : " + offerDto.orderId()));
         checkForOffering(offerDto,orders);
         Offer offer = entityMapper.dtoToOffer(offerDto);
@@ -95,7 +95,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         offerService.save(offer);
         return offerDto;
     }
-    private void checkemployeeExists(OfferDto offerDto) {
+    private void checkEmployeeExists(OfferDto offerDto) {
         if (!employeeExistsByEmployeeId(offerDto.employeeId())){
             throw new NotFoundEmployee();
         }
@@ -339,12 +339,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     private boolean validateImageJpg(String file) throws IOException {
         byte[] imageBytes = decodeImage(file);
-        // Check if the image has enough bytes to be a JPEG
-        if (imageBytes.length < 4) { // At least 4 bytes needed for header and footer
+
+        if (imageBytes.length < 4) {
             throw new ItIsNotJpgFile("File is too short to be a valid image");
         }
 
-        // Check for JPEG signature (FF D8 at start and FF D9 at end)
         if (imageBytes[0] != (byte) 0xFF || imageBytes[1] != (byte) 0xD8) {
             throw new ItIsNotJpgFile("The file is not a JPG image");
         }

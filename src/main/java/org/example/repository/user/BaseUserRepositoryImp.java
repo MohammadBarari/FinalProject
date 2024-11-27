@@ -22,11 +22,10 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
         public PassAndUser findPass(PassAndUser passAndUser){
             try {
                 Query query = entityManager.createNativeQuery("""
-            select * from pass_and_user where username = ? and pass = ? and type_of_user = ?;
+            select * from pass_and_user where username = ?  and type_of_user = ?;
 """,PassAndUser.class);
                 query.setParameter(1, passAndUser.getUsername());
-                query.setParameter(2, passAndUser.getPass());
-                query.setParameter(3,passAndUser.getTypeOfUser().toString());
+                query.setParameter(2,passAndUser.getTypeOfUser().toString());
                 return (PassAndUser) query.getSingleResult();
             }catch (Exception e) {
                 return null;

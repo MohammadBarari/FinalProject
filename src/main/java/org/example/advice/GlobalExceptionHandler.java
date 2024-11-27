@@ -30,27 +30,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> runTimeExceptionHandler(RuntimeException e) {
-        logger.error("An error occurred : {}", e.getMessage(), e);
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception e) {
-        logger.error("An error occurred : {}", e.getMessage(), e);
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error"
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
     @ExceptionHandler(NotFoundEmployee.class)
     public ResponseEntity<ErrorResponse> handleEmployeeNullException(Exception e) {
         logger.error("An error occurred : {} ", e.getMessage(), e);
@@ -75,6 +54,26 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> runTimeExceptionHandler(RuntimeException e) {
+        logger.error("An error occurred : {}", e.getMessage(), e);
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                e.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception e) {
+        logger.error("An error occurred : {}", e.getMessage(), e);
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error"
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

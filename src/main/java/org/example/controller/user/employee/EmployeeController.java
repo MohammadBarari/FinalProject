@@ -6,13 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.ChangingPasswordDto;
 import org.example.dto.EmployeeSignUpDto;
 import org.example.dto.changingPasswordDtoController;
-import org.example.dto.employee.EmployeeLoginDtoOutput;
-import org.example.dto.employee.OfferDto;
-import org.example.dto.employee.OrderOutputEmployee;
-import org.example.dto.employee.SubHandlerOutput;
+import org.example.dto.employee.*;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.employee.EmployeeService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,17 +35,21 @@ public class EmployeeController {
     }
 
     @PostMapping("/offer")
-    public OfferDto createOffer(@RequestBody @Valid OfferDto offerDto) {
-        return employeeService.giveOfferToOrder(offerDto);
+    public OfferDto createOffer(@RequestBody @Valid OfferDtoInput offerDto) {
+        Integer employeeId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        OfferDto offerDto1 = new OfferDto(offerDto.offerPrice(),offerDto.timeOfWork(),offerDto.workTimeInMinutes(),offerDto.orderId(),employeeId);
+        return employeeService.giveOfferToOrder(offerDto1);
     }
 
-    @GetMapping(("/orders/all/{employeeId}")) // Shortened URL
-    public List<OrderOutputEmployee> getAllOrders(@PathVariable @NotNull Integer employeeId) {
+    @GetMapping(("/orders/all"))
+    public List<OrderOutputEmployee> getAllOrders() {
+        Integer employeeId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return employeeService.findOrdersForEmployee(employeeId);
     }
 
-    @GetMapping("/subHandlers/{employeeId}") // Shortened URL
-    public List<SubHandlerOutput> getSubHandler(@PathVariable @NotNull Integer employeeId) {
+    @GetMapping("/subHandlers")
+    public List<SubHandlerOutput> getSubHandler() {
+        Integer employeeId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return employeeService.findAllSubHandlersForEmployee(employeeId);
     }
 
@@ -56,17 +58,19 @@ public class EmployeeController {
         return employeeService.validateEmployeeEmail(token);
     }
 
-    @GetMapping("/orders/{employeeId}") // Shortened URL
-    public List<OrdersOutputDtoUser> getOrders(@PathVariable @NotNull Integer employeeId, @RequestParam(required = false) String orderState) {
+    @GetMapping("/orders")
+    public List<OrdersOutputDtoUser> getOrders( @RequestParam(required = false) String orderState) {
+        Integer employeeId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return employeeService.optionalSelectOrdersForEmployee(employeeId, orderState);
     }
 
-    @GetMapping("/credit/{employeeId}") // Shortened URL
-    public Double getCredit(@PathVariable @NotNull Integer employeeId) {
+    @GetMapping("/credit")
+    public Double getCredit() {
+        Integer employeeId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return employeeService.getCreditAmount(employeeId);
     }
 
-    @PostMapping("/password/change") // Shortened URL
+    @PostMapping("/password/change")
     public String changePassword(@Valid @RequestBody changingPasswordDtoController changingPasswordDto) {
         return employeeService.changingPassword(new ChangingPasswordDto(changingPasswordDto.user(), changingPasswordDto.oldPass(), changingPasswordDto.newPass(), TypeOfUser.EMPLOYEE));
     }

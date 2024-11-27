@@ -7,10 +7,7 @@ import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
 import org.example.dto.admin.FindFilteredOrdersDto;
-import org.example.exeptions.AllNotBeLetterOrDigits;
-import org.example.exeptions.NotFoundUser;
-import org.example.exeptions.PassNot8Digits;
-import org.example.exeptions.UnableToChangePassWord;
+import org.example.exeptions.*;
 import org.example.repository.user.BaseUserRepository;
 import org.example.service.credit.CreditService;
 import org.example.service.emailToken.EmailTokenService;
@@ -106,6 +103,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
                 .typeOfUser(changingPasswordDto.typeOfUser())
                 .pass(passwordEncoder.encode(changingPasswordDto.oldPass())).build();
         PassAndUser newPassAndUser = Optional.ofNullable(baseUserRepository.findPass(passAndUser)).orElseThrow(()-> new UnableToChangePassWord("You should enter all field correctly "));
+        if (!passwordEncoder.matches(changingPasswordDto.oldPass(), passAndUser.getPass())){
+            throw new PasswordNotCorrect();
+        }
         newPassAndUser.setPass(passwordEncoder.encode(changingPasswordDto.newPass()));
         baseUserRepository.updatePass(newPassAndUser);
         return "successful";

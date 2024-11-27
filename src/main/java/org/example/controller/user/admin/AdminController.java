@@ -42,7 +42,7 @@ public class AdminController {
     }
 
     @PostMapping("/employees/{employeeId}/validate")
-    public void validateEmployee(@PathVariable @Digits(integer = 3, fraction = 0) @NotNull Integer employeeId) {
+    public void validateEmployee(@PathVariable @Digits(integer = 5, fraction = 0) @NotNull Integer employeeId) {
         adminService.acceptEmployee(employeeId);
     }
 

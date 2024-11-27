@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.atmosphere.config.service.Post;
 import org.example.dto.*;
 import org.example.dto.customer.*;
 import org.example.dto.subHandlers.SubHandlersDtoOutputId;
@@ -12,11 +11,12 @@ import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.exeptions.FailedDoingOperation;
 import org.example.service.captcha.CaptchaService;
+import org.example.service.mapStruct.EntityMapper;
 import org.example.service.user.customer.CustomerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Objects;
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/customer")
@@ -40,39 +40,43 @@ public class CustomerController {
 
 
     @PostMapping("/subhandler/get")
-    public OrderDto getSubHandlerForCustomer(@RequestBody @Valid OrderDto dto) {
-        return customerService.createOrder(dto);
+    public OrderDto getSubHandlerForCustomer(@RequestBody @Valid OrderDtoInput dto) {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        OrderDto orderDto =new OrderDto(dto.offeredPrice(),dto.detail(),dto.timeOfWork(),dto.address(),dto.subHandlerId(),customerId);
+        return customerService.createOrder(orderDto);
     }
 
 
     @PostMapping("/order/start/{orderId}")
-    public void changeOrderToStart(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer orderId) {
+    public void changeOrderToStart(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer orderId) {
         customerService.startOrder(orderId);
     }
 
 
-    @GetMapping("/orders/{customerId}")
-    public List<OrdersOutputDtoCustomer> findAllOrders(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer customerId) {
+    @GetMapping("/orders")
+    public List<OrdersOutputDtoCustomer> findAllOrders() {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(customerId);
         return customerService.getAllOrders(customerId);
     }
 
 
     @PostMapping("/order/comment/{ordersId}/{star}/{comment}")
-    public void giveComment(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer ordersId,
-                            @PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer star,
+    public void giveComment(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer ordersId,
+                            @PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer star,
                             @PathVariable @NotNull String comment) {
         customerService.addComment(ordersId, star, comment);
     }
 
 
     @GetMapping("/order/{orderId}/offers")
-    public List<OfferDtoForCustomer> customerSeeAllOfferInOneOrder(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer orderId) {
+    public List<OfferDtoForCustomer> customerSeeAllOfferInOneOrder(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer orderId) {
         return customerService.getOffersForOrder(orderId);
     }
 
 
     @PostMapping("/offer/accept/{offerId}")
-    public void customerAcceptOffer(@PathVariable @NotNull @Digits(integer = 3, fraction = 0) Integer offerId) {
+    public void customerAcceptOffer(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer offerId) {
         customerService.customerAcceptOffer(offerId);
     }
 
@@ -96,14 +100,16 @@ public class CustomerController {
 
 
     @PostMapping("/order/done/{orderId}")
-    public String customerMakeOrderStateDone(@NotNull @PathVariable @Digits(integer = 3, fraction = 0) Integer orderId) {
+    public String customerMakeOrderStateDone(@NotNull @PathVariable @Digits(integer = 5, fraction = 0) Integer orderId) {
         return customerService.makeServiceStateToDone(orderId);
     }
 
 
-    @PostMapping("/payEmployee/{orderId}/{customerId}")
-    public String customerPayEmployee(@NotNull @PathVariable @Digits(integer = 3, fraction = 0) Integer orderId,
-                                      @NotNull @PathVariable @Digits(integer = 3, fraction = 0) Integer customerId) {
+    @PostMapping("/payEmployee/{orderId}")
+    public String customerPayEmployee(@NotNull @PathVariable @Digits(integer = 5, fraction = 0) Integer orderId) {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
         return customerService.customerPay(orderId, customerId);
     }
 
@@ -134,8 +140,9 @@ public class CustomerController {
     }
 
 
-    @GetMapping("/credit/{customerId}")
-    public Double getCredit(@PathVariable @NotNull Integer customerId) {
+    @GetMapping("/credit")
+    public Double getCredit() {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return customerService.getCreditAmount(customerId);
     }
 

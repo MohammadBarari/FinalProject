@@ -2,6 +2,7 @@ package org.example.service.order.imp;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Orders;
+import org.example.exeptions.NotFoundOrder;
 import org.example.exeptions.OrderStateIsNotCorrect;
 import org.example.exeptions.TimeOfWorkDoesntMatch;
 import org.example.repository.order.OrderRepository;
@@ -58,11 +59,11 @@ public class OrderServiceImp implements OrderService {
     }
     @Override
     public List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect {
-        List<Orders> allDefiend =orderRepository.selectOrdersByCustomer(customerId);
-        if (allDefiend.isEmpty()) {
-            throw new OrderStateIsNotCorrect();
+        List<Orders> allDefined =orderRepository.selectOrdersByCustomer(customerId);
+        if (allDefined.isEmpty()) {
+            throw new NotFoundOrder("Not found any order with customer id :" + customerId);
         }
-        return allDefiend;
+        return allDefined;
     }
     @Override
     public List<Orders> findOrdersForSubHandler(Integer subHandlerId) {
