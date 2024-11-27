@@ -58,15 +58,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> runTimeExceptionHandler(RuntimeException e) {
-        logger.error("An error occurred : {}", e.getMessage(), e);
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<ErrorResponse> runTimeExceptionHandler(RuntimeException e) {
+//        logger.error("An error occurred : {}", e.getMessage(), e);
+//        ErrorResponse errorResponse = new ErrorResponse(
+//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                e.getMessage()
+//        );
+//        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception e) {

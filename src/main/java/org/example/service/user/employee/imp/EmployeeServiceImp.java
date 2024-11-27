@@ -40,11 +40,14 @@ import java.util.*;
 
 @Service
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
+
     private final EmployeeRepository employeeRepository ;
+
     public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
         super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
         this.employeeRepository = employeeRepository;
     }
+
     @Override
     @Transactional
     public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws Exception {
@@ -267,6 +270,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public boolean checkIfNotDuplicateUser(String user) {
         return Objects.isNull(employeeRepository.find(user, Employee.class));
     }
+
     @Override
     public void sendToken(String email , TypeOfUser typeOfUser) {
         emailTokenService.sendEmail(email,typeOfUser);

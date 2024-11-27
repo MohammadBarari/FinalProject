@@ -42,6 +42,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         this.creditService = creditService;
         this.passwordEncoder =passwordEncoder;
     }
+
     @SneakyThrows
     @Override
     public boolean validatePassWord(String pass) {
@@ -53,6 +54,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
             return false;
         }
     }
+
     @Override
     @Transactional
     public void signUp(T t){

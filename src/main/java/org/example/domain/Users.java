@@ -35,6 +35,5 @@ public class Users extends BaseEntity {
     private LocalDateTime timeOfRegistration;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JsonIgnore
     private PassAndUser passAndUser;
 }

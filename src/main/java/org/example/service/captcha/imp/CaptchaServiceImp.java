@@ -11,6 +11,4 @@ public class CaptchaServiceImp implements CaptchaService {
     public String generateCaptcha() {
         return String.valueOf(new Random().nextInt(8999) + 1000);
     }
-
-
 }
