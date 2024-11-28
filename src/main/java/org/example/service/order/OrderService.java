@@ -1,8 +1,8 @@
 package org.example.service.order;
 
 import org.example.domain.Orders;
-import org.example.exeptions.OrderStateIsNotCorrect;
-import org.example.exeptions.TimeOfWorkDoesntMatch;
+import org.example.exeptions.order.OrderStateIsNotCorrect;
+import org.example.exeptions.wrongTime.TimeOfWorkDoesntMatch;
 
 import java.time.LocalDate;
 import java.util.List;

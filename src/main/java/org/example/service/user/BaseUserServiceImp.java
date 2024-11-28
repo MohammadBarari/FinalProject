@@ -7,7 +7,12 @@ import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.example.dto.ChangingPasswordDto;
 import org.example.dto.admin.FindFilteredOrdersDto;
-import org.example.exeptions.*;
+import org.example.exeptions.NotFoundException.NotFoundUser;
+import org.example.exeptions.password.AllNotBeLetterOrDigits;
+import org.example.exeptions.password.PassNot8Digits;
+import org.example.exeptions.password.PasswordNotCorrect;
+import org.example.exeptions.password.UnableToChangePassWord;
+import org.example.repository.passAndUser.PassAndUserRepository;
 import org.example.repository.user.BaseUserRepository;
 import org.example.service.credit.CreditService;
 import org.example.service.emailToken.EmailTokenService;
@@ -31,8 +36,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     protected final EmailTokenService emailTokenService ;
     protected final CreditService creditService ;
     protected final PasswordEncoder passwordEncoder;
+    protected final PassAndUserRepository passAndUserRepository;
     @Autowired
-    public BaseUserServiceImp(BaseUserRepository baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ){
+    public BaseUserServiceImp(BaseUserRepository baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ,PassAndUserRepository passAndUserRepository){
         this.baseUserRepository = baseUserRepository;
         this.orderService = orderService;
         this.offerService = offerService;
@@ -41,6 +47,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         this.emailTokenService = emailTokenService;
         this.creditService = creditService;
         this.passwordEncoder =passwordEncoder;
+        this.passAndUserRepository = passAndUserRepository;
     }
 
     @SneakyThrows
@@ -63,7 +70,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     @Override
     @Transactional
     public void savePassAndUser(PassAndUser passAndUser){
-        baseUserRepository.saveUserAndPass(passAndUser);
+        passAndUserRepository.save(passAndUser);
     }
 
     private boolean checkIfIts8Digits(String pass) throws PassNot8Digits{
@@ -104,12 +111,12 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user())
                 .typeOfUser(changingPasswordDto.typeOfUser())
                 .pass(passwordEncoder.encode(changingPasswordDto.oldPass())).build();
-        PassAndUser newPassAndUser = Optional.ofNullable(baseUserRepository.findPass(passAndUser)).orElseThrow(()-> new UnableToChangePassWord("You should enter all field correctly "));
+        PassAndUser newPassAndUser = Optional.ofNullable(passAndUserRepository.findPass(passAndUser.getUsername(), String.valueOf(passAndUser.getTypeOfUser()))).orElseThrow(()-> new UnableToChangePassWord());
         if (!passwordEncoder.matches(changingPasswordDto.oldPass(), passAndUser.getPass())){
             throw new PasswordNotCorrect();
         }
         newPassAndUser.setPass(passwordEncoder.encode(changingPasswordDto.newPass()));
-        baseUserRepository.updatePass(newPassAndUser);
+        passAndUserRepository.save(newPassAndUser);
         return "successful";
     }
     @Override

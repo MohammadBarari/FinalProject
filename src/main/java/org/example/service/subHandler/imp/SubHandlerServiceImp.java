@@ -26,18 +26,16 @@ public class SubHandlerServiceImp implements SubHandlerService {
         subHandlerRepository.save(subHandler);
     }
 
-
-
     @Override
     @Transactional
     public void deleteSubHandler(Integer subHandlerId) {
-        subHandlerRepository.delete(subHandlerId);
+        subHandlerRepository.deleteById(subHandlerId);
     }
 
     @Override
     @Transactional
     public void updateSubHandler(SubHandler subHandler) {
-        subHandlerRepository.update(subHandler);
+        subHandlerRepository.save(subHandler);
     }
 
     @Override
@@ -47,6 +45,6 @@ public class SubHandlerServiceImp implements SubHandlerService {
 
     @Override
     public SubHandler findSubHandlerById(Integer subHandlerId) {
-        return subHandlerRepository.selectById(subHandlerId);
+        return subHandlerRepository.findSubHandlerById(subHandlerId);
     }
 }

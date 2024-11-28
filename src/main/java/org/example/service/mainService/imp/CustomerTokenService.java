@@ -2,7 +2,7 @@ package org.example.service.mainService.imp;//package org.example.service.mainSe
 //
 //import org.example.domain.Customer;
 //import org.example.domain.EmailToken;
-//import org.example.exeptions.InvalidTokenExceptions;
+//import org.example.exeptions.emailToken.InvalidTokenExceptions;
 //import org.example.service.emailToken.EmailTokenService;
 //import org.example.service.user.customer.CustomerService;
 //import org.example.service.user.employee.EmployeeService;

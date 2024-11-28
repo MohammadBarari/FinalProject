@@ -7,7 +7,13 @@ import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.*;
+import org.example.exeptions.NotFoundException.NotFoundEmployee;
+import org.example.exeptions.NotFoundException.NotFoundHandler;
+import org.example.exeptions.NotFoundException.NotFoundSubHandler;
+import org.example.exeptions.employee.EmployeeIsNotAccepted;
+import org.example.exeptions.duplicate.HandlerIsDuplicate;
+import org.example.exeptions.global.FailedDoingOperation;
+import org.example.exeptions.password.YouInsertNothing;
 import org.example.repository.user.admin.AdminRepository;
 import org.example.service.handler.HandlerService;
 import org.example.service.mapStruct.EntityMapper;
@@ -56,7 +62,7 @@ public class AdminServiceImp implements AdminService {
    }
     @Override
     public SubHandler saveSubHandler(SubHandlerDto subHandlerDto) {
-        Handler handler = Optional.ofNullable(handlerService.findHandlerById(subHandlerDto.handlerId())).orElseThrow(() -> new HandlerIsNull("Unable to find Handler with this id : "+ subHandlerDto.handlerId() ));
+        Handler handler = Optional.ofNullable(handlerService.findHandlerById(subHandlerDto.handlerId())).orElseThrow(() -> new NotFoundHandler("Unable to find Handler with this id : "+ subHandlerDto.handlerId() ));
         SubHandler foundInRep = subHandlerService.findSubHandlerByName(subHandlerDto.name());
         if (foundInRep != null) {
             throw new HandlerIsDuplicate();
@@ -71,7 +77,7 @@ public class AdminServiceImp implements AdminService {
     public void saveEmployeeToSubHandler(Integer employeeId,Integer subHandlerId) {
        Employee employee = Optional.ofNullable(employeeService.findById(employeeId,Employee.class)).orElseThrow(()-> new NotFoundEmployee("Unable to find Employee with this id : "+ employeeId ));
        if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
-          SubHandler subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()-> new HandlerIsNull("Unable to find SubHandler with this id : "+ subHandlerId ));
+          SubHandler subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()-> new NotFoundHandler("Unable to find SubHandler with this id : "+ subHandlerId ));
           if (Objects.isNull(employee.getSubHandlers()))
           {
               Set<SubHandler> handlers = Set.of(subHandler);
@@ -90,7 +96,7 @@ public class AdminServiceImp implements AdminService {
 
             subHandler = subHandlerService.findSubHandlerById(changeSubHandlerDto.id());
             if (subHandler == null) {
-                throw new SubHandlerNull();
+                throw new NotFoundSubHandler();
             }
             if (!Objects.isNull(changeSubHandlerDto.detail())) {
                 subHandler.setDetail(changeSubHandlerDto.detail());
@@ -156,8 +162,8 @@ public class AdminServiceImp implements AdminService {
     @Transactional
     public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId)  {
             Employee employee = Optional.ofNullable(employeeService.findById(employeeId,Employee.class)).orElseThrow(()->  new NotFoundEmployee());
-            SubHandler  subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()->new SubHandlerNull());
-            adminRepository.deleteEmployeeFromSubHandler(employee,subHandlerId);
+            SubHandler  subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()->new NotFoundSubHandler("Unable to find SubHandler with this id : "+ subHandlerId ));
+            adminRepository.deleteEmployeeFromSubHandler(employeeId,subHandlerId);
     }
 
     @Override

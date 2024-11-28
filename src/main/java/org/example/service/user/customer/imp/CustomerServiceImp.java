@@ -15,7 +15,22 @@ import org.example.dto.subHandlers.SubHandlersDtoOutputId;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.*;
+import org.example.exeptions.NotFoundException.NotFoundCustomer;
+import org.example.exeptions.NotFoundException.NotFoundHandler;
+import org.example.exeptions.NotFoundException.NotFoundOffer;
+import org.example.exeptions.NotFoundException.NotFoundOrder;
+import org.example.exeptions.captcha.CaptchaDoesNotMatchException;
+import org.example.exeptions.emailToken.InvalidTokenExceptions;
+import org.example.exeptions.global.FailedDoingOperation;
+import org.example.exeptions.money.DontHaveEnoughMoney;
+import org.example.exeptions.password.PasswordNotCorrect;
+import org.example.exeptions.customer.InvalidCustomerDataException;
+import org.example.exeptions.duplicate.DuplicateCommentException;
+import org.example.exeptions.order.OrderPriceShouldBeHigherThanBase;
+import org.example.exeptions.order.OrderStateIsNotCorrect;
+import org.example.exeptions.order.StarShouldBeenBetween1To5;
+import org.example.exeptions.wrongTime.TimeOfWorkDoesntMatch;
+import org.example.repository.passAndUser.PassAndUserRepository;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.customer.CustomerRepository;
 import org.example.service.credit.CreditService;
@@ -45,8 +60,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final CombinedUserClassFromCustomer combineUserClass;
 
 
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService, PasswordEncoder passwordEncoder) {
-        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository) {
+        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;
         this.customerCartService = customerCartService;
@@ -87,7 +102,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
 
     private SubHandler findSubHandler(Integer subHandlerId) {
         return Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId))
-                .orElseThrow(() -> new HandlerIsNull("SubHandler not found with ID: " + subHandlerId));
+                .orElseThrow(() -> new NotFoundHandler("SubHandler not found with ID: " + subHandlerId));
     }
     private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler) {
         if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
@@ -175,7 +190,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             return customerDto;
         }
         else {
-            throw new InavlidCustomerDataException("invalid customer data for sign up");
+            throw new InvalidCustomerDataException("invalid customer data for sign up");
         }
     }
     private void addCreditAndPass(Customer customer,CustomerSignUpDto customerDto){

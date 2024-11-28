@@ -15,7 +15,17 @@ import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.*;
+import org.example.exeptions.emailToken.InvalidTokenExceptions;
+import org.example.exeptions.NotFoundException.NotFoundEmployee;
+import org.example.exeptions.NotFoundException.NotFoundOffer;
+import org.example.exeptions.password.PasswordNotCorrect;
+import org.example.exeptions.employee.ImageValidationException;
+import org.example.exeptions.employee.InvalidEmployeeDataException;
+import org.example.exeptions.employee.NotJpgFile;
+import org.example.exeptions.order.OfferPriceIsLessThanOrderPrice;
+import org.example.exeptions.order.OrderStateIsNotCorrect;
+import org.example.exeptions.wrongTime.TimeOfWorkDoesntMatch;
+import org.example.repository.passAndUser.PassAndUserRepository;
 import org.example.repository.user.BaseUserRepository;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.example.service.credit.CreditService;
@@ -43,8 +53,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     private final EmployeeRepository employeeRepository ;
 
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService) {
-        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService);
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService, PassAndUserRepository passAndUserRepository) {
+        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.employeeRepository = employeeRepository;
     }
 
@@ -345,15 +355,15 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         byte[] imageBytes = decodeImage(file);
 
         if (imageBytes.length < 4) {
-            throw new ItIsNotJpgFile("File is too short to be a valid image");
+            throw new NotJpgFile("File is too short to be a valid image");
         }
 
         if (imageBytes[0] != (byte) 0xFF || imageBytes[1] != (byte) 0xD8) {
-            throw new ItIsNotJpgFile("The file is not a JPG image");
+            throw new NotJpgFile("The file is not a JPG image");
         }
 
         if (imageBytes[imageBytes.length - 2] != (byte) 0xFF || imageBytes[imageBytes.length - 1] != (byte) 0xD9) {
-            throw new ItIsNotJpgFile("The file is not a valid JPG image (missing footer)");
+            throw new NotJpgFile("The file is not a valid JPG image (missing footer)");
         }
         return true;
     }

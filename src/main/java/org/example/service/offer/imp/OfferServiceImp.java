@@ -24,13 +24,13 @@ public class OfferServiceImp implements OfferService {
     @Override
     @Transactional
     public void update(Offer offer) {
-        offerRepository.update(offer);
+        offerRepository.save(offer);
     }
 
     @Override
     @Transactional
     public void delete(Integer offerId) {
-        offerRepository.delete(offerId);
+        offerRepository.deleteById(offerId);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class OfferServiceImp implements OfferService {
 
     @Override
     public Offer findById(int id) {
-        return offerRepository.findById(id);
+        return offerRepository.findOfferById(id);
     }
 
     @Override

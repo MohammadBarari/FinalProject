@@ -31,7 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (requestPath.startsWith("/auth/login") || requestPath.startsWith("/customer/signup") || requestPath.startsWith("/employee/signUp") ||requestPath.startsWith("http://localhost:63342/FinalProject/web")
         ||requestPath.startsWith("/customer/captcha")) {
-        ///captcha/generate
             chain.doFilter(request, response);
             return;
         }
@@ -61,7 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
         chain.doFilter(request, response);
     }
 }

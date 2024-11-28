@@ -4,7 +4,7 @@ package org.example.java.org.example;//package org.example.java.org.example;
 //import org.example.dto.ChangeSubHandlerDto;
 //import org.example.exeptions.ErrorWhileUpdatingSubHandler;
 //import org.example.exeptions.SubHandlerNull;
-//import org.example.exeptions.YouInsertNothing;
+//import org.example.exeptions.password.YouInsertNothing;
 //import org.example.service.mainService.imp.HandlerMainServiceImp;
 //import org.example.service.subHandler.SubHandlerService;
 //import org.junit.jupiter.api.BeforeEach;

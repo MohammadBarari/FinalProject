@@ -2,7 +2,7 @@ package org.example.service.emailToken.imp;
 
 import org.example.domain.EmailToken;
 import org.example.enumirations.TypeOfUser;
-import org.example.exeptions.InvalidTokenExceptions;
+import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.repository.emailToken.EmailTokenRepository;
 import org.example.service.emailToken.EmailTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +49,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
     public EmailToken findByToken(String token) {
         return emailTokenRepository.findByToken(token);
     }
+
     @Override
     public void validateToken(String token) {
         EmailToken emailToken = Optional.ofNullable(findByToken(token)).orElseThrow(() -> new InvalidTokenExceptions("Token is invalid"));

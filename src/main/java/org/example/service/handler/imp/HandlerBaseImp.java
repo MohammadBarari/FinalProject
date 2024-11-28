@@ -23,13 +23,13 @@ public class HandlerBaseImp implements HandlerService {
     @Override
     @Transactional
     public void deleteHandler(Integer id) {
-        handlerRepository.delete(id);
+        handlerRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     public void updateHandler(Handler handler) {
-        handlerRepository.update(handler);
+        handlerRepository.save(handler);
     }
 
     @Override
@@ -39,11 +39,11 @@ public class HandlerBaseImp implements HandlerService {
 
     @Override
     public Handler findHandlerById(Integer id) {
-        return handlerRepository.findById(id);
+        return handlerRepository.findHandlerById(id);
     }
 
     @Override
     public Handler findHandlerByName(String name) {
-        return handlerRepository.findByName(name);
+        return handlerRepository.findHandlerByName(name);
     }
 }

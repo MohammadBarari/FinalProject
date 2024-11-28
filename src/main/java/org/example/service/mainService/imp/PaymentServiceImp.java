@@ -4,8 +4,8 @@ package org.example.service.mainService.imp;//package org.example.service.mainSe
 //import org.example.domain.*;
 //import org.example.dto.PayToCartDto;
 //import org.example.enumirations.OrderState;
-//import org.example.exeptions.DontHaveEnoughMoney;
-//import org.example.exeptions.NotFoundOffer;
+//import org.example.exeptions.money.DontHaveEnoughMoney;
+//import org.example.exeptions.NotFoundException.NotFoundOffer;
 //import org.example.service.credit.CreditService;
 //import org.example.service.mainService.PaymentService;
 //import org.example.service.offer.OfferService;

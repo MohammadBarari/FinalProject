@@ -3,7 +3,6 @@ package org.example.repository.user;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import org.example.domain.PassAndUser;
 import org.example.domain.Users;
 import org.springframework.stereotype.Repository;
 
@@ -16,41 +15,18 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
         public void save(T user){
                 entityManager.persist(user);
         }
-        public void saveUserAndPass(PassAndUser passAndUser) {
-                entityManager.persist(passAndUser);
-        }
-        public PassAndUser findPass(PassAndUser passAndUser){
-            try {
-                Query query = entityManager.createNativeQuery("""
-            select * from pass_and_user where username = ?  and type_of_user = ?;
-""",PassAndUser.class);
-                query.setParameter(1, passAndUser.getUsername());
-                query.setParameter(2,passAndUser.getTypeOfUser().toString());
-                return (PassAndUser) query.getSingleResult();
-            }catch (Exception e) {
-                return null;
-            }
-        }
 
 
-    @Override
-    public void updatePass(PassAndUser passAndUser) {
-            entityManager.merge(passAndUser);
-    }
-
-    public void update(T t) {
-
+        public void update(T t) {
                 entityManager.merge(t);
-
         }
         //todo: must check this out
-        public void delete(T t)throws Exception{
+        public void delete(T t){
             entityManager.remove(t);
         }
         //todo: must check this all
 
     @Override
-
     public Object find(String userName , Class<T> userType) {
         try {
             Query query = entityManager.createNativeQuery("""

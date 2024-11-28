@@ -2,9 +2,10 @@ package org.example.service.order.imp;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Orders;
-import org.example.exeptions.NotFoundOrder;
-import org.example.exeptions.OrderStateIsNotCorrect;
-import org.example.exeptions.TimeOfWorkDoesntMatch;
+import org.example.exeptions.NotFoundException.NotFoundOrder;
+import org.example.exeptions.order.OrderStateIsNotCorrect;
+import org.example.exeptions.wrongTime.TimeOfWorkDoesntMatch;
+import org.example.repository.order.CustomOrderRepository;
 import org.example.repository.order.OrderRepository;
 import org.example.service.order.OrderService;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderServiceImp implements OrderService {
     private final OrderRepository orderRepository ;
+    private final CustomOrderRepository orderCustomRepository ;
     @Override
     @Transactional
     public void save(Orders orders) throws TimeOfWorkDoesntMatch {
@@ -30,14 +32,13 @@ public class OrderServiceImp implements OrderService {
     @Override
     @Transactional
     public void update(Orders orders) {
-        orderRepository.update(orders);
-
+        orderRepository.save(orders);
     }
 
     @Override
     @Transactional
     public void delete(int id) {
-        orderRepository.delete(id);
+        orderRepository.deleteById(id);
     }
     @Override
     public List<Orders> findAll() {
@@ -45,7 +46,7 @@ public class OrderServiceImp implements OrderService {
     }
     @Override
     public List<Orders> findOrdersForEmployee(Integer employeeId) {
-        return orderRepository.selectByEmployeeSubHandler(employeeId);
+        return orderRepository.findOrdersByEmployee(employeeId);
     }
 
     @Override
@@ -55,11 +56,11 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public Orders findById(int id) {
-        return orderRepository.findById(id);
+        return orderRepository.findOrdersById(id);
     }
     @Override
     public List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect {
-        List<Orders> allDefined =orderRepository.selectOrdersByCustomer(customerId);
+        List<Orders> allDefined =orderRepository.findOrdersByCustomer(customerId);
         if (allDefined.isEmpty()) {
             throw new NotFoundOrder("Not found any order with customer id :" + customerId);
         }
@@ -83,16 +84,16 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public List<Orders> optionalFindOrders(LocalDate startDate, LocalDate endDate, List<String> handlersName, List<String> subHandlers) {
-        return orderRepository.optionalSelectOrders(startDate, endDate, handlersName, subHandlers);
+        return orderCustomRepository.optionalSelectOrders(startDate, endDate, handlersName, subHandlers);
     }
 
     @Override
     public List<Orders> optionalFindOrdersForEmployee(Integer employeeId, String orderState) {
-        return orderRepository.optionalSelectOrdersForEmployee(employeeId, orderState);
+        return orderCustomRepository.optionalSelectOrdersForEmployee(employeeId, orderState);
     }
 
     @Override
     public List<Orders> optionalFindOrdersForCustomer(Integer employeeId, String orderState) {
-        return orderRepository.optionalSelectOrdersForCustomer(employeeId, orderState);
+        return orderCustomRepository.optionalSelectOrdersForCustomer(employeeId, orderState);
     }
 }

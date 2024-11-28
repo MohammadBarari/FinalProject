@@ -4,8 +4,8 @@ package org.example.java.org.example.serviceTest.employee;//package org.example.
 //import org.example.domain.Employee;
 //import org.example.domain.PassAndUser;
 //import org.example.dto.EmployeeSignUpDto;
-//import org.example.exeptions.DontHaveEnoughMoney;
-//import org.example.exeptions.PassNot8Digits;
+//import org.example.exeptions.money.DontHaveEnoughMoney;
+//import org.example.exeptions.password.PassNot8Digits;
 //import org.example.repository.user.employee.EmployeeRepository;
 //
 //import org.example.service.user.employee.imp.EmployeeServiceImp;

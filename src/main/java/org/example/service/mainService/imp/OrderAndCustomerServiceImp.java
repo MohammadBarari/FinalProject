@@ -3,9 +3,9 @@ package org.example.service.mainService.imp;
 import org.example.domain.Offer;
 import org.example.domain.Orders;
 import org.example.enumirations.OrderState;
-import org.example.exeptions.ErrorWhileFindingOffers;
-import org.example.exeptions.NotFoundOrder;
-import org.example.exeptions.OrderStateIsNotCorrect;
+import org.example.exeptions.NotFoundException.NotFoundOffer;
+import org.example.exeptions.NotFoundException.NotFoundOrder;
+import org.example.exeptions.order.OrderStateIsNotCorrect;
 import org.example.service.mainService.OrderAndCustomerService;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -38,11 +38,11 @@ public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
     }
 //todo: should be deleted
     @Override
-    public List<Offer> customerSeeAllOfferInOneOrder(Integer orderId) throws ErrorWhileFindingOffers {
+    public List<Offer> customerSeeAllOfferInOneOrder(Integer orderId)  {
         try {
             return offerService.findAllOffersForSpecificOrder(orderId);
         }catch (Exception e){
-            throw new ErrorWhileFindingOffers();
+            throw new NotFoundOffer();
         }
     }
 }

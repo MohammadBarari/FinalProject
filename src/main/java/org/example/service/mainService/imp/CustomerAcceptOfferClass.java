@@ -5,7 +5,7 @@ import org.example.domain.Employee;
 import org.example.domain.Offer;
 import org.example.domain.Orders;
 import org.example.enumirations.OrderState;
-import org.example.exeptions.NotFoundOffer;
+import org.example.exeptions.NotFoundException.NotFoundOffer;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
