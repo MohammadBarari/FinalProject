@@ -39,12 +39,9 @@ import org.example.service.user.employee.EmployeeService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.imageio.ImageIO;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -61,7 +58,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     @Transactional
     public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws Exception {
-
         if (validateEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64())) {
             Employee employee = getEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64());
             Credit credit = Credit.builder().typeOfEmployee(TypeOfUser.EMPLOYEE).amount(0.0d).build();
@@ -82,7 +78,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 .username(employeeSignUpDto.phone()).build();
     }
 
-    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, String file) throws Exception {
+    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, String file){
         Employee employee =entityMapper.dtoToEmployee(employeeSignUpDto);
         employee.setImage(decodeImage(file));
         employee.setEmployeeState(EmployeeState.NEW);
@@ -221,24 +217,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     public Boolean employeeExistsByEmail(String email) {
         return employeeRepository.employeeExistsByEmail(email);
-    }
-
-    private void addImageToEmployee(Employee employee, File file) throws IOException {
-        if (file.exists() && file.length() > 0) {
-            try (InputStream inputStream = new FileInputStream(file)) {
-                byte[] photo = new byte[(int) file.length()];
-                int bytesRead = inputStream.read(photo);
-                if (bytesRead > 0) {
-                    employee.setImage(photo);
-                } else {
-                    throw new IOException("Failed to read the image data from file: " + file.getName());
-                }
-            } catch (IOException e) {
-                throw new IOException("Error while reading image file: " + file.getName(), e);
-            }
-        } else {
-            throw new IOException("File does not exist or is empty: " + file.getAbsolutePath());
-        }
     }
 
     @Override

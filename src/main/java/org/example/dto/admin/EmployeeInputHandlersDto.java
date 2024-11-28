@@ -13,5 +13,6 @@ public record EmployeeInputHandlersDto(
         List<String> handlersName,
         Integer minScore,
         Integer maxScore,
-        boolean ascending) {
+        boolean ascending
+) {
 }

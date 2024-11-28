@@ -42,6 +42,6 @@ public interface CustomerService extends BaseUserService<Customer> {
     List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input);
     List<OrdersOutputDtoUser> optionalSelectOrdersForCustomer(Integer employeeId, String orderState);
     Double getCreditAmount(Integer id);
-    List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOfferInput input);
+    List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOffer input);
     CustomerLoginDtoOutput login(String user, String pass) ;
 }

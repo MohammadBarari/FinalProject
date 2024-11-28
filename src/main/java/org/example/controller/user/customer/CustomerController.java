@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
+
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/customer")
@@ -93,7 +95,6 @@ public class CustomerController {
 
     @PostMapping("/chargeCredit")
     public ResponseEntity<String> customerChargeCredit(@RequestBody @Valid PayToCartDto payToCartDto , @RequestParam String captcha) {
-        System.out.println(this.captcha + " : " +captcha);
         String response = customerService.customerChargeCart(payToCartDto,this.captcha,captcha);
         return ResponseEntity.ok(response);
     }
@@ -108,8 +109,6 @@ public class CustomerController {
     @PostMapping("/payEmployee/{orderId}")
     public String customerPayEmployee(@NotNull @PathVariable @Digits(integer = 5, fraction = 0) Integer orderId) {
         Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
         return customerService.customerPay(orderId, customerId);
     }
 
@@ -134,8 +133,9 @@ public class CustomerController {
     }
 
 
-    @GetMapping("/orders/{customerId}/details")
-    public List<OrdersOutputDtoUser> getOrders(@PathVariable @NotNull Integer customerId, @RequestParam(required = false) String orderState) {
+    @GetMapping("/orders/details")
+    public List<OrdersOutputDtoUser> getOrders(@RequestParam(required = false) String orderState) {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return customerService.optionalSelectOrdersForCustomer(customerId, orderState);
     }
 
@@ -159,7 +159,9 @@ public class CustomerController {
 
     @GetMapping("/offers/sorted")
     public List<SortedOfferDtoForCustomer> getSortedOffer(@Valid @RequestBody SortingOfferInput input) {
-        return customerService.sortedOfferForCustomer(input);
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SortingOffer sortingOffer = new SortingOffer(customerId,input.orderId(),input.sortByScore(),input.ascending());
+        return customerService.sortedOfferForCustomer(sortingOffer);
     }
 
 

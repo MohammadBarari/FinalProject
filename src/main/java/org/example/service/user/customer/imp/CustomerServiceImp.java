@@ -118,7 +118,11 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
 
     @Transactional
     public List<OfferDtoForCustomer> getOffersForOrder(Integer orderId)  {
+             Integer customerId =(Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
              Orders orders = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(()-> new NotFoundOrder("unable to find order with id : " + orderId));
+             if (!Objects.equals(orders.getCustomer().getId(), customerId)) {
+                 throw new NotFoundOrder();
+             }
              List<Offer> offers = Optional.ofNullable(offerService.findAllOffersForSpecificOrder(orderId)).orElseThrow(() -> new NotFoundOffer("no offers found in this order with id : " + orderId));
              List<OfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
              offers.forEach(offer -> {
@@ -136,7 +140,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
          List<Handler> handlers =  handlerService.findAllHandlers();
          List<HandlerCustomerDto> handlerCustomerDtos = new ArrayList<>();
          handlers.forEach(handler -> {
-
             handlerCustomerDtos.add(new HandlerCustomerDto(handler.getId(),handler.getName()));
          });
          return handlerCustomerDtos;
@@ -170,6 +173,16 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Transactional
     public void startOrder(Integer orderId) {
         Orders order = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(() -> new NotFoundOrder());
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        validateOrderForStarting(order, customerId);
+        order.setOrderState(OrderState.STARTED);
+        orderService.update(order);
+    }
+
+    private void validateOrderForStarting(Orders order, Integer customerId) {
+        if (order.getCustomer().getId()!= customerId){
+            throw new NotFoundOrder();
+        }
         if (order.getOrderState() != OrderState.UNDER_REACHING_EMPLOYEE){
             throw new OrderStateIsNotCorrect();
         }
@@ -177,8 +190,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         if (offer.getTimeOfWork().isAfter(LocalDateTime.now())) {
             throw new TimeOfWorkDoesntMatch();
         }
-        order.setOrderState(OrderState.STARTED);
-        orderService.update(order);
     }
 
     @Override
@@ -227,7 +238,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     public CustomerLoginDtoOutput login(String user, String pass)
     {
-        Customer customer = Optional.ofNullable(customerRepository.findByUser(user)).orElseThrow(() -> new NotFoundCustomer());
+        Customer customer = Optional.ofNullable(customerRepository.findByUser(user)).orElseThrow(NotFoundCustomer::new);
         if (passwordEncoder.matches(customer.getPassAndUser().getPass(),passwordEncoder.encode(pass))) {
         throw new PasswordNotCorrect();
     }
@@ -241,11 +252,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     @Transactional
     public String addComment(Integer ordersId, Integer star, String comment){
-        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Orders orders = Optional.ofNullable(findOrder(ordersId)).orElseThrow(() -> new NotFoundOrder("orders not found"));
-        if (orders.getCustomer().getId()!= customerId){
-            throw new NotFoundOrder("Not found your order");
-        }
+        validateOrderByCustomerId(orders);
         validateForComment(orders,star);
         orders.setComment(comment);
         orders.setScore(star);
@@ -312,7 +320,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
 
     @Override
     public String makeServiceStateToDone(Integer orderId) {
-            combineUserClass.makeTheOrderDone(orderId);
+        combineUserClass.makeTheOrderDone(orderId);
             return "successful";
     }
 
@@ -429,8 +437,9 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
 
     @Override
     @Transactional
-    public List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOfferInput input) {
+    public List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOffer input) {
         Orders order = Optional.ofNullable(orderService.findById(input.orderId())).orElseThrow(()-> new NotFoundOrder("unable to find order with id : "+input.orderId()));
+        validateOrderByCustomerId(order);
         if (Objects.equals(order.getCustomer().getId(), input.customerId())) {
             List<Offer> offers = offerService.findAllOffersForSpecificOrder(input.orderId());
             if (input.sortByScore() && !input.ascending()) {
@@ -452,6 +461,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             }
         }else {
             throw new NotFoundOrder("Unable to find order with id : "+input.orderId());
+        }
+    }
+
+    private void validateOrderByCustomerId(Orders order) {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!Objects.equals(order.getCustomer().getId(), customerId)){
+            throw new NotFoundOrder();
         }
     }
 

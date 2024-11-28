@@ -16,15 +16,13 @@ public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepositor
                 entityManager.persist(user);
         }
 
-
         public void update(T t) {
                 entityManager.merge(t);
         }
-        //todo: must check this out
+
         public void delete(T t){
             entityManager.remove(t);
         }
-        //todo: must check this all
 
     @Override
     public Object find(String userName , Class<T> userType) {

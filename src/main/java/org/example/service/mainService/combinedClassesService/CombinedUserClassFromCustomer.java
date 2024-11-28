@@ -14,10 +14,12 @@ import org.example.exeptions.wrongTime.ItIsNotProperTimeToSetThis;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.example.service.user.employee.EmployeeService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,12 +32,12 @@ public class CombinedUserClassFromCustomer {
         this.employeeService = employeeService;
         this.offerService = offerService;
     }
-    @Transactional
-    public void addStarToEmployee(Integer employeeId, Integer starId) {
-        Employee employee = employeeService.findById(employeeId, Employee.class);
-        employee.setScore(employee.getScore() + starId);
-        employeeService.updateUser(employee);
-    }
+//    @Transactional
+//    public void addStarToEmployee(Integer employeeId, Integer starId) {
+//        Employee employee = employeeService.findById(employeeId, Employee.class);
+//        employee.setScore(employee.getScore() + starId);
+//        employeeService.updateUser(employee);
+//    }
     @Transactional
     public void makeTheOrderDone(Integer orderId)  {
         Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(orderId)).orElseThrow(() ->  new NotFoundOffer("unable to find offer in order with ID :" + orderId));
@@ -58,7 +60,8 @@ public class CombinedUserClassFromCustomer {
         }
         employeeService.updateUser(employee);
     }
-    private static void validateOrderDone(Orders order, Offer offer){
+    private void validateOrderDone(Orders order, Offer offer){
+        validateOrderWithCustomerId(order);
         if (order.getOrderState() != OrderState.STARTED){
             throw new OrderStateIsNotCorrect();
         }
@@ -70,11 +73,19 @@ public class CombinedUserClassFromCustomer {
     public void acceptOffer(Integer  offerId){
             Offer offer = Optional.ofNullable(offerService.findById(offerId)).orElseThrow(() -> new NotFoundOffer("unable to find offer with ID :" + offerId));
             Orders orders = Optional.ofNullable(orderService.findById(offer.getOrders().getId())).orElseThrow(() -> new NotFoundOrder("unable to find order with ID :" + offer.getOrders().getId()));
+            validateOrderWithCustomerId(orders);
             offer.setAccepted(true);
             offerService.update(offer);
             Employee employee = Optional.ofNullable(employeeService.findById(offer.getEmployee().getId(),Employee.class)).orElseThrow(()-> new NotFoundEmployee("Unable to find any employee with this offer ID : "  + offerId));
             orders.setEmployee(employee);
             orders.setOrderState(OrderState.UNDER_REACHING_EMPLOYEE);
             orderService.update(orders);
+    }
+
+    private void validateOrderWithCustomerId(Orders orders) {
+        Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!Objects.equals(orders.getCustomer().getId(), customerId)){
+            throw new NotFoundOffer();
+        }
     }
 }
