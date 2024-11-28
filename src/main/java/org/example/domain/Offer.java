@@ -1,10 +1,7 @@
 package org.example.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
 import lombok.*;
-
 import java.time.LocalDateTime;
 @Getter
 @Setter

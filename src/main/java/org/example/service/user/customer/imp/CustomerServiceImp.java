@@ -2,9 +2,9 @@ package org.example.service.user.customer.imp;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.example.domain.*;
-import org.example.dto.CustomerSignUpDto;
-import org.example.dto.OrderDto;
-import org.example.dto.PayToCartDto;
+import org.example.dto.customer.CustomerSignUpDto;
+import org.example.dto.orders.OrderDto;
+import org.example.dto.customer.PayToCartDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.dto.admin.FindCustomerByFilterDto;
 import org.example.dto.admin.FindFilteredCustomerDto;
@@ -37,8 +37,8 @@ import org.example.service.credit.CreditService;
 import org.example.service.customerCart.CustomerCartService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.handler.HandlerService;
-import org.example.service.mainService.imp.CombinedUserClassFromCustomer;
-import org.example.service.mainService.imp.CustomerAcceptOfferClass;
+import org.example.service.mainService.combinedClassesService.CombinedUserClassFromCustomer;
+import org.example.service.mainService.combinedClassesService.CustomerAcceptOfferClass;
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -95,6 +95,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         orderService.save(orders);
         return orderDto;
     }
+
     private Customer findCustomer(Integer customerId) throws NotFoundCustomer {
         return Optional.ofNullable(customerRepository.findById(customerId, Customer.class))
                 .orElseThrow(() -> new NotFoundCustomer("Customer not found with ID: " + customerId));
@@ -104,6 +105,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         return Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId))
                 .orElseThrow(() -> new NotFoundHandler("SubHandler not found with ID: " + subHandlerId));
     }
+
     private boolean isOrderValidated(OrderDto orderDto,SubHandler subHandler) {
         if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
             throw new TimeOfWorkDoesntMatch();
@@ -154,6 +156,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         }
         return null;
     }
+
     @Transactional
     public List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId){
         List<Orders> customerOrders = orderService.findAllOrdersThatHaveSameCustomer(customerId);
@@ -163,6 +166,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         });
         return ordersOutputDtoCustomers;
     }
+
     @Transactional
     public void startOrder(Integer orderId) {
         Orders order = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(() -> new NotFoundOrder());
@@ -176,7 +180,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         order.setOrderState(OrderState.STARTED);
         orderService.update(order);
     }
-
 
     @Override
     @Transactional
@@ -193,6 +196,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new InvalidCustomerDataException("invalid customer data for sign up");
         }
     }
+
     private void addCreditAndPass(Customer customer,CustomerSignUpDto customerDto){
         PassAndUser passAndUser = getPassAndUser(customerDto);
         passAndUser.setPass(passwordEncoder.encode(passAndUser.getPass()));
@@ -202,6 +206,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         customer.setCredit(credit);
         customer.setPassAndUser(passAndUser);
     }
+
     private static PassAndUser getPassAndUser(CustomerSignUpDto customerDto) {
         PassAndUser passAndUser = new PassAndUser();
         passAndUser.setUsername(customerDto.phone());
@@ -209,6 +214,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         passAndUser.setTypeOfUser(TypeOfUser.CUSTOMER);
         return passAndUser;
     }
+
     @Override
     public boolean validateCustomer(CustomerSignUpDto customerDto) {
 
@@ -217,6 +223,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         }
         return false;
     }
+
     @Override
     public CustomerLoginDtoOutput login(String user, String pass)
     {
@@ -226,10 +233,12 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
         return new CustomerLoginDtoOutput(customer.getId(),customer.getName(),customer.getLast_name(),customer.getPhone(),customer.getCredit().getAmount());
     }
+
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
         return Objects.isNull(customerRepository.find(user, Customer.class));
     }
+    @Override
     @Transactional
     public String addComment(Integer ordersId, Integer star, String comment){
         Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -245,6 +254,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         orderService.update(orders);
         return "successful";
     }
+
     private void validateForComment(Orders orders,Integer star){
         if (orders.getScore() != null)
         {
@@ -257,9 +267,11 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new StarShouldBeenBetween1To5();
         }
     }
+
     private Orders findOrder(Integer orderId){
         return Optional.ofNullable(orderService.findById(orderId)).orElseThrow(() -> new NotFoundOrder("Order not found with ID: " + orderId));
     }
+
     private boolean validateStar(int star) {
         return star <= 5 && star >= 0;
     }
@@ -284,6 +296,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new DontHaveEnoughMoney();
         }
     }
+
     private CustomerCart getCustomerCart(PayToCartDto payToCartDto) {
         CustomerCart customerCart;
         customerCart  = new CustomerCart();
@@ -296,11 +309,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         customerCart.setMoney(payToCartDto.amount() + 1000d);
         return customerCart;
     }
+
     @Override
     public String makeServiceStateToDone(Integer orderId) {
             combineUserClass.makeTheOrderDone(orderId);
             return "successful";
     }
+
     @Transactional
     @Override
     public String customerPay(Integer ordersId, Integer customerId){
@@ -346,6 +361,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             throw new DontHaveEnoughMoney();
         }
     }
+
     @Override
     public void sendToken(String email , TypeOfUser typeOfUser) {
         emailTokenService.sendEmail(email,typeOfUser);
@@ -358,15 +374,18 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         validateCustomerToken(emailToken);
         return "successful";
     }
+
     private void validateCustomerToken(EmailToken emailToken) {
         Customer customer = Optional.ofNullable(findByEmail(emailToken.getEmail())).orElseThrow(() -> new InvalidTokenExceptions("The token is not from the user"));
         customer.setActive(true);
         emailToken.setExpired(true);
     }
+
     @Override
     public List<Orders> findPaidOrders(Integer customerId) {
         return orderService.findPaidOrdersForCustomer(customerId);
     }
+
     @Override
     @Transactional
     public List<DoneDutiesDto> findDoneWorksById(Integer id) {
@@ -387,10 +406,12 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         }
         return doneDutiesDos;
     }
+
     @Override
     public List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input) {
         return customerRepository.selectCustomerByReports(input.startDate(),input.endDate(),input.doneOrderStart(),input.doneOrderEnd());
     }
+
     @Override
     public List<OrdersOutputDtoUser> optionalSelectOrdersForCustomer(Integer customerId, String orderState) {
         List<Orders> orders = orderService.optionalFindOrdersForCustomer(customerId, orderState);
@@ -400,10 +421,12 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         }
         return ordersOutputDtoUsers;
     }
+
     @Override
     public Double getCreditAmount(Integer id) {
         return Optional.ofNullable(creditService.findByCustomerId(id).getAmount()).orElseThrow(()-> new NotFoundCustomer("unable to find customer with id : "+id ));
     }
+
     @Override
     @Transactional
     public List<SortedOfferDtoForCustomer> sortedOfferForCustomer(SortingOfferInput input) {

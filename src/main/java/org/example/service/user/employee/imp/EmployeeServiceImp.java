@@ -1,6 +1,6 @@
 package org.example.service.user.employee.imp;
 import org.example.domain.*;
-import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.employee.EmployeeSignUpDto;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;
@@ -108,11 +108,13 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         offerService.save(offer);
         return offerDto;
     }
+
     private void checkEmployeeExists(OfferDto offerDto) {
         if (!employeeExistsByEmployeeId(offerDto.employeeId())){
             throw new NotFoundEmployee();
         }
     }
+
     private void checkForOffering(OfferDto offerDto ,Orders orders){
         if (!(orders.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER) ||
                 orders.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE))
@@ -126,7 +128,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             throw new OfferPriceIsLessThanOrderPrice();
         }
     }
-    //2
+
     @Transactional
     public void saveEmployee( Employee employee){
         employeeRepository.save(employee);
@@ -263,11 +265,13 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         });
         return orderOutputEmployees;
     }
+
     @Override
     public boolean validateEmployee(EmployeeSignUpDto employee, String file) throws IOException {
         return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())
                 && validateImageJpg (file) && checkImageSize(file);
     }
+
     @Override
     public EmployeeLoginDtoOutput login(String user, String pass)  {
         Employee employee =  Optional.ofNullable(employeeRepository.findByUser(user)).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
@@ -276,6 +280,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         return new EmployeeLoginDtoOutput(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getCredit().getAmount(),employee.getImage(),employee.getScore());
     }
+
     @Override
     public boolean checkIfNotDuplicateUser(String user) {
         return Objects.isNull(employeeRepository.find(user, Employee.class));
@@ -285,6 +290,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public void sendToken(String email , TypeOfUser typeOfUser) {
         emailTokenService.sendEmail(email,typeOfUser);
     }
+
     @Override
     @Transactional
     public String validateEmployeeEmail(String token) {

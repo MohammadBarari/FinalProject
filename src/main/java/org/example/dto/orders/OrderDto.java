@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.orders;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;

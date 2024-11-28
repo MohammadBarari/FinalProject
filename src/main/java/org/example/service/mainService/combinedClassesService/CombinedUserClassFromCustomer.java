@@ -1,4 +1,4 @@
-package org.example.service.mainService.imp;
+package org.example.service.mainService.combinedClassesService;
 
 import jakarta.transaction.Transactional;
 import org.example.domain.Employee;

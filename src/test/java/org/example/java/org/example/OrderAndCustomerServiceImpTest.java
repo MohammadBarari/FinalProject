@@ -5,7 +5,7 @@ package org.example.java.org.example;//package org.example.java.org.example;
 //import org.example.domain.Orders;
 //import org.example.enumirations.OrderState;
 //import org.example.exeptions.*;
-//import org.example.service.mainService.imp.OrderAndCustomerServiceImp;
+//import org.example.service.mainService.combinedClassesService.OrderAndCustomerServiceImp;
 //import org.example.service.offer.OfferService;
 //import org.example.service.order.OrderService;
 //import org.junit.jupiter.api.BeforeEach;

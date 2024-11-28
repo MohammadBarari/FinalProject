@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.password;
 
 import org.example.enumirations.TypeOfUser;
 

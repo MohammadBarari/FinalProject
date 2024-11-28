@@ -1,10 +1,10 @@
 package org.example.service.mapStruct;
 
 import org.example.domain.*;
-import org.example.dto.CustomerSignUpDto;
-import org.example.dto.EmployeeSignUpDto;
-import org.example.dto.OrderDto;
-import org.example.dto.SubHandlerDto;
+import org.example.dto.customer.CustomerSignUpDto;
+import org.example.dto.employee.EmployeeSignUpDto;
+import org.example.dto.orders.OrderDto;
+import org.example.dto.subHandlers.SubHandlerDto;
 import org.example.dto.admin.CustomerOutput;
 import org.example.dto.customer.OrderDtoInput;
 import org.example.dto.employee.OfferDto;

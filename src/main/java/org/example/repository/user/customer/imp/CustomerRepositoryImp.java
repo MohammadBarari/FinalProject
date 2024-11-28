@@ -3,7 +3,6 @@ package org.example.repository.user.customer.imp;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import org.example.domain.Customer;
-import org.example.domain.Employee;
 import org.example.domain.Orders;
 import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.repository.user.BaseUserRepositoryImp;
@@ -74,6 +73,7 @@ where  pau.username= ? and pau.pass = ?
             LocalDateTime startDateTime = startDate.atStartOfDay();
             predicates.add(cb.greaterThanOrEqualTo(customer.get("timeOfRegistration"), startDateTime));
         }
+
         if (endDate != null) {
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
             predicates.add(cb.lessThanOrEqualTo(customer.get("timeOfRegistration"), endDateTime));
@@ -143,4 +143,5 @@ where  pau.username= ? and pau.pass = ?
                 .otherwise(0L).as(Long.class);
         return cb.sum(caseExpression).as(Long.class);
     }
+
 }

@@ -2,10 +2,10 @@ package org.example.java.org.example;//package org.example.java.org.example;
 //
 //import org.example.domain.*;
 //import org.example.dto.employee.OfferDto;
-//import org.example.dto.OrderDto;
+//import org.example.dto.orders.OrderDto;
 //import org.example.enumirations.OrderState;
 //import org.example.exeptions.*;
-//import org.example.service.mainService.imp.CustomerAcceptOfferClass;
+//import org.example.service.mainService.combinedClassesService.CustomerAcceptOfferClass;
 //import org.example.service.offer.OfferService;
 //import org.example.service.order.OrderService;
 //import org.example.service.subHandler.SubHandlerService;

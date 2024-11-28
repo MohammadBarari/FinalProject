@@ -1,14 +1,12 @@
 package org.example.domain;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import org.example.enumirations.EmployeeState;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -31,11 +29,7 @@ public class Employee extends Users {
     @OneToOne(cascade = CascadeType.ALL)
     private Credit credit;
     public Employee setEmployeeState(EmployeeState employeeState) {
-        if (employeeState == null) {
-            this.employeeState = EmployeeState.NEW;
-        }else {
-        this.employeeState = employeeState;
-        }
+        this.employeeState = Objects.requireNonNullElse(employeeState, EmployeeState.NEW);
             return this;
     }
 }

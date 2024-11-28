@@ -1,28 +1,23 @@
 package org.example.controller.user;
 
 import org.example.domain.PassAndUser;
-import org.example.dto.LoginDto;
+import org.example.dto.user.LoginDto;
 import org.example.repository.passAndUser.PassAndUserRepository;
 import org.example.service.sercurity.CustomUserDetailsService;
 import org.example.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final PassAndUserRepository passAndUserRepository;
     private final JwtUtil jwtUtil;
 
-    public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JwtUtil jwtUtil,PassAndUserRepository passAndUserRepository) {
-        this.authenticationManager = authenticationManager;
+    public AuthController(CustomUserDetailsService userDetailsService, JwtUtil jwtUtil,PassAndUserRepository passAndUserRepository) {
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
         this.passAndUserRepository = passAndUserRepository;

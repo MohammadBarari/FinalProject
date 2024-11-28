@@ -10,7 +10,6 @@ import org.example.repository.user.BaseUserRepositoryImp;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

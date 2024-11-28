@@ -2,9 +2,9 @@ package org.example.service.user.customer;
 
 import org.example.domain.Customer;
 import org.example.domain.Orders;
-import org.example.dto.CustomerSignUpDto;
-import org.example.dto.OrderDto;
-import org.example.dto.PayToCartDto;
+import org.example.dto.customer.CustomerSignUpDto;
+import org.example.dto.orders.OrderDto;
+import org.example.dto.customer.PayToCartDto;
 import org.example.dto.admin.CustomerOutputDtoForReport;
 import org.example.dto.admin.FindCustomerByFilterDto;
 import org.example.dto.admin.FindFilteredCustomerDto;

@@ -2,7 +2,7 @@ package org.example.service.user.employee;
 
 import org.example.domain.Employee;
 import org.example.domain.Orders;
-import org.example.dto.EmployeeSignUpDto;
+import org.example.dto.employee.EmployeeSignUpDto;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoHandlers;
 import org.example.dto.admin.EmployeeOutputDtoReport;

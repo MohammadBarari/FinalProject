@@ -1,11 +1,10 @@
 package org.example.service.user;
 
 import jakarta.transaction.Transactional;
-import lombok.SneakyThrows;
 import org.example.domain.Orders;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
-import org.example.dto.ChangingPasswordDto;
+import org.example.dto.password.ChangingPasswordDto;
 import org.example.dto.admin.FindFilteredOrdersDto;
 import org.example.exeptions.NotFoundException.NotFoundUser;
 import org.example.exeptions.password.AllNotBeLetterOrDigits;
@@ -28,6 +27,7 @@ import java.util.Optional;
 
 
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {
+
     private final BaseUserRepository baseUserRepository ;
     protected final OrderService orderService ;
     protected final OfferService offerService ;
@@ -37,6 +37,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     protected final CreditService creditService ;
     protected final PasswordEncoder passwordEncoder;
     protected final PassAndUserRepository passAndUserRepository;
+
     @Autowired
     public BaseUserServiceImp(BaseUserRepository baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ,PassAndUserRepository passAndUserRepository){
         this.baseUserRepository = baseUserRepository;
@@ -50,7 +51,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         this.passAndUserRepository = passAndUserRepository;
     }
 
-    @SneakyThrows
+
     @Override
     public boolean validatePassWord(String pass) {
         String pass1 = pass.replaceAll("\\s","");
@@ -97,7 +98,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         }
         return false;
     }
-    private boolean checkIfAllNotBeLetterOrDigit(String pass) throws Exception{
+    private boolean checkIfAllNotBeLetterOrDigit(String pass){
         if (checkIfAllNotBeLetter(pass) && checkIfAllNotBeNumber(pass)){
             return true;
         }
@@ -120,10 +121,12 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         return "successful";
     }
     @Override
+
     @Transactional
     public void updateUser(T t){
         baseUserRepository.update(t);
     };
+
     @Override
     @Transactional
     public T findById(int id , Class<T> tClass){

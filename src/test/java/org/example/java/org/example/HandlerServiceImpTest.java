@@ -1,7 +1,7 @@
 package org.example.java.org.example;//package org.example.java.org.example;
 //
 //import org.example.domain.SubHandler;
-//import org.example.dto.ChangeSubHandlerDto;
+//import org.example.dto.subHandlers.ChangeSubHandlerDto;
 //import org.example.exeptions.ErrorWhileUpdatingSubHandler;
 //import org.example.exeptions.SubHandlerNull;
 //import org.example.exeptions.password.YouInsertNothing;

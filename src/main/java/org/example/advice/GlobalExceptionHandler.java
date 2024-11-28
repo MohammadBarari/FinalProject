@@ -1,10 +1,5 @@
 package org.example.advice;
-
-
-import org.example.exeptions.NotFoundException.NotFoundCustomer;
-import org.example.exeptions.NotFoundException.NotFoundEmployee;
 import org.example.exeptions.NotFoundException.NotFoundException;
-import org.example.exeptions.NotFoundException.NotFoundOrder;
 import org.example.exeptions.captcha.CaptchaDoesNotMatchException;
 import org.example.exeptions.customer.InvalidCustomerDataException;
 import org.example.exeptions.duplicate.DuplicateException;
@@ -12,22 +7,15 @@ import org.example.exeptions.employee.EmployeeException;
 import org.example.exeptions.global.FailedDoingOperation;
 import org.example.exeptions.money.DontHaveEnoughMoney;
 import org.example.exeptions.order.OrderException;
-import org.example.exeptions.password.AllNotBeLetterOrDigits;
-import org.example.exeptions.duplicate.DuplicateCommentException;
-import org.example.exeptions.employee.EmployeeIsNotAccepted;
-import org.example.exeptions.order.OrderPriceShouldBeHigherThanBase;
 import org.example.exeptions.password.PasswordException;
 import org.example.exeptions.wrongTime.TimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.HashMap;
 import java.util.Map;
 

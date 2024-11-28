@@ -1,10 +1,9 @@
 package org.example.service.user.admin;
 
-import org.example.domain.Customer;
 import org.example.domain.Handler;
 import org.example.domain.SubHandler;
-import org.example.dto.ChangeSubHandlerDto;
-import org.example.dto.SubHandlerDto;
+import org.example.dto.subHandlers.ChangeSubHandlerDto;
+import org.example.dto.subHandlers.SubHandlerDto;
 import org.example.dto.admin.*;
 import org.example.dto.orders.OrderOutputDto;
 import org.example.dto.servisesDone.DoneDutiesDto;

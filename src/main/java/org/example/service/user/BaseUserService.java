@@ -3,7 +3,7 @@ package org.example.service.user;
 import org.example.domain.Orders;
 import org.example.domain.PassAndUser;
 import org.example.domain.Users;
-import org.example.dto.ChangingPasswordDto;
+import org.example.dto.password.ChangingPasswordDto;
 import org.example.dto.admin.FindFilteredOrdersDto;
 
 import java.util.List;
@@ -17,8 +17,6 @@ public interface BaseUserService<T extends Users> {
     boolean validatePassWord(String pass);
 
     void savePassAndUser(PassAndUser passAndUser);
-
-
 
     boolean checkIfNotDuplicateUser(String user);
 

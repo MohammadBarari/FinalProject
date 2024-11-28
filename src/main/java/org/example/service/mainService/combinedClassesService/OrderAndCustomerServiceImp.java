@@ -1,21 +1,18 @@
-package org.example.service.mainService.imp;
-
+package org.example.service.mainService.combinedClassesService;
 import org.example.domain.Offer;
 import org.example.domain.Orders;
 import org.example.enumirations.OrderState;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
 import org.example.exeptions.NotFoundException.NotFoundOrder;
 import org.example.exeptions.order.OrderStateIsNotCorrect;
-import org.example.service.mainService.OrderAndCustomerService;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 
 @Service
-public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
+public class OrderAndCustomerServiceImp  {
     private final OrderService orderService;
     private final OfferService offerService;
     public OrderAndCustomerServiceImp(OrderService orderService, OfferService offerService) {
@@ -23,8 +20,7 @@ public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
         this.offerService = offerService;
     }
 
-    @Override
-    //todo:to be deleted
+
     public void changeOrderToStart(Integer orderId) throws NotFoundOrder, OrderStateIsNotCorrect {
         Orders order = orderService.findById(orderId);
         if (Objects.isNull(order)){
@@ -36,8 +32,8 @@ public class OrderAndCustomerServiceImp implements OrderAndCustomerService {
         order.setOrderState(OrderState.STARTED);
         orderService.update(order);
     }
-//todo: should be deleted
-    @Override
+
+
     public List<Offer> customerSeeAllOfferInOneOrder(Integer orderId)  {
         try {
             return offerService.findAllOffersForSpecificOrder(orderId);
