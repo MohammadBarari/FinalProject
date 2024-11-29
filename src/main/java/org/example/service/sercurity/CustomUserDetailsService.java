@@ -45,16 +45,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         return List.of(new SimpleGrantedAuthority("ROLE_" + type.name()));
     }
 
-    public String registerUser(PassAndUser user) {
-        user.setPass(passwordEncoder.encode(user.getPass()));
-        passAndUserRepository.save(user);
-        return "User registered successfully";
-    }
-
-    private String encodingPassword(String password) {
-        return passwordEncoder.encode(password);
-    }
-
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }

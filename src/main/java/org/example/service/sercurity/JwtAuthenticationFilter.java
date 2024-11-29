@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.util.JwtUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String requestPath = request.getServletPath();
 
-        if (requestPath.startsWith("/auth/login") || requestPath.startsWith("/customer/signup") || requestPath.startsWith("/employee/signUp") ||requestPath.startsWith("http://localhost:63342/FinalProject/web")
+        if (requestPath.startsWith("/auth/login") || requestPath.startsWith("/customer/signup") || requestPath.startsWith("/employee/signUp") ||requestPath.startsWith("/FinalProject/web")
         ||requestPath.startsWith("/customer/captcha")) {
             chain.doFilter(request, response);
             return;
