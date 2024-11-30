@@ -25,6 +25,12 @@ Security:
 Spring Security implemented with role-based access control.
 Activation emails for new accounts; specialists' status updated upon verification.
 Profile management for specialists and customers, with full service history and reporting available for administrators.
+
+Phase 5: JWT, Spring Data JPA, and Enhanced Exception Handling
+JWT Integration: Implemented JWT for stateless authentication, securing APIs with role-based access control.
+Spring Data JPA: Integrated Spring Data JPA for CRUD operations while retaining CriteriaBuilder for complex custom searches.
+Enhanced Exception Handling: Centralized exception management with @RestControllerAdvice, integrating SLF4J logging for detailed error tracking and improved debugging.
+
 ## Technologies Used
 
 Backend: Java, Hibernate, Spring Boot, Spring MVC, Spring Security

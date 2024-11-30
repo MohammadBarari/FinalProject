@@ -1,5 +1,4 @@
 package org.example.repository.user.employee.imp;
-
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
@@ -14,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 @Repository
 @Primary
 public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {

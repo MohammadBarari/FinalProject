@@ -1,5 +1,4 @@
 package org.example.util;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,11 +8,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.Properties;
 
 @Configuration
 public class SpringConfig {
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
