@@ -15,6 +15,7 @@ import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
+import org.example.events.UserCreationEvent;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.exeptions.NotFoundException.NotFoundEmployee;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
@@ -36,6 +37,7 @@ import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.employee.EmployeeService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,10 +51,11 @@ import java.util.*;
 public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements EmployeeService {
 
     private final EmployeeRepository employeeRepository ;
-
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService, PassAndUserRepository passAndUserRepository) {
+    private final ApplicationEventPublisher publisher;
+    public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
         super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.employeeRepository = employeeRepository;
+        this.publisher = publisher;
     }
 
     @Override
@@ -64,6 +67,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             employee.setCredit(credit);
             PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
             employee.setPassAndUser(passAndUser);
+            publisher.publishEvent(new UserCreationEvent(TypeOfUser.CUSTOMER,employeeSignUpDto.email()));
             sendToken(employeeSignUpDto.email(),TypeOfUser.EMPLOYEE);
             saveEmployee(employee);
             return employeeSignUpDto;
@@ -266,7 +270,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     public void sendToken(String email , TypeOfUser typeOfUser) {
-        emailTokenService.sendEmail(email,typeOfUser);
+//        emailTokenService.sendEmail(email,typeOfUser);
     }
 
     @Override

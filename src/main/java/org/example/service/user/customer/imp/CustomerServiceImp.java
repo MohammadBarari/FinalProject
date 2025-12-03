@@ -15,6 +15,7 @@ import org.example.dto.subHandlers.SubHandlersDtoOutputId;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
+import org.example.events.UserCreationEvent;
 import org.example.exeptions.NotFoundException.NotFoundCustomer;
 import org.example.exeptions.NotFoundException.NotFoundHandler;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
@@ -45,6 +46,7 @@ import org.example.service.order.OrderService;
 import org.example.service.subHandler.SubHandlerService;
 import org.example.service.user.BaseUserServiceImp;
 import org.example.service.user.customer.CustomerService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -58,14 +60,15 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final HandlerService handlerService;
     private final CustomerCartService customerCartService;
     private final CombinedUserClassFromCustomer combineUserClass;
+    private final ApplicationEventPublisher publisher;
 
-
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository) {
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
         super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;
         this.customerCartService = customerCartService;
         this.combineUserClass = combineUserClass;
+        this.publisher = publisher;
     }
 
 
@@ -199,6 +202,8 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             Customer customer = entityMapper.dtoToCustomer(customerDto);
             customer.setTimeOfRegistration(LocalDateTime.now());
             addCreditAndPass(customer,customerDto);
+            //todo : must public an event here
+            publisher.publishEvent(new UserCreationEvent(TypeOfUser.CUSTOMER,customerDto.email()));
             sendToken(customerDto.email(),TypeOfUser.CUSTOMER);
             signUp(customer);
             return customerDto;
@@ -372,7 +377,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
 
     @Override
     public void sendToken(String email , TypeOfUser typeOfUser) {
-        emailTokenService.sendEmail(email,typeOfUser);
+//        emailTokenService.sendEmail(email,typeOfUser);
     }
     @Override
     @Transactional

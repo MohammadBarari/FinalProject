@@ -3,12 +3,15 @@ package org.example.service.emailToken.imp;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.EmailToken;
 import org.example.enumirations.TypeOfUser;
+import org.example.events.UserCreationEvent;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.repository.emailToken.EmailTokenRepository;
 import org.example.service.emailToken.EmailTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -26,16 +29,17 @@ public class EmailTokenServiceImp implements EmailTokenService {
         emailTokenRepository.delete(emailToken);
     }
     //update
-    @Override
-    @Transactional
-    public void sendEmail(String email , TypeOfUser typeOfUser) {
-        if (emailTokenRepository.existsByEmail(email))
-            throw new InvalidTokenExceptions("Email already exists");
 
-        EmailToken emailToken = createEmailToken(typeOfUser,email);
+    @Transactional
+    @EventListener
+    @Async
+    public void sendEmail(UserCreationEvent input) {
+        if (emailTokenRepository.existsByEmail(input.email()))
+            throw new InvalidTokenExceptions("Email already exists");
+        EmailToken emailToken = createEmailToken(input.typeOfCreatedUser(),input.email());
         String token = generateToken();
         emailToken.setToken(token);
-        sendingMail(email,token,emailToken,typeOfUser);
+        sendingMail(input.email(),token,emailToken,input.typeOfCreatedUser());
         emailTokenRepository.save(emailToken);
     }
     @Override
