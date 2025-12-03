@@ -9,6 +9,8 @@ window.onload = function() {
     startTimer();
 };
 
+
+
 function startTimer() {
     let timeLeft = remainingTime;
     timer = setInterval(() => {
@@ -29,13 +31,15 @@ function updateTimerDisplay(timeLeft) {
     document.getElementById('timer').textContent = `Remaining Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+let currentCaptchaID = null;
 async function fetchCaptcha() {
     try {
         const response = await fetch("http://localhost:8080/customer/captcha/generate", {
             method: "POST"
         });
-        const captcha = await response.text();
-        document.getElementById('captchaDisplay').textContent = captcha;
+        const captcha = await response.json();
+        currentCaptchaID = captcha.id;
+        document.getElementById('captchaDisplay').textContent = captcha.captcha;
     } catch (error) {
         showNotification("Error fetching CAPTCHA: " + error.message);
     }
@@ -47,9 +51,9 @@ async function handleChargeCredit() {
     const cartNumber = document.getElementById('cartNumber').value;
     const cvv2 = document.getElementById('cvv2').value;
     const expiresDate = document.getElementById('expiresDate').value;
-    const captcha = document.getElementById('captcha').value;
+    const captchaAnswer = document.getElementById('captcha').value;
 
-    if (!customerId || isNaN(amount) || !cartNumber || !cvv2 || !expiresDate || !captcha) {
+    if (!customerId || isNaN(amount) || !cartNumber || !cvv2 || !expiresDate || !captchaAnswer) {
         showNotification("Please fill in all fields correctly.");
         return;
     }
@@ -59,11 +63,13 @@ async function handleChargeCredit() {
         amount: amount,
         cartNumber: cartNumber,
         cvv2: cvv2,
-        expiresDate: expiresDate
+        expiresDate: expiresDate,
+        captchaAnswer : captchaAnswer,
+        captchaId : currentCaptchaID,
     };
 
     try {
-        const response = await fetch(`http://localhost:8080/customer/chargeCredit?captcha=${encodeURIComponent(captcha)}`, {
+        const response = await fetch(`http://localhost:8080/customer/chargeCredit`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

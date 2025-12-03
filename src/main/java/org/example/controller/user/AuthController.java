@@ -25,16 +25,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
-        if (loginDto.userName() == null || loginDto.password() == null) {
+        if (loginDto.username() == null || loginDto.password() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username and password are required");
         }
 
-        PassAndUser user = passAndUserRepository.findByUsername(loginDto.userName());
+        PassAndUser user = passAndUserRepository.findByUsername(loginDto.username());
         if (user == null || !userDetailsService.validatePassword(loginDto.password(), user.getPass())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
 
-        String token = jwtUtil.generateToken(loginDto.userName(), user.getId(), user.getTypeOfUser().name());
+        String token = jwtUtil.generateToken(loginDto.username(), user.getId(), user.getTypeOfUser().name());
         return ResponseEntity.ok(token);
     }
 }

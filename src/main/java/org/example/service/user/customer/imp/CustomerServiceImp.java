@@ -285,10 +285,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
     @Override
     @Transactional
-    public String customerChargeCart(PayToCartDto payToCartDto , String captcha ,String userCaptcha){
-        if (!Objects.equals(captcha,userCaptcha)){
-            throw new CaptchaDoesNotMatchException();
-        }
+    public String customerChargeCart(PayToCartDto payToCartDto ){
+//        if (!Objects.equals(captcha,userCaptcha)){
+//            throw new CaptchaDoesNotMatchException();
+//        }
         Credit customerCredit = creditService.findByCustomerId(payToCartDto.customerId());
         CustomerCart customerCart = customerCartService.findCustomerCartByCustomerId(payToCartDto.customerId());
         if (Objects.isNull(customerCart)){

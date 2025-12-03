@@ -1,5 +1,10 @@
 package org.example.service.captcha;
 
+import org.example.dto.captcha.CaptchaDto;
+
 public interface CaptchaService {
-    String generateCaptcha();
+    CaptchaDto generateCaptcha();
+
+    void validateCaptcha(String id , String userAnswer);
+
 }

@@ -7,6 +7,7 @@ import org.example.dto.password.ChangingPasswordDto;
 import org.example.dto.employee.EmployeeSignUpDto;
 import org.example.dto.password.changingPasswordDtoController;
 import org.example.dto.employee.*;
+import org.example.dto.user.LoginDto;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.employee.EmployeeService;
@@ -29,9 +30,8 @@ public class EmployeeController {
     }
 
     @PostMapping("/login")
-    public EmployeeLoginDtoOutput login(
-            @RequestParam @NotNull String username, @RequestParam @NotNull String password) {
-        return employeeService.login(username, password);
+    public EmployeeLoginDtoOutput login(@RequestBody @Valid  LoginDto input) {
+        return employeeService.login(input.username(), input.password());
     }
 
     @PostMapping("/offer")

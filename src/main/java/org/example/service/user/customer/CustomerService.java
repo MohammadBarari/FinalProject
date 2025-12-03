@@ -30,7 +30,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     void customerAcceptOffer(Integer offerId);
     List<HandlerCustomerDto> getHandlersForCustomer();
     List<SubHandlersDtoOutputId> getSubHandlersForHandler(Integer handlerId);
-    String customerChargeCart(PayToCartDto payToCartDto ,String captcha,String userCaptcha );
+    String customerChargeCart(PayToCartDto payToCartDto );
     String makeServiceStateToDone(Integer orderId);
     String customerPay(Integer ordersId, Integer customerId);
     List<Customer> findCustomerByOptional(FindFilteredCustomerDto input);

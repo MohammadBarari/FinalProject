@@ -4,11 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.captcha.CaptchaDto;
 import org.example.dto.customer.*;
 import org.example.dto.orders.OrderDto;
 import org.example.dto.password.ChangingPasswordDto;
 import org.example.dto.password.changingPasswordDtoController;
 import org.example.dto.subHandlers.SubHandlersDtoOutputId;
+import org.example.dto.user.LoginDto;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.captcha.CaptchaService;
@@ -26,7 +28,6 @@ import java.util.List;
 public class CustomerController {
     private final CustomerService customerService;
     private final CaptchaService captchaService;
-    private String captcha;
 
     @PostMapping("/signup")
     public CustomerSignUpDto signUp(@RequestBody @Valid CustomerSignUpDto dto) {
@@ -34,10 +35,9 @@ public class CustomerController {
     }
 
 
-    @GetMapping("/login/{username}/{password}")
-    public CustomerLoginDtoOutput login(@PathVariable @NotNull String username,
-                                        @PathVariable @NotNull String password) {
-        return customerService.login(username, password);
+    @PostMapping("/login/{username}/{password}")
+    public CustomerLoginDtoOutput login(@RequestBody @Valid LoginDto input) {
+        return customerService.login(input.username(), input.password());
     }
 
 
@@ -94,8 +94,9 @@ public class CustomerController {
     }
 
     @PostMapping("/chargeCredit")
-    public ResponseEntity<String> customerChargeCredit(@RequestBody @Valid PayToCartDto payToCartDto , @RequestParam String captcha) {
-        String response = customerService.customerChargeCart(payToCartDto,this.captcha,captcha);
+    public ResponseEntity<String> customerChargeCredit(@RequestBody @Valid PayToCartDto payToCartDto) {
+        captchaService.validateCaptcha(payToCartDto.captchaId(),payToCartDto.captchaAnswer());
+        String response = customerService.customerChargeCart(payToCartDto);
         return ResponseEntity.ok(response);
     }
 
@@ -169,12 +170,11 @@ public class CustomerController {
     public String chargeCartSuccess() {
         return "success";
     }
+
     @CrossOrigin(origins = "http://localhost:63342")
     @PostMapping("/captcha/generate")
-    public String generateCaptcha() {
-        captcha = captchaService.generateCaptcha();
-        System.out.println(captcha);
-        return captcha;
+    public CaptchaDto generateCaptcha() {
+        return captchaService.generateCaptcha();
     }
 
 }
