@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.captcha.CaptchaDto;
 import org.example.dto.customer.*;
+import org.example.dto.orders.LeavingCommentDto;
 import org.example.dto.orders.OrderDto;
 import org.example.dto.password.ChangingPasswordDto;
 import org.example.dto.password.changingPasswordDtoController;
@@ -34,12 +35,10 @@ public class CustomerController {
         return customerService.createCustomer(dto);
     }
 
-
     @PostMapping("/login/{username}/{password}")
     public CustomerLoginDtoOutput login(@RequestBody @Valid LoginDto input) {
         return customerService.login(input.username(), input.password());
     }
-
 
     @PostMapping("/subhandler/get")
     public OrderDto getSubHandlerForCustomer(@RequestBody @Valid OrderDtoInput dto) {
@@ -48,12 +47,10 @@ public class CustomerController {
         return customerService.createOrder(orderDto);
     }
 
-
     @PostMapping("/order/start/{orderId}")
     public void changeOrderToStart(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer orderId) {
         customerService.startOrder(orderId);
     }
-
 
     @GetMapping("/orders")
     public List<OrdersOutputDtoCustomer> findAllOrders() {
@@ -61,15 +58,6 @@ public class CustomerController {
         System.out.println(customerId);
         return customerService.getAllOrders(customerId);
     }
-
-
-    @PostMapping("/order/comment/{ordersId}/{star}/{comment}")
-    public void giveComment(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer ordersId,
-                            @PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer star,
-                            @PathVariable @NotNull String comment) {
-        customerService.addComment(ordersId, star, comment);
-    }
-
 
     @GetMapping("/order/{orderId}/offers")
     public List<OfferDtoForCustomer> customerSeeAllOfferInOneOrder(@PathVariable @NotNull @Digits(integer = 5, fraction = 0) Integer orderId) {
@@ -113,26 +101,15 @@ public class CustomerController {
         return customerService.customerPay(orderId, customerId);
     }
 
-
-    @PostMapping("/order/{orderId}/commentAndStar/{star}")
-    public String addCommentAndStar(@PathVariable @Digits(integer = 5, fraction = 0) Integer orderId,
-                                    @RequestBody CommentDto comment,
-                                    @PathVariable @Digits(integer = 5, fraction = 0) Integer star) {
-        return customerService.addComment(orderId, star, comment.comment());
+    @PostMapping("/order/comment")
+    public void giveComment(@RequestBody @Valid LeavingCommentDto input) {
+        customerService.addComment(input.ordersId(), input.star(), input.comment());
     }
-
-
-    @GetMapping("/hi")
-    public String hi() {
-        return "hi";
-    }
-
 
     @GetMapping("/verify")
     public String verify(@RequestParam(required = false, name = "token") String token) {
         return customerService.validateCustomerEmail(token);
     }
-
 
     @GetMapping("/orders/details")
     public List<OrdersOutputDtoUser> getOrders(@RequestParam(required = false) String orderState) {
@@ -140,13 +117,11 @@ public class CustomerController {
         return customerService.optionalSelectOrdersForCustomer(customerId, orderState);
     }
 
-
     @GetMapping("/credit")
     public Double getCredit() {
         Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return customerService.getCreditAmount(customerId);
     }
-
 
     @PostMapping("/password/change")
     public String changePassword(@Valid @RequestBody changingPasswordDtoController changingPasswordDto) {
@@ -157,14 +132,12 @@ public class CustomerController {
                 TypeOfUser.CUSTOMER));
     }
 
-
     @GetMapping("/offers/sorted")
     public List<SortedOfferDtoForCustomer> getSortedOffer(@Valid @RequestBody SortingOfferInput input) {
         Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         SortingOffer sortingOffer = new SortingOffer(customerId,input.orderId(),input.sortByScore(),input.ascending());
         return customerService.sortedOfferForCustomer(sortingOffer);
     }
-
 
     @GetMapping("/charge/success")
     public String chargeCartSuccess() {

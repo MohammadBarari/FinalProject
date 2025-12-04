@@ -50,32 +50,32 @@ public class AdminController {
         adminService.detailPriceSubHandlerChanger(changeSubHandlerDto);
     }
 
-    @GetMapping("/customers")
+    @PostMapping("/customers")
     public List<CustomerOutput> findCustomers(@RequestBody FindFilteredCustomerDto input) {
         return adminService.findCustomerByOptional(input);
     }
 
-    @GetMapping("/employees")
+    @PostMapping("/employees")
     public List<EmployeeOutputDtoHandlers> findEmployees(@RequestBody @Valid EmployeeInputHandlersDto input) {
         return adminService.findEmployeesByOptionalInformation(input);
     }
 
     @GetMapping("/users/{id}/services/{typeOfUser}")
-    public List<DoneDutiesDto> findPaidServices(@PathVariable Integer id, @PathVariable String typeOfUser) {
-        return adminService.findPaidWorksById(id, TypeOfUser.valueOf(typeOfUser));
+    public List<DoneDutiesDto> findPaidServices(@PathVariable Integer id, @PathVariable TypeOfUser typeOfUser) {
+        return adminService.findPaidWorksById(id, typeOfUser);
     }
 
-    @GetMapping("/orders")
-    public List<OrderOutputDto> findOrders(@RequestBody FindFilteredOrdersDto input) {
+    @PostMapping("/orders")
+    public List<OrderOutputDto> findOrders(@RequestBody @Valid FindFilteredOrdersDto input) {
         return adminService.optionalFindOrders(input);
     }
 
-    @GetMapping("/reports/employees")
+    @PostMapping("/reports/employees")
     public List<EmployeeOutputDtoReport> getEmployeeReports(@RequestBody @Valid FindFilteredEmployeeDto input) {
         return adminService.findEmployeeByReports(input);
     }
 
-    @GetMapping("/reports/customers")
+    @PostMapping("/reports/customers")
     public List<CustomerOutputDtoForReport> getCustomerReports(@RequestBody @Valid FindCustomerByFilterDto input) {
         return adminService.findCustomerByReports(input);
     }

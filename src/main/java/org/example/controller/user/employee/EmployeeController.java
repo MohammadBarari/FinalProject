@@ -72,6 +72,7 @@ public class EmployeeController {
 
     @PostMapping("/password/change")
     public String changePassword(@Valid @RequestBody changingPasswordDtoController changingPasswordDto) {
-        return employeeService.changingPassword(new ChangingPasswordDto(changingPasswordDto.user(), changingPasswordDto.oldPass(), changingPasswordDto.newPass(), TypeOfUser.EMPLOYEE));
+        return employeeService.changingPassword(new ChangingPasswordDto(changingPasswordDto.user(),
+                changingPasswordDto.oldPass(), changingPasswordDto.newPass(), TypeOfUser.EMPLOYEE));
     }
 }
