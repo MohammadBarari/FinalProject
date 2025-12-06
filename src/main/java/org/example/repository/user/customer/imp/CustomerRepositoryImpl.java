@@ -10,7 +10,6 @@ import org.example.repository.user.BaseUserRepositoryImpl;
 import org.example.repository.user.customer.CustomerRepository;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +17,7 @@ import java.util.List;
 @Slf4j
 public class CustomerRepositoryImpl extends BaseUserRepositoryImpl<Customer> implements CustomerRepository {
 
-//    @Override
-//    public Customer login(String username, String password) {
-//        try {
-//            Query query = entityManager.createNativeQuery("""
-//select customer.* from customer join pass_and_user pau on pau.id = customer.pass_and_user_id
-//where  pau.username= ? and pau.pass = ?
-//""",Customer.class);
-//            query.setParameter(1, username);
-//            query.setParameter(2, password);
-//            return (Customer) query.getSingleResult();
-//        }catch (Exception e) {
-//            return null;
-//        }
-//    }
-    public List<Customer> selectCustomerByOptional(String name, String lastName, String email, String phone) {
+public List<Customer> selectCustomerByOptional(String name, String lastName, String email, String phone) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Customer> query = cb.createQuery(Customer.class);
         Root<Customer> customer = query.from(Customer.class);
@@ -67,7 +52,8 @@ public class CustomerRepositoryImpl extends BaseUserRepositoryImpl<Customer> imp
         }
     }
     @Override
-    public List<CustomerOutputDtoForReport> selectCustomerByReports(LocalDate startDate, LocalDate endDate, Integer doneOrderStart, Integer doneOrderEnd) {
+    public List<CustomerOutputDtoForReport> selectCustomerByReports(LocalDate startDate, LocalDate endDate,
+                                                                    Integer doneOrderStart, Integer doneOrderEnd) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CustomerOutputDtoForReport> query = cb.createQuery(CustomerOutputDtoForReport.class);
         Root<Customer> customer = query.from(Customer.class);
@@ -127,6 +113,16 @@ public class CustomerRepositoryImpl extends BaseUserRepositoryImpl<Customer> imp
         return entityManager.createQuery(query).getResultList();
     }
 
+    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> orderRoot, Root<Customer> customerRoot) {
+        Predicate isPaid = cb.equal(orderRoot.get("orderState"), "PAID");
+        Predicate customerExists =cb.equal(orderRoot.get("customer").get("id"), customerRoot.get("id"));
+        Predicate predicate2 = cb.and(isPaid,customerExists);
+        Expression<Long> caseExpression = cb.selectCase()
+                .when(predicate2, 1L)
+                .otherwise(0L).as(Long.class);
+        return cb.sum(caseExpression).as(Long.class);
+    }
+
     @Override
     public Customer findByUser(String user) {
         try {
@@ -140,16 +136,5 @@ public class CustomerRepositoryImpl extends BaseUserRepositoryImpl<Customer> imp
         }
     }
 
-
-    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> orderRoot, Root<Customer> customerRoot) {
-        Join<Orders, Customer> a = orderRoot.join("customer", JoinType.INNER);
-        Predicate isPaid = cb.equal(orderRoot.get("orderState"), "PAID");
-        Predicate customerExists =cb.equal(orderRoot.get("customer").get("id"), customerRoot.get("id"));
-        Predicate predicate2 = cb.and(isPaid,customerExists);
-        Expression<Long> caseExpression = cb.selectCase()
-                .when(predicate2, 1L)
-                .otherwise(0L).as(Long.class);
-        return cb.sum(caseExpression).as(Long.class);
-    }
 
 }

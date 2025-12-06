@@ -20,7 +20,6 @@ import org.example.exeptions.NotFoundException.NotFoundCustomer;
 import org.example.exeptions.NotFoundException.NotFoundHandler;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
 import org.example.exeptions.NotFoundException.NotFoundOrder;
-import org.example.exeptions.captcha.CaptchaDoesNotMatchException;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.exeptions.global.FailedDoingOperation;
 import org.example.exeptions.money.DontHaveEnoughMoney;
@@ -62,7 +61,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final CombinedUserClassFromCustomer combineUserClass;
     private final ApplicationEventPublisher publisher;
 
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
+    public CustomerServiceImp(BaseUserRepository<Customer> baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
         super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;
@@ -80,14 +79,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             return buildOrder(orderDto,customer, subHandler);
         }
         return null;
-    }
-    private void validateOrder(OrderDto orderDto, SubHandler subHandler) {
-        if (orderDto.timeOfWork().isBefore(LocalDateTime.now())) {
-            throw new TimeOfWorkDoesntMatch();
-        }
-        if (orderDto.offeredPrice() < subHandler.getBasePrice()) {
-            throw new OrderPriceShouldBeHigherThanBase();
-        }
     }
 
     private OrderDto buildOrder(OrderDto orderDto, Customer customer, SubHandler subHandler) {
@@ -128,9 +119,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
              }
              List<Offer> offers = Optional.ofNullable(offerService.findAllOffersForSpecificOrder(orderId)).orElseThrow(() -> new NotFoundOffer("no offers found in this order with id : " + orderId));
              List<OfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
-             offers.forEach(offer -> {
-                 offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getId(),offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes(),offer.isAccepted()));
-             });
+             offers.forEach(offer -> offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getId(),offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes(),offer.isAccepted())));
              return offerDtoForCustomers;
     }
 
@@ -142,9 +131,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     public List<HandlerCustomerDto> getHandlersForCustomer() {
          List<Handler> handlers =  handlerService.findAllHandlers();
          List<HandlerCustomerDto> handlerCustomerDtos = new ArrayList<>();
-         handlers.forEach(handler -> {
-            handlerCustomerDtos.add(new HandlerCustomerDto(handler.getId(),handler.getName()));
-         });
+         handlers.forEach(handler -> handlerCustomerDtos.add(new HandlerCustomerDto(handler.getId(),handler.getName())));
          return handlerCustomerDtos;
     }
 
@@ -167,15 +154,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     public List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId){
         List<Orders> customerOrders = orderService.findAllOrdersThatHaveSameCustomer(customerId);
         List<OrdersOutputDtoCustomer> ordersOutputDtoCustomers = new ArrayList<>();
-        customerOrders.forEach(orders -> {
-            ordersOutputDtoCustomers.add(new OrdersOutputDtoCustomer(orders.getId(),orders.getEmployee()!= null? orders.getEmployee().getId(): null, orders.getEmployee()!=null?orders.getEmployee().getName() + " " + orders.getEmployee().getLast_name() : null,orders.getOfferedPrice(),orders.getDetail(),Objects.isNull(orders.getSubHandler().getName()) ? "" : orders.getSubHandler().getName(),orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState()));
-        });
+        customerOrders.forEach(orders -> ordersOutputDtoCustomers.add(new OrdersOutputDtoCustomer(orders.getId(),orders.getEmployee()!= null? orders.getEmployee().getId(): null, orders.getEmployee()!=null?orders.getEmployee().getName() + " " + orders.getEmployee().getLast_name() : null,orders.getOfferedPrice(),orders.getDetail(),Objects.isNull(orders.getSubHandler().getName()) ? "" : orders.getSubHandler().getName(),orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState())));
         return ordersOutputDtoCustomers;
     }
 
     @Transactional
     public void startOrder(Integer orderId) {
-        Orders order = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(() -> new NotFoundOrder());
+        Orders order = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(NotFoundOrder::new);
         Integer customerId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         validateOrderForStarting(order, customerId);
         order.setOrderState(OrderState.STARTED);
@@ -183,13 +168,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     private void validateOrderForStarting(Orders order, Integer customerId) {
-        if (order.getCustomer().getId()!= customerId){
+        if (!Objects.equals(order.getCustomer().getId(), customerId)){
             throw new NotFoundOrder();
         }
         if (order.getOrderState() != OrderState.UNDER_REACHING_EMPLOYEE){
             throw new OrderStateIsNotCorrect();
         }
-        Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(order.getId())).orElseThrow(() -> new NotFoundOffer());
+        Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(order.getId())).orElseThrow(NotFoundOffer::new);
         if (offer.getTimeOfWork().isAfter(LocalDateTime.now())) {
             throw new TimeOfWorkDoesntMatch();
         }
@@ -234,10 +219,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     public boolean validateCustomer(CustomerSignUpDto customerDto) {
 
-        if (checkIfNotDuplicateUser(customerDto.phone()) && validatePassWord(customerDto.password())) {
-            return true;
-        }
-        return false;
+        return checkIfNotDuplicateUser(customerDto.phone()) && validatePassWord(customerDto.password());
     }
 
     @Override
@@ -291,9 +273,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     @Transactional
     public String customerChargeCart(PayToCartDto payToCartDto ){
-//        if (!Objects.equals(captcha,userCaptcha)){
-//            throw new CaptchaDoesNotMatchException();
-//        }
         Credit customerCredit = creditService.findByCustomerId(payToCartDto.customerId());
         CustomerCart customerCart = customerCartService.findCustomerCartByCustomerId(payToCartDto.customerId());
         if (Objects.isNull(customerCart)){
@@ -453,7 +432,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             } else if (!input.sortByScore() && !input.ascending()) {
                 List<Offer> sortedOffer =  offers.stream().sorted(Comparator.comparingLong(Offer::getOfferPrice)).collect(Collectors.toList());
                 return getOfferDtoForCustomers(input.sortByScore(), true, sortedOffer);
-            } else if (input.sortByScore() && input.ascending()) {
+            } else if (input.sortByScore()) {
                 List<Offer> sortedOffer = offers.stream()
                         .sorted((e1, e2) -> Integer.compare(e2.getEmployee().getScore(), e1.getEmployee().getScore()))
                         .collect(Collectors.toList());

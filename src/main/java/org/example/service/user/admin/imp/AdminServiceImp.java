@@ -156,7 +156,7 @@ public class AdminServiceImp implements AdminService {
     @Override
     @Transactional
     public void removeEmployeeFromSubHandler(Integer employeeId, Integer subHandlerId)  {
-            Employee employee = Optional.ofNullable(employeeService.findById(employeeId,Employee.class)).orElseThrow(()->  new NotFoundEmployee());
+            Employee employee = Optional.ofNullable(employeeService.findById(employeeId,Employee.class)).orElseThrow(NotFoundEmployee::new);
             SubHandler  subHandler = Optional.ofNullable(subHandlerService.findSubHandlerById(subHandlerId)).orElseThrow(()->new NotFoundSubHandler("Unable to find SubHandler with this id : "+ subHandlerId ));
             adminRepository.deleteEmployeeFromSubHandler(employeeId,subHandlerId);
     }

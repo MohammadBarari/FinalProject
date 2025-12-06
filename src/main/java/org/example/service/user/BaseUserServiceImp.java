@@ -27,7 +27,7 @@ import java.util.Optional;
 
 public abstract class BaseUserServiceImp <T extends Users> implements BaseUserService<T> {
 
-    private final BaseUserRepository baseUserRepository ;
+    private final BaseUserRepository<T> baseUserRepository ;
     protected final OrderService orderService ;
     protected final OfferService offerService ;
     protected final SubHandlerService subHandlerService;
@@ -38,7 +38,7 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     protected final PassAndUserRepository passAndUserRepository;
 
     @Autowired
-    public BaseUserServiceImp(BaseUserRepository baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ,PassAndUserRepository passAndUserRepository){
+    public BaseUserServiceImp(BaseUserRepository<T> baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ,PassAndUserRepository passAndUserRepository){
         this.baseUserRepository = baseUserRepository;
         this.orderService = orderService;
         this.offerService = offerService;
@@ -53,13 +53,10 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
 
     @Override
     public boolean validatePassWord(String pass) {
-        String pass1 = pass.replaceAll("\\s","");
-        //todo: check the password and validate it
-        if (checkIfIts8Digits(pass) && checkIfAllNotBeLetterOrDigit(pass))
+        String spaceRemovedPassword = pass.replaceAll("\\s","");
+        checkIfIts8Digits(spaceRemovedPassword);
+        checkIfAllNotBeLetterOrDigit(spaceRemovedPassword);
         return true;
-        else {
-            return false;
-        }
     }
 
     @Override
@@ -67,17 +64,9 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     public void signUp(T t){
         baseUserRepository.save(t);
     }
-    @Override
-    @Transactional
-    public void savePassAndUser(PassAndUser passAndUser){
-        passAndUserRepository.save(passAndUser);
-    }
 
-    private boolean checkIfIts8Digits(String pass) throws PassNot8Digits{
-        if (pass.length() == 8 ){
-            return true;
-        }
-        else {
+    private void checkIfIts8Digits(String pass) throws PassNot8Digits{
+        if (pass.length() != 8 ){
             throw new PassNot8Digits();
         }
     }
@@ -97,39 +86,38 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
         }
         return false;
     }
-    private boolean checkIfAllNotBeLetterOrDigit(String pass){
-        if (checkIfAllNotBeLetter(pass) && checkIfAllNotBeNumber(pass)){
-            return true;
-        }
-        else {
+    private void checkIfAllNotBeLetterOrDigit(String pass){
+        if (!(checkIfAllNotBeLetter(pass) && checkIfAllNotBeNumber(pass))){
             throw new AllNotBeLetterOrDigits();
         }
     }
     @Override
     @Transactional
     public String changingPassword(ChangingPasswordDto changingPasswordDto){
-        PassAndUser passAndUser = PassAndUser.builder().username(changingPasswordDto.user())
-                .typeOfUser(changingPasswordDto.typeOfUser())
-                .pass(passwordEncoder.encode(changingPasswordDto.oldPass())).build();
-        PassAndUser newPassAndUser = Optional.ofNullable(passAndUserRepository.findPass(passAndUser.getUsername(), String.valueOf(passAndUser.getTypeOfUser()))).orElseThrow(()-> new UnableToChangePassWord());
-        if (!passwordEncoder.matches(changingPasswordDto.oldPass(), passAndUser.getPass())){
+        validatePassWord(changingPasswordDto.newPass());
+        PassAndUser managedPasswordAndUserNameFromDatabase =
+                Optional.ofNullable(passAndUserRepository.findPass(changingPasswordDto.user(),
+                String.valueOf(changingPasswordDto.typeOfUser()))).
+                        orElseThrow(UnableToChangePassWord::new);
+        if (!passwordEncoder.matches(changingPasswordDto.oldPass(), managedPasswordAndUserNameFromDatabase.getPass())){
             throw new PasswordNotCorrect();
         }
-        newPassAndUser.setPass(passwordEncoder.encode(changingPasswordDto.newPass()));
-        passAndUserRepository.save(newPassAndUser);
+        managedPasswordAndUserNameFromDatabase.setPass(passwordEncoder.encode(changingPasswordDto.newPass()));
+        passAndUserRepository.save(managedPasswordAndUserNameFromDatabase);
         return "successful";
     }
-    @Override
 
+    @Override
     @Transactional
     public void updateUser(T t){
         baseUserRepository.update(t);
-    };
+    }
 
     @Override
     @Transactional
     public T findById(int id , Class<T> tClass){
-            return Optional.ofNullable((T) baseUserRepository.findById(id,tClass)).orElseThrow(()-> new NotFoundUser("Unable to find Employee with this ID : "+ id));
+            return Optional.ofNullable(baseUserRepository.findById(id,tClass))
+                    .orElseThrow(()-> new NotFoundUser("Unable to find Employee with this ID : "+ id));
     }
 
     @Override

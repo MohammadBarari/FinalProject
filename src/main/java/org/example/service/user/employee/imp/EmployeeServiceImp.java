@@ -20,7 +20,6 @@ import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.exeptions.NotFoundException.NotFoundEmployee;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
 import org.example.exeptions.password.PasswordNotCorrect;
-import org.example.exeptions.employee.ImageValidationException;
 import org.example.exeptions.employee.InvalidEmployeeDataException;
 import org.example.exeptions.employee.NotJpgFile;
 import org.example.exeptions.order.OfferPriceIsLessThanOrderPrice;
@@ -41,9 +40,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -52,7 +49,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     private final EmployeeRepository employeeRepository ;
     private final ApplicationEventPublisher publisher;
-    public EmployeeServiceImp(BaseUserRepository baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
+    public EmployeeServiceImp(BaseUserRepository<Employee> baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
         super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.employeeRepository = employeeRepository;
         this.publisher = publisher;
@@ -60,7 +57,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     @Transactional
-    public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto) throws Exception {
+    public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto) {
         if (validateEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64())) {
             Employee employee = getEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64());
             Credit credit = Credit.builder().typeOfEmployee(TypeOfUser.EMPLOYEE).amount(0.0d).build();
@@ -133,24 +130,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public void saveEmployee( Employee employee){
         employeeRepository.save(employee);
     }
-    @Override
-    public  boolean validateImage(File imageFile){
-        try {
-            if (ImageIO.read(imageFile) == null) {
-                throw new ImageValidationException("The file is not a valid image.");
-            }
-            return true;
-        } catch (IOException e) {
-            throw new ImageValidationException("Cannot read file: " + imageFile.getName(), e);
-        }
-    }
-    @Override
-    public  boolean checkIfImageSizeIsOkay(File imageFile) {
-        if (imageFile.length() < 300*1024){
-            return true;
-        }
-        throw new RuntimeException("file is too large");
-    }
 
     @Override
     public List<SubHandlerOutput> findAllSubHandlersForEmployee(Integer employeeId) {
@@ -161,32 +140,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             subHandlerOutputs.add(s);
         });
         return subHandlerOutputs;
-    }
-
-    @Transactional
-    @Override
-    public List<OrderOutputEmployee> getOrdersForEmployee(Integer employeeId) {
-        List<Orders> orders = new ArrayList<>();
-        List<SubHandler> subHandlers = subHandlerService.subHandlersForEmployee(employeeId);
-        if (subHandlers!=null && !subHandlers.isEmpty()) {
-            for (SubHandler subHandler : subHandlers) {
-                List<Orders> ordersPerSubHandler = orderService.findOrdersForSubHandler(subHandler.getId());
-                ordersPerSubHandler.forEach(orders1 -> System.out.println(orders1.getCustomer().getId()));
-                if (!orderService.findOrdersForSubHandler(subHandler.getId()).isEmpty()) {
-                    if (!orders.isEmpty()) {
-                        orders.addAll(orderService.findOrdersForSubHandler(subHandler.getId()));
-                    } else {
-                        orders.addAll(ordersPerSubHandler);
-                    }
-                }
-            }
-        }
-        List<OrderOutputEmployee> orderOutputEmployees = new ArrayList<>();
-        orders.forEach(orders1 -> {
-            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getId(),orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
-            orderOutputEmployees.add(o);
-        });
-        return orderOutputEmployees;
     }
 
     @Override
@@ -249,7 +202,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public boolean validateEmployee(EmployeeSignUpDto employee, String file) throws IOException {
+    public boolean validateEmployee(EmployeeSignUpDto employee, String file) {
         return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())
                 && validateImageJpg (file) && checkImageSize(file);
     }
@@ -288,10 +241,6 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
             emailToken.setExpired(true);
         }
     }
-    @Override
-    public List<Orders> findPaidOrders(Integer employeeId) {
-        return orderService.findPaidOrdersForEmployee(employeeId);
-    }
 
     @Override
     @Transactional
@@ -315,8 +264,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         Integer customerId = orders.getCustomer().getId();
         String customerFullName = orders.getCustomer().getName() + " " + orders.getCustomer().getLast_name();
         Double price = Double.valueOf(offer.getOfferPrice());
-        DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(), orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore(), id, employeeName, customerFullName, customerId, orders.getComment());
-        return dto;
+        return new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(), orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore(), id, employeeName, customerFullName, customerId, orders.getComment());
     }
 
     @Override
@@ -339,7 +287,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         return Optional.ofNullable(creditService.findByEmployeeId(id).getAmount()).orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
     }
 
-    private boolean validateImageJpg(String file) throws IOException {
+    private boolean validateImageJpg(String file) {
         byte[] imageBytes = decodeImage(file);
 
         if (imageBytes.length < 4) {
@@ -355,7 +303,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         return true;
     }
-    private boolean checkImageSize (String file) throws IOException {
+    private boolean checkImageSize (String file) {
         long sizeInKb = decodeImage(file).length /1024;
         return sizeInKb < 300;
     }

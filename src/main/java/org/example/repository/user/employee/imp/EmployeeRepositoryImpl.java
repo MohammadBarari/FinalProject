@@ -2,6 +2,7 @@ package org.example.repository.user.employee.imp;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.example.domain.*;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoReport;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Repository
 @Primary
+@Slf4j
 public class EmployeeRepositoryImpl extends BaseUserRepositoryImpl<Employee> implements EmployeeRepository {
 
     @Transactional
@@ -28,8 +30,7 @@ where  pau.username= ? and pau.pass = ?
    """,Employee.class);
             query.setParameter(1, username);
             query.setParameter(2, password);
-            Employee employee = (Employee) query.getSingleResult();
-            return employee;
+            return (Employee) query.getSingleResult();
         }catch (Exception e) {
             return null;
         }
@@ -119,12 +120,12 @@ where  pau.username= ? and pau.pass = ?
         );
         List<Predicate> havingOrdersPredicates = new ArrayList<>();
         if (doneWorksStart != null || doneWorksEnd != null) {
-            havingOrdersPredicates.add(countingOrders(doneWorksStart, doneWorksEnd, worksCountSubquery, cb, employee));
+            havingOrdersPredicates.add(countingOrders(doneWorksStart, doneWorksEnd, worksCountSubquery, cb));
         }
         if (offerSentStart != null || offerSentEnd != null) {
             havingOrdersPredicates.add(countingOfferPredicate(cb, offerSentStart, offerSentEnd, offersCountSubquery));
         }
-        if (havingOrdersPredicates.size() > 0) {
+        if (!havingOrdersPredicates.isEmpty()) {
             query.having(havingOrdersPredicates.toArray(new Predicate[0]));
         }
         return entityManager.createQuery(query).getResultList();
@@ -144,18 +145,15 @@ where  pau.username= ? and pau.pass = ?
     }
 
 
-    private Predicate countingOrders(Integer start, Integer end, Subquery<Long> orderCount, CriteriaBuilder cb, Root<Employee> employeeRoot) {
-        Predicate predicate = cb.conjunction();
-        if (start != null) {
-            predicate = cb.and(predicate, cb.greaterThanOrEqualTo(orderCount, start.longValue()));
-        }
-        if (end != null) {
-            predicate = cb.and(predicate, cb.lessThan(orderCount, end.longValue()));
-        }
-        return predicate;
+    private Predicate countingOrders(Integer start, Integer end, Subquery<Long> orderCount, CriteriaBuilder cb) {
+        return getPredicate(cb, start, end, orderCount);
     }
 
     private Predicate countingOfferPredicate(CriteriaBuilder cb, Integer start, Integer end, Subquery<Long> offerCount) {
+        return getPredicate(cb, start, end, offerCount);
+    }
+
+    private static Predicate getPredicate(CriteriaBuilder cb, Integer start, Integer end, Subquery<Long> offerCount) {
         Predicate predicate = cb.conjunction();
         if (start != null) {
             predicate = cb.and(predicate, cb.greaterThanOrEqualTo(offerCount, start.longValue()));
@@ -165,6 +163,7 @@ where  pau.username= ? and pau.pass = ?
         }
         return predicate;
     }
+
     public List<Employee> selectEmployeesByOptionalInformation(
             EmployeeInputHandlersDto input) {
 
@@ -233,7 +232,7 @@ where  pau.username= ? and pau.pass = ?
             query.setParameter(1, email);
             query.executeUpdate();
         }catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new RuntimeException("failed to set under review state");
         }
     }
