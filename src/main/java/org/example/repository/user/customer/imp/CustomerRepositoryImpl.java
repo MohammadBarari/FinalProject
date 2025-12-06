@@ -2,10 +2,11 @@ package org.example.repository.user.customer.imp;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
+import lombok.extern.slf4j.Slf4j;
 import org.example.domain.Customer;
 import org.example.domain.Orders;
 import org.example.dto.admin.CustomerOutputDtoForReport;
-import org.example.repository.user.BaseUserRepositoryImp;
+import org.example.repository.user.BaseUserRepositoryImpl;
 import org.example.repository.user.customer.CustomerRepository;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
@@ -14,22 +15,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class CustomerRepositoryImp extends BaseUserRepositoryImp<Customer> implements CustomerRepository {
+@Slf4j
+public class CustomerRepositoryImpl extends BaseUserRepositoryImpl<Customer> implements CustomerRepository {
 
-    @Override
-    public Customer login(String username, String password) {
-        try {
-            Query query = entityManager.createNativeQuery("""
-select customer.* from customer join pass_and_user pau on pau.id = customer.pass_and_user_id
-where  pau.username= ? and pau.pass = ?
-""",Customer.class);
-            query.setParameter(1, username);
-            query.setParameter(2, password);
-            return (Customer) query.getSingleResult();
-        }catch (Exception e) {
-            return null;
-        }
-    }
+//    @Override
+//    public Customer login(String username, String password) {
+//        try {
+//            Query query = entityManager.createNativeQuery("""
+//select customer.* from customer join pass_and_user pau on pau.id = customer.pass_and_user_id
+//where  pau.username= ? and pau.pass = ?
+//""",Customer.class);
+//            query.setParameter(1, username);
+//            query.setParameter(2, password);
+//            return (Customer) query.getSingleResult();
+//        }catch (Exception e) {
+//            return null;
+//        }
+//    }
     public List<Customer> selectCustomerByOptional(String name, String lastName, String email, String phone) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Customer> query = cb.createQuery(Customer.class);
@@ -58,7 +60,9 @@ where  pau.username= ? and pau.pass = ?
 """,Customer.class);
             query.setParameter(1, email);
             return (Customer) query.getSingleResult();
-            }catch (Exception e) {
+            }
+
+           catch (Exception e) {
             return null;
         }
     }
@@ -70,20 +74,24 @@ where  pau.username= ? and pau.pass = ?
         List<Predicate> predicates = new ArrayList<>();
 
         if (startDate != null) {
-            LocalDateTime startDateTime = startDate.atStartOfDay();
-            predicates.add(cb.greaterThanOrEqualTo(customer.get("timeOfRegistration"), startDateTime));
+            predicates.add(cb.greaterThanOrEqualTo(
+                    customer.get("timeOfRegistration"),
+                    startDate.atStartOfDay()
+            ));
         }
 
         if (endDate != null) {
-            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-            predicates.add(cb.lessThanOrEqualTo(customer.get("timeOfRegistration"), endDateTime));
+            predicates.add(cb.lessThanOrEqualTo(
+                    customer.get("timeOfRegistration"),
+                    endDate.atTime(23, 59, 59)
+            ));
         }
 
-        Expression<Long> worksPaid = null;
+        Expression<Long> worksPaid;
         List<Predicate> havingOrdersPaidPredicates = new ArrayList<>();
         Root<Orders> ordersRoot = query.from(Orders.class);
         Join<Orders, Customer> ordersJoin = ordersRoot.join("customer", JoinType.LEFT);
-        worksPaid = getWorksPaid(cb, ordersRoot,ordersJoin,customer);
+        worksPaid = getWorksPaid(cb, ordersRoot, customer);
         if (doneOrderStart != null || doneOrderEnd != null) {
             predicates.add(cb.equal(ordersJoin.get("id"), customer.get("id")));
             if (doneOrderStart != null) {
@@ -133,7 +141,7 @@ where  pau.username= ? and pau.pass = ?
     }
 
 
-    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> orderRoot,Join<Orders, Customer> ordersJoinJoin,Root<Customer> customerRoot) {
+    private Expression<Long> getWorksPaid(CriteriaBuilder cb, Root<Orders> orderRoot, Root<Customer> customerRoot) {
         Join<Orders, Customer> a = orderRoot.join("customer", JoinType.INNER);
         Predicate isPaid = cb.equal(orderRoot.get("orderState"), "PAID");
         Predicate customerExists =cb.equal(orderRoot.get("customer").get("id"), customerRoot.get("id"));

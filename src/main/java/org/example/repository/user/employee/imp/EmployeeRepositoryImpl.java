@@ -5,7 +5,7 @@ import jakarta.transaction.Transactional;
 import org.example.domain.*;
 import org.example.dto.admin.EmployeeInputHandlersDto;
 import org.example.dto.admin.EmployeeOutputDtoReport;
-import org.example.repository.user.BaseUserRepositoryImp;
+import org.example.repository.user.BaseUserRepositoryImpl;
 import org.example.repository.user.employee.EmployeeRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Repository
 @Primary
-public class  EmployeeRepositoryImp extends BaseUserRepositoryImp<Employee> implements EmployeeRepository {
+public class EmployeeRepositoryImpl extends BaseUserRepositoryImpl<Employee> implements EmployeeRepository {
 
     @Transactional
     @Override

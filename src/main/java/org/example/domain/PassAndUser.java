@@ -3,7 +3,7 @@ package org.example.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.enumirations.TypeOfUser;
-import org.hibernate.validator.constraints.Length;
+
 
 @Getter
 @Setter

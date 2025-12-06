@@ -9,6 +9,5 @@ public interface CreditService {
     Credit findCreditById(int id);
     Credit findByCustomerId(int customerId);
     Credit findByEmployeeId(int employeeId);
-    void payToEmployee(Integer customerCreditId,Integer employeeCreditId,Long offerPrice);
 
 }

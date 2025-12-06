@@ -14,11 +14,11 @@ public interface OfferRepository extends JpaRepository<Offer, Integer> {
     List<Offer> findAllForOrder(int orderId);
 
     @Query(value = """
-        SELECT * 
+        SELECT *\s
         FROM offer o
         JOIN orders ord ON ord.id = o.order_id
         WHERE ord.id = ?1 AND o.accepted = true
-        """, nativeQuery = true)
+       \s""", nativeQuery = true)
     Offer selectAcceptedOfferInOrder( Integer orderId);
 
     @Query(value = """

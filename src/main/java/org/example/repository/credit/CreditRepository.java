@@ -4,8 +4,6 @@ import org.example.domain.Credit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
 public interface CreditRepository extends JpaRepository<Credit, Integer> {
 
     Credit findCreditById(int creditId);

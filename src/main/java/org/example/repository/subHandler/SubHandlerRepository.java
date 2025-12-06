@@ -23,7 +23,7 @@ public interface SubHandlerRepository extends JpaRepository<SubHandler, Integer>
     List<SubHandler> selectByEmployeeId(Integer employeeId);
 
     @Query(value = """
-            select sub_handler.* from sub_handler where name = ?1 
+            select sub_handler.* from sub_handler where name = ?1\s
 """,nativeQuery = true)
     SubHandler selectByName(String name);
 }

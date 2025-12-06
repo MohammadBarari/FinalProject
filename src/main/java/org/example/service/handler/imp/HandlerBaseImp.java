@@ -21,18 +21,6 @@ public class HandlerBaseImp implements HandlerService {
     }
 
     @Override
-    @Transactional
-    public void deleteHandler(Integer id) {
-        handlerRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public void updateHandler(Handler handler) {
-        handlerRepository.save(handler);
-    }
-
-    @Override
     public List<Handler> findAllHandlers() {
         return handlerRepository.findAll();
     }

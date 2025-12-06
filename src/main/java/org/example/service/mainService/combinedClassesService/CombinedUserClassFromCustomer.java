@@ -32,12 +32,7 @@ public class CombinedUserClassFromCustomer {
         this.employeeService = employeeService;
         this.offerService = offerService;
     }
-//    @Transactional
-//    public void addStarToEmployee(Integer employeeId, Integer starId) {
-//        Employee employee = employeeService.findById(employeeId, Employee.class);
-//        employee.setScore(employee.getScore() + starId);
-//        employeeService.updateUser(employee);
-//    }
+
     @Transactional
     public void makeTheOrderDone(Integer orderId)  {
         Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(orderId)).orElseThrow(() ->  new NotFoundOffer("unable to find offer in order with ID :" + orderId));

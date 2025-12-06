@@ -39,7 +39,7 @@ import org.example.service.customerCart.CustomerCartService;
 import org.example.service.emailToken.EmailTokenService;
 import org.example.service.handler.HandlerService;
 import org.example.service.mainService.combinedClassesService.CombinedUserClassFromCustomer;
-import org.example.service.mainService.combinedClassesService.CustomerAcceptOfferClass;
+
 import org.example.service.mapStruct.EntityMapper;
 import org.example.service.offer.OfferService;
 import org.example.service.order.OrderService;
@@ -62,7 +62,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final CombinedUserClassFromCustomer combineUserClass;
     private final ApplicationEventPublisher publisher;
 
-    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, CustomerAcceptOfferClass customerAcceptOfferClass, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
+    public CustomerServiceImp(BaseUserRepository baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
         super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;

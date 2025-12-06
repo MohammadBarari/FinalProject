@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CaptchaServiceImp implements CaptchaService {
-    private Map<String,String> captchaMapHolder = new ConcurrentHashMap<>();
+    private final Map<String,String> captchaMapHolder = new ConcurrentHashMap<>();
     @Override
     public CaptchaDto generateCaptcha() {
         String captchaId = UUID.randomUUID().toString();

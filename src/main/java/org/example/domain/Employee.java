@@ -28,8 +28,7 @@ public class Employee extends Users {
 
     @OneToOne(cascade = CascadeType.ALL)
     private Credit credit;
-    public Employee setEmployeeState(EmployeeState employeeState) {
+    public void setEmployeeState(EmployeeState employeeState) {
         this.employeeState = Objects.requireNonNullElse(employeeState, EmployeeState.NEW);
-            return this;
     }
 }

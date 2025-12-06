@@ -92,7 +92,7 @@ public class AdminServiceImp implements AdminService {
     }
     @Override
     public void detailPriceSubHandlerChanger(ChangeSubHandlerDto changeSubHandlerDto)  {
-            SubHandler subHandler = null;
+            SubHandler subHandler;
 
             subHandler = subHandlerService.findSubHandlerById(changeSubHandlerDto.id());
             if (subHandler == null) {
@@ -126,10 +126,7 @@ public class AdminServiceImp implements AdminService {
     public List<EmployeeOutputDtoHandlers> findEmployeesByOptionalInformation(EmployeeInputHandlersDto input) {
         return employeeService.findEmployeesByOptionalInformation(input);
     }
-    public List<Orders> findOptionalOrdersByEmployeeId(Integer employeeId){
-        //todo: have to be done
-        return null;
-    }
+
     public List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser) {
         switch (typeOfUser) {
             case EMPLOYEE -> {
@@ -144,12 +141,10 @@ public class AdminServiceImp implements AdminService {
     @Transactional
     public List<OrderOutputDto> optionalFindOrders(FindFilteredOrdersDto input) {
         List<OrderOutputDto> ordersOutputDtos = new ArrayList<>();
-        employeeService.optionalFindOrders(input).forEach(orders -> {
-            ordersOutputDtos.add(new OrderOutputDto(orders.getOfferedPrice(),orders.getDetail()
-                    ,orders.getSubHandler().getName(),orders.getTimeOfWork()
-                    ,orders.getAddress(),orders.getOrderState()
-                    ,orders.getCustomer().getName()+ " " + orders.getCustomer().getLast_name(),orders.getCustomer().getId(),orders.getEmployee() != null?orders.getEmployee().getName():null,orders.getEmployee()!=null?orders.getEmployee().getId():null,orders.getScore(),orders.getComment()));
-        });
+        employeeService.optionalFindOrders(input).forEach(orders -> ordersOutputDtos.add(new OrderOutputDto(orders.getOfferedPrice(),orders.getDetail()
+                ,orders.getSubHandler().getName(),orders.getTimeOfWork()
+                ,orders.getAddress(),orders.getOrderState()
+                ,orders.getCustomer().getName()+ " " + orders.getCustomer().getLast_name(),orders.getCustomer().getId(),orders.getEmployee() != null?orders.getEmployee().getName():null,orders.getEmployee()!=null?orders.getEmployee().getId():null,orders.getScore(),orders.getComment())));
         return ordersOutputDtos;
     }
 

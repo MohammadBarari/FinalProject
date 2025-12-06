@@ -7,7 +7,7 @@ import org.example.events.UserCreationEvent;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.repository.emailToken.EmailTokenRepository;
 import org.example.service.emailToken.EmailTokenService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,10 +24,6 @@ public class EmailTokenServiceImp implements EmailTokenService {
 
     private final EmailTokenRepository emailTokenRepository;
     private final JavaMailSender javaMailSender;
-    @Transactional
-    public void remove(EmailToken emailToken) {
-        emailTokenRepository.delete(emailToken);
-    }
     //update
 
     @Transactional
@@ -39,7 +35,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
         EmailToken emailToken = createEmailToken(input.typeOfCreatedUser(),input.email());
         String token = generateToken();
         emailToken.setToken(token);
-        sendingMail(input.email(),token,emailToken,input.typeOfCreatedUser());
+        sendingMail(input.email(),token, input.typeOfCreatedUser());
         emailTokenRepository.save(emailToken);
     }
     @Override
@@ -57,7 +53,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
         return UUID.randomUUID().toString();
     }
 
-    private void sendingMail(String email, String token ,EmailToken emailToken,TypeOfUser typeOfUser) {
+    private void sendingMail(String email, String token , TypeOfUser typeOfUser) {
         Optional.of(emailTokenRepository.existsByEmail(email)).filter(f -> !f).orElseThrow
                 (()  -> new InvalidTokenExceptions("Email already exists"));
         String activationLink =

@@ -11,9 +11,7 @@ public interface OrderService {
     void save(Orders orders) throws TimeOfWorkDoesntMatch;
     void update(Orders orders);
     void delete(int id);
-    List<Orders> findAll();
-    List<Orders> findOrdersForEmployee(Integer employeeId);
-    List<Orders> findGotOrdersForEmployee(Integer employeeId);
+
     Orders findById(int id);
     List<Orders> findAllOrdersThatHaveSameCustomer(Integer customerId) throws OrderStateIsNotCorrect;
     List<Orders> findOrdersForSubHandler(Integer subHandlerId);

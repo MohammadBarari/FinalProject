@@ -40,19 +40,6 @@ public class OrderServiceImp implements OrderService {
     public void delete(int id) {
         orderRepository.deleteById(id);
     }
-    @Override
-    public List<Orders> findAll() {
-        return List.of();
-    }
-    @Override
-    public List<Orders> findOrdersForEmployee(Integer employeeId) {
-        return orderRepository.findOrdersByEmployee(employeeId);
-    }
-
-    @Override
-    public List<Orders> findGotOrdersForEmployee(Integer employeeId) {
-        return orderRepository.selectGotOrdersByEmployeeId(employeeId);
-    }
 
     @Override
     public Orders findById(int id) {

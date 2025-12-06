@@ -7,7 +7,7 @@ import org.example.domain.Users;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class BaseUserRepositoryImp<T extends Users> implements BaseUserRepository<T>{
+public class BaseUserRepositoryImpl<T extends Users> implements BaseUserRepository<T>{
 
        @PersistenceContext
        public EntityManager entityManager;
