@@ -144,7 +144,8 @@ public class AdminServiceImp implements AdminService {
         employeeService.optionalFindOrders(input).forEach(orders -> ordersOutputDtos.add(new OrderOutputDto(orders.getOfferedPrice(),orders.getDetail()
                 ,orders.getSubHandler().getName(),orders.getTimeOfWork()
                 ,orders.getAddress(),orders.getOrderState()
-                ,orders.getCustomer().getName()+ " " + orders.getCustomer().getLast_name(),orders.getCustomer().getId(),orders.getEmployee() != null?orders.getEmployee().getName():null,orders.getEmployee()!=null?orders.getEmployee().getId():null,orders.getScore(),orders.getComment())));
+                ,orders.getCustomer().getName()+ " " + orders.getCustomer().getLast_name(),
+                orders.getCustomer().getId(),orders.getEmployee() != null?orders.getEmployee().getName():null,orders.getEmployee()!=null?orders.getEmployee().getId():null,orders.getScore(),orders.getComment())));
         return ordersOutputDtos;
     }
 

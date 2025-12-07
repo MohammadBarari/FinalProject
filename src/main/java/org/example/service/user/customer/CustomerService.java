@@ -1,7 +1,6 @@
 package org.example.service.user.customer;
 
 import org.example.domain.Customer;
-import org.example.domain.Orders;
 import org.example.dto.customer.CustomerSignUpDto;
 import org.example.dto.orders.OrderDto;
 import org.example.dto.customer.PayToCartDto;
@@ -25,7 +24,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     List<OfferDtoForCustomer> getOffersForOrder(Integer orderId);
     void startOrder(Integer orderId);
     boolean checkIfNotDuplicateUser(String user);
-    String addComment(Integer ordersId, Integer star, String comment);
+    void addComment(Integer ordersId, Integer star, String comment);
     List<OrdersOutputDtoCustomer> getAllOrders( Integer customerId);
     void customerAcceptOffer(Integer offerId);
     List<HandlerCustomerDto> getHandlersForCustomer();
@@ -37,7 +36,7 @@ public interface CustomerService extends BaseUserService<Customer> {
     Customer findByEmail(String email);
     void sendToken(String email , TypeOfUser typeOfUser);
     String validateCustomerEmail(String token);
-    List<Orders> findPaidOrders(Integer employeeId);
+
     List<DoneDutiesDto> findDoneWorksById(Integer id);
     List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input);
     List<OrdersOutputDtoUser> optionalSelectOrdersForCustomer(Integer employeeId, String orderState);

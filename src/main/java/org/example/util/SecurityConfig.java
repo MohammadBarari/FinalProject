@@ -21,7 +21,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/customer/signup", "/employee/signUp","customer/verify","employee/verify","auth/login" ,"http://localhost:63342/FinalProject/web","/customer/captcha/generate","/customer/chargeCredit","/customer/charge/success").permitAll()
+                        .requestMatchers("/customer/signup", "/employee/signUp","customer/verify"
+                                ,"employee/verify","auth/login" ,"http://localhost:63342/FinalProject/web"
+                                ,"/customer/captcha/generate"
+                                ,"/customer/chargeCredit","/customer/charge/success").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/employee/**").hasRole("EMPLOYEE")

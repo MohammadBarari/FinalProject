@@ -49,8 +49,14 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     private final EmployeeRepository employeeRepository ;
     private final ApplicationEventPublisher publisher;
-    public EmployeeServiceImp(BaseUserRepository<Employee> baseUserRepository, PasswordEncoder passwordEncoder, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, EmployeeRepository employeeRepository, OrderService orderService, OfferService offerService, SubHandlerService subHandlerService, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
-        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
+    public EmployeeServiceImp(BaseUserRepository<Employee> baseUserRepository, PasswordEncoder passwordEncoder,
+                              CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper,
+                              EmployeeRepository employeeRepository,
+                              OrderService orderService, OfferService offerService, SubHandlerService subHandlerService,
+                              PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
+
+        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService
+                ,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.employeeRepository = employeeRepository;
         this.publisher = publisher;
     }
@@ -92,7 +98,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     public OfferDto giveOfferToOrder(OfferDto offerDto)
     {
         checkEmployeeExists(offerDto);
-        Orders orders = Optional.ofNullable(orderService.findById(offerDto.orderId())).orElseThrow(()-> new NotFoundOffer("Unable to find order with this ID : " + offerDto.orderId()));
+        Orders orders = Optional.ofNullable(orderService.findById(offerDto.orderId()))
+                .orElseThrow(()-> new NotFoundOffer("Unable to find order with this ID : " + offerDto.orderId()));
         checkForOffering(offerDto,orders);
         Offer offer = entityMapper.dtoToOffer(offerDto);
         Employee employee = new Employee();
@@ -157,10 +164,14 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 List<String> subHandlersNameString = new ArrayList<>();
                 if (employee.getSubHandlers() != null && !employee.getSubHandlers().isEmpty()) {
                     for (SubHandler subHandler : employee.getSubHandlers()) {
-                        subHandlersNameString.add("name : " + subHandler.getName() + "||| handlerName : " + subHandler.getHandler().getName());
+                        subHandlersNameString.
+                                add("name : " + subHandler.getName() + "||| handlerName : " + subHandler.getHandler().getName());
                     }
                 }
-                employeeOutputDtoHandlers.add(new EmployeeOutputDtoHandlers(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getTimeOfRegistration(),employee.getEmployeeState(),employee.getScore(),subHandlersNameString));
+                employeeOutputDtoHandlers.add(new EmployeeOutputDtoHandlers(employee.getId(),
+                        employee.getName(),employee.getLast_name(),
+                        employee.getEmail(),employee.getPhone(),employee.getTimeOfRegistration(),
+                        employee.getEmployeeState(),employee.getScore(),subHandlersNameString));
             }
         }
         return employeeOutputDtoHandlers;
@@ -186,7 +197,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 List<Orders> ordersPerSubHandler = orderService.findOrdersForSubHandler(subHandler.getId());
                 if (!ordersPerSubHandler.isEmpty()) {
                     for (Orders order : ordersPerSubHandler) {
-                        if (order.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE) || order.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER)) {
+                        if (order.getOrderState().equals(OrderState.UNDER_CHOOSING_EMPLOYEE) ||
+                                order.getOrderState().equals(OrderState.WAITING_FOR_EMPLOYEE_OFFER)) {
                             orders.add(order);
                         }
                     }
@@ -195,7 +207,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         List<OrderOutputEmployee> orderOutputEmployees = new ArrayList<>();
         orders.forEach(orders1 -> {
-            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getId(),orders1.getOfferedPrice(),orders1.getDetail(),orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),orders1.getCustomer().getName(),orders1.getCustomer().getId());
+            OrderOutputEmployee o = new OrderOutputEmployee(orders1.getId(),orders1.getOfferedPrice(),orders1.getDetail(),
+                    orders1.getSubHandler().getName(),orders1.getTimeOfWork(),orders1.getAddress(),orders1.getOrderState(),
+                    orders1.getCustomer().getName(),orders1.getCustomer().getId());
             orderOutputEmployees.add(o);
         });
         return orderOutputEmployees;
@@ -209,11 +223,13 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     public EmployeeLoginDtoOutput login(String user, String pass)  {
-        Employee employee =  Optional.ofNullable(employeeRepository.findByUser(user)).orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
+        Employee employee =  Optional.ofNullable(employeeRepository.findByUser(user))
+                .orElseThrow(() -> new NotFoundEmployee("username or password maybe incorrect"));
         if (passwordEncoder.matches(employee.getPassAndUser().getPass(),passwordEncoder.encode(pass))){
             throw new PasswordNotCorrect();
         }
-        return new EmployeeLoginDtoOutput(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),employee.getPhone(),employee.getCredit().getAmount(),employee.getImage(),employee.getScore());
+        return new EmployeeLoginDtoOutput(employee.getId(),employee.getName(),employee.getLast_name(),employee.getEmail(),
+                employee.getPhone(),employee.getCredit().getAmount(),employee.getImage(),employee.getScore());
     }
 
     @Override
@@ -229,7 +245,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     @Transactional
     public String validateEmployeeEmail(String token) {
-        EmailToken emailToken = Optional.ofNullable(emailTokenService.findByToken(token)).orElseThrow(()-> new InvalidTokenExceptions("not found token"));
+        EmailToken emailToken = Optional.ofNullable(emailTokenService.findByToken(token))
+                .orElseThrow(()-> new InvalidTokenExceptions("not found token"));
         emailTokenService.validateToken(token);
         validateEmployeeToken(emailToken);
         return "successful";
@@ -250,7 +267,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         if (allDoneOrders!=null && !allDoneOrders.isEmpty()) {
             for (Orders orders : allDoneOrders) {
                 if (orders.getOrderState() == OrderState.PAID) {
-                    Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(orders.getId())).orElseThrow(() -> new NotFoundOffer("offer not found"));
+                    Offer offer = Optional.ofNullable(offerService.findAcceptedOfferInOrder(orders.getId())).
+                            orElseThrow(() -> new NotFoundOffer("offer not found"));
                     DoneDutiesDto dto = getDoneDutiesDto(id, orders, offer);
                     doneDutiesDtos.add(dto);
                 }
@@ -264,12 +282,15 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         Integer customerId = orders.getCustomer().getId();
         String customerFullName = orders.getCustomer().getName() + " " + orders.getCustomer().getLast_name();
         Double price = Double.valueOf(offer.getOfferPrice());
-        return new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(), orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore(), id, employeeName, customerFullName, customerId, orders.getComment());
+        return new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(),
+                orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore(), id,
+                employeeName, customerFullName, customerId, orders.getComment());
     }
 
     @Override
     public List<EmployeeOutputDtoReport> findEmployeeByReports(FindFilteredEmployeeDto input) {
-        return employeeRepository.selectEmployeeByReports(input.startDateRegistration(),input.endDateRegistration(),input.doneWorksStart(),input.doneWorksEnd(),input.offerSentStart(),input.offerSentEnd());
+        return employeeRepository.selectEmployeeByReports(input.startDateRegistration(),input.endDateRegistration()
+                ,input.doneWorksStart(),input.doneWorksEnd(),input.offerSentStart(),input.offerSentEnd());
     }
 
     @Override
@@ -277,14 +298,17 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         List<Orders> orders = orderService.optionalFindOrdersForEmployee(employeeId, orderState);
         List<OrdersOutputDtoUser> ordersOutputDtoUsers = new ArrayList<>();
         for (Orders orders1 : orders) {
-            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getId(),orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
+            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getId(),orders1.getOfferedPrice()
+                    , orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState()
+                    , orders1.getScore(), orders1.getComment()));
         }
         return ordersOutputDtoUsers;
     }
 
     @Override
     public Double getCreditAmount(Integer id) {
-        return Optional.ofNullable(creditService.findByEmployeeId(id).getAmount()).orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
+        return Optional.ofNullable(creditService.findByEmployeeId(id).getAmount())
+                .orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
     }
 
     private boolean validateImageJpg(String file) {

@@ -61,8 +61,15 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private final CombinedUserClassFromCustomer combineUserClass;
     private final ApplicationEventPublisher publisher;
 
-    public CustomerServiceImp(BaseUserRepository<Customer> baseUserRepository, CreditService creditService, EmailTokenService emailTokenService, EntityMapper entityMapper, CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService, OfferService offerService, HandlerService handlerService, PasswordEncoder passwordEncoder, PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
-        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
+    public CustomerServiceImp(BaseUserRepository<Customer> baseUserRepository, CreditService creditService
+            , EmailTokenService emailTokenService, EntityMapper entityMapper
+            , CombinedUserClassFromCustomer combineUserClass, CustomerCartService customerCartService
+            , CustomerRepository customerRepository, SubHandlerService subHandlerService, OrderService orderService,
+                              OfferService offerService, HandlerService handlerService, PasswordEncoder passwordEncoder,
+                              PassAndUserRepository passAndUserRepository, ApplicationEventPublisher publisher) {
+
+        super(baseUserRepository,passwordEncoder,creditService,orderService,offerService
+                ,subHandlerService,entityMapper,emailTokenService,passAndUserRepository);
         this.customerRepository = customerRepository;
         this.handlerService = handlerService;
         this.customerCartService = customerCartService;
@@ -113,13 +120,17 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Transactional
     public List<OfferDtoForCustomer> getOffersForOrder(Integer orderId)  {
              Integer customerId =(Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-             Orders orders = Optional.ofNullable(orderService.findById(orderId)).orElseThrow(()-> new NotFoundOrder("unable to find order with id : " + orderId));
+             Orders orders = Optional.ofNullable(orderService.findById(orderId))
+                     .orElseThrow(()-> new NotFoundOrder("unable to find order with id : " + orderId));
              if (!Objects.equals(orders.getCustomer().getId(), customerId)) {
                  throw new NotFoundOrder();
              }
-             List<Offer> offers = Optional.ofNullable(offerService.findAllOffersForSpecificOrder(orderId)).orElseThrow(() -> new NotFoundOffer("no offers found in this order with id : " + orderId));
+             List<Offer> offers = Optional.ofNullable(offerService.findAllOffersForSpecificOrder(orderId))
+                     .orElseThrow(() -> new NotFoundOffer("no offers found in this order with id : " + orderId));
              List<OfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
-             offers.forEach(offer -> offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getId(),offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes(),offer.isAccepted())));
+             offers.forEach(offer -> offerDtoForCustomers.add(new OfferDtoForCustomer(offer.getId(),offer.getOfferPrice()
+                     ,offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name()
+                     ,offer.getTimeOfWork(),offer.getWorkTimeInMinutes(),offer.isAccepted())));
              return offerDtoForCustomers;
     }
 
@@ -154,7 +165,12 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     public List<OrdersOutputDtoCustomer> getAllOrders(@NotNull Integer customerId){
         List<Orders> customerOrders = orderService.findAllOrdersThatHaveSameCustomer(customerId);
         List<OrdersOutputDtoCustomer> ordersOutputDtoCustomers = new ArrayList<>();
-        customerOrders.forEach(orders -> ordersOutputDtoCustomers.add(new OrdersOutputDtoCustomer(orders.getId(),orders.getEmployee()!= null? orders.getEmployee().getId(): null, orders.getEmployee()!=null?orders.getEmployee().getName() + " " + orders.getEmployee().getLast_name() : null,orders.getOfferedPrice(),orders.getDetail(),Objects.isNull(orders.getSubHandler().getName()) ? "" : orders.getSubHandler().getName(),orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState())));
+        customerOrders.forEach(orders -> ordersOutputDtoCustomers.
+                add(new OrdersOutputDtoCustomer(orders.getId(),orders.getEmployee()!= null? orders.getEmployee().getId(): null
+                        , orders.getEmployee()!=null?orders.getEmployee().getName() + " " + orders.getEmployee().getLast_name() : null
+                        ,orders.getOfferedPrice(),orders.getDetail()
+                        ,Objects.isNull(orders.getSubHandler().getName()) ? "" : orders.getSubHandler().getName()
+                        ,orders.getTimeOfWork(),orders.getAddress(),orders.getOrderState())));
         return ordersOutputDtoCustomers;
     }
 
@@ -238,7 +254,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
     @Override
     @Transactional
-    public String addComment(Integer ordersId, Integer star, String comment){
+    public void addComment(Integer ordersId, Integer star, String comment){
         Orders orders = Optional.ofNullable(findOrder(ordersId)).orElseThrow(() -> new NotFoundOrder("orders not found"));
         validateOrderByCustomerId(orders);
         validateForComment(orders,star);
@@ -247,7 +263,6 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         Integer employeeTotalScore = orders.getEmployee().getScore();
         orders.getEmployee().setScore(employeeTotalScore + star);
         orderService.update(orders);
-        return "successful";
     }
 
     private void validateForComment(Orders orders,Integer star){
@@ -361,28 +376,26 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     @Transactional
     public String validateCustomerEmail(String token) {
-        EmailToken emailToken = Optional.ofNullable(emailTokenService.findByToken(token)).orElseThrow(()-> new InvalidTokenExceptions("not found token"));
+        EmailToken emailToken = Optional.ofNullable(emailTokenService.findByToken(token))
+                .orElseThrow(()-> new InvalidTokenExceptions("not found token"));
         emailTokenService.validateToken(token);
         validateCustomerToken(emailToken);
         return "successful";
     }
 
     private void validateCustomerToken(EmailToken emailToken) {
-        Customer customer = Optional.ofNullable(findByEmail(emailToken.getEmail())).orElseThrow(() -> new InvalidTokenExceptions("The token is not from the user"));
+        Customer customer = Optional.ofNullable(findByEmail(emailToken.getEmail()))
+                .orElseThrow(() -> new InvalidTokenExceptions("The token is not from the user"));
         customer.setActive(true);
         emailToken.setExpired(true);
-    }
-
-    @Override
-    public List<Orders> findPaidOrders(Integer customerId) {
-        return orderService.findPaidOrdersForCustomer(customerId);
     }
 
     @Override
     @Transactional
     public List<DoneDutiesDto> findDoneWorksById(Integer id) {
         List<DoneDutiesDto> doneDutiesDos = new ArrayList<>();
-        List<Orders> allDoneOrders = Optional.ofNullable(orderService.findPaidOrdersForCustomer(id)).orElseThrow(()-> new NotFoundOrder("no paid order was found for this customer "));
+        List<Orders> allDoneOrders = Optional.ofNullable(orderService.findPaidOrdersForCustomer(id))
+                .orElseThrow(()-> new NotFoundOrder("no paid order was found for this customer "));
         for (Orders orders : allDoneOrders) {
             Offer offer = offerService.findAcceptedOfferInOrder(orders.getId());
             if (offer!= null) {
@@ -392,7 +405,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
                 Integer customerId = customer.getId();
                 String customerFullName = customer.getName() + " " + customer.getLast_name();
                 Double price = Double.valueOf(offer.getOfferPrice());
-                DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName(), orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice()), orders.getScore() != null ? orders.getScore() : 0, employeeId, employeeName, customerFullName, customerId, orders.getComment());
+                DoneDutiesDto dto = new DoneDutiesDto(orders.getTimeOfWork(), price, new SubHandlersDtoOutput(orders.getSubHandler().getName()
+                        , orders.getSubHandler().getDetail(), orders.getSubHandler().getBasePrice())
+                        , orders.getScore() != null ? orders.getScore() : 0, employeeId
+                        , employeeName, customerFullName, customerId, orders.getComment());
                 doneDutiesDos.add(dto);
             }
         }

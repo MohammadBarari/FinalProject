@@ -38,7 +38,11 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
     protected final PassAndUserRepository passAndUserRepository;
 
     @Autowired
-    public BaseUserServiceImp(BaseUserRepository<T> baseUserRepository,PasswordEncoder passwordEncoder,CreditService creditService,OrderService orderService,OfferService offerService,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService ,PassAndUserRepository passAndUserRepository){
+    public BaseUserServiceImp(BaseUserRepository<T> baseUserRepository,PasswordEncoder passwordEncoder
+            ,CreditService creditService,OrderService orderService,OfferService offerService
+            ,SubHandlerService subHandlerService,EntityMapper entityMapper,EmailTokenService emailTokenService
+            ,PassAndUserRepository passAndUserRepository)
+    {
         this.baseUserRepository = baseUserRepository;
         this.orderService = orderService;
         this.offerService = offerService;
