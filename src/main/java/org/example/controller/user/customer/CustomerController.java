@@ -16,13 +16,14 @@ import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.captcha.CaptchaService;
 import org.example.service.user.customer.CustomerService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "${app.cors.allowed-origins}")
 @RestController
 @RequestMapping("/customer")
 @RequiredArgsConstructor
@@ -144,7 +145,7 @@ public class CustomerController {
         return "success";
     }
 
-    @CrossOrigin(origins = "http://localhost:63342")
+    @CrossOrigin(origins = "${app.cors.allowed-origins}")
     @PostMapping("/captcha/generate")
     public CaptchaDto generateCaptcha() {
         return captchaService.generateCaptcha();

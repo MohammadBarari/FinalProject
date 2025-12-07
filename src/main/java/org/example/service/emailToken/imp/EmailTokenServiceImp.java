@@ -7,7 +7,7 @@ import org.example.events.UserCreationEvent;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.repository.emailToken.EmailTokenRepository;
 import org.example.service.emailToken.EmailTokenService;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,6 +21,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class EmailTokenServiceImp implements EmailTokenService {
+
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     private final EmailTokenRepository emailTokenRepository;
     private final JavaMailSender javaMailSender;
@@ -57,7 +60,7 @@ public class EmailTokenServiceImp implements EmailTokenService {
         Optional.of(emailTokenRepository.existsByEmail(email)).filter(f -> !f).orElseThrow
                 (()  -> new InvalidTokenExceptions("Email already exists"));
         String activationLink =
-                "http://localhost:8080/"+(typeOfUser == TypeOfUser.CUSTOMER? "customer" : "employee") +"/verify?token=" + token;
+                baseUrl+(typeOfUser == TypeOfUser.CUSTOMER? "customer" : "employee") +"/verify?token=" + token;
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Email Activation");

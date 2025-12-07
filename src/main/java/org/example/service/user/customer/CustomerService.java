@@ -36,7 +36,6 @@ public interface CustomerService extends BaseUserService<Customer> {
     Customer findByEmail(String email);
     void sendToken(String email , TypeOfUser typeOfUser);
     String validateCustomerEmail(String token);
-
     List<DoneDutiesDto> findDoneWorksById(Integer id);
     List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input);
     List<OrdersOutputDtoUser> optionalSelectOrdersForCustomer(Integer employeeId, String orderState);

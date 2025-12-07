@@ -425,7 +425,9 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
         List<Orders> orders = orderService.optionalFindOrdersForCustomer(customerId, orderState);
         List<OrdersOutputDtoUser> ordersOutputDtoUsers = new ArrayList<>();
         for (Orders orders1 : orders) {
-            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getId(),orders1.getOfferedPrice(), orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(), orders1.getScore(), orders1.getComment()));
+            ordersOutputDtoUsers.add(new OrdersOutputDtoUser(orders1.getId(),orders1.getOfferedPrice(),
+                    orders1.getDetail(), orders1.getTimeOfWork(), orders1.getAddress(), orders1.getOrderState(),
+                    orders1.getScore(), orders1.getComment()));
         }
         return ordersOutputDtoUsers;
     }
@@ -474,7 +476,10 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     private List<SortedOfferDtoForCustomer> getOfferDtoForCustomers(Boolean sortByScore, Boolean ascending, List<Offer> sortedOffer) {
         List<SortedOfferDtoForCustomer> offerDtoForCustomers = new ArrayList<>();
         for (Offer offer : sortedOffer) {
-            offerDtoForCustomers.add(new SortedOfferDtoForCustomer(offer.getOfferPrice(),offer.getEmployee().getScore(),offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),offer.getTimeOfWork(),offer.getWorkTimeInMinutes(), ascending, sortByScore));
+            offerDtoForCustomers
+                    .add(new SortedOfferDtoForCustomer(offer.getOfferPrice(),offer.getEmployee().getScore(),
+                            offer.getEmployee().getName() + " " + offer.getEmployee().getLast_name(),
+                            offer.getTimeOfWork(),offer.getWorkTimeInMinutes(), ascending, sortByScore));
         }
         return offerDtoForCustomers;
     }
