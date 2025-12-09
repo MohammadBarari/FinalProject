@@ -30,7 +30,7 @@ public class EmployeeController {
             @RequestPart("image") MultipartFile image
 
     ) throws Exception {
-        return employeeService.signUpEmployee(employeeSignUpDto);
+        return employeeService.signUpEmployee(employeeSignUpDto,image);
     }
 
     @PostMapping("/login")

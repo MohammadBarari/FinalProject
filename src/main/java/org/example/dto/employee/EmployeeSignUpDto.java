@@ -15,8 +15,7 @@ public record EmployeeSignUpDto(
 
         @NotNull  @Pattern(regexp = "^\\d{11}$") String phone ,
 
-        @NotNull   String password,
+        @NotNull   String password
 
-        String imageBase64
 ) {
 }

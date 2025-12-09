@@ -65,9 +65,9 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     @Transactional
-    public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto) {
-        if (validateEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64())) {
-            Employee employee = getEmployee(employeeSignUpDto,employeeSignUpDto.imageBase64());
+    public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto , MultipartFile image) {
+        if (validateEmployee(employeeSignUpDto,image)) {
+            Employee employee = getEmployee(employeeSignUpDto,image);
             Credit credit = Credit.builder().typeOfEmployee(TypeOfUser.EMPLOYEE).amount(0.0d).build();
             employee.setCredit(credit);
             PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
@@ -218,7 +218,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public boolean validateEmployee(EmployeeSignUpDto employee, String file) {
+    public boolean validateEmployee(EmployeeSignUpDto employee, MultipartFile file) {
         return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())
                 && validateImageJpg (file) && checkImageSize(file);
     }

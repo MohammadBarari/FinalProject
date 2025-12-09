@@ -159,7 +159,7 @@ public class CustomerServiceTest {
 
         Credit credit = new Credit();
         credit.setId(100);
-        credit.setAmount(50.0); // less than offer price
+        credit.setAmount(50.0);
         customer.setCredit(credit);
 
         Orders order = new Orders();
@@ -192,7 +192,7 @@ public class CustomerServiceTest {
 
         Orders order = new Orders();
         order.setId(10);
-        order.setCustomer(anotherCustomer); // different customer
+        order.setCustomer(anotherCustomer);
         order.setOrderState(OrderState.DONE);
 
         Offer offer = new Offer();
@@ -368,14 +368,13 @@ public class CustomerServiceTest {
     void customerChargeCart_shouldCreateCartAndCharge_whenCartDoesNotExistAndEnoughMoney()
     {
         Integer customerId = 1;
-        Double amount = 200.0;
 
         PayToCartDto dto = new PayToCartDto(
                 customerId,
                 200.0,
                 "1111-2222-3333-4444",
                 "123",
-                LocalDate.of(2022,11,02),
+                LocalDate.of(2022,11, 2),
                 null,
                 null
         );
@@ -406,7 +405,6 @@ public class CustomerServiceTest {
     void customerChargeCart_shouldUseExistingCartAndCharge_whenCartExistsAndEnoughMoney()
     {
         Integer customerId = 1;
-        Double amount = 200.0;
 
         PayToCartDto dto = new PayToCartDto(
                 customerId,
@@ -443,7 +441,6 @@ public class CustomerServiceTest {
     void customerChargeCart_shouldThrowDontHaveEnoughMoney_whenCartDoesNotHaveEnoughBalance()
     {
         Integer customerId = 1;
-        Double amount = 200.0;
 
         PayToCartDto dto = new PayToCartDto(
                 customerId,
@@ -478,8 +475,6 @@ public class CustomerServiceTest {
     {
         Integer customerId = 1;
         Integer orderId = 10;
-
-        // put customerId in SecurityContext as principal
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(customerId, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -543,7 +538,7 @@ public class CustomerServiceTest {
 
         Orders order = new Orders();
         order.setId(orderId);
-        order.setCustomer(otherCustomer); // different than principal
+        order.setCustomer(otherCustomer);
 
         when(orderService.findById(orderId)).thenReturn(order);
 
@@ -600,7 +595,7 @@ public class CustomerServiceTest {
         order.setOrderState(OrderState.UNDER_REACHING_EMPLOYEE);
 
         Offer offer = new Offer();
-        offer.setTimeOfWork(LocalDateTime.now().minusMinutes(5)); // before now
+        offer.setTimeOfWork(LocalDateTime.now().minusMinutes(5));
 
         when(orderService.findById(orderId)).thenReturn(order);
         when(offerService.findAcceptedOfferInOrder(orderId)).thenReturn(offer);
@@ -614,7 +609,7 @@ public class CustomerServiceTest {
     @Test
     void startOrder_shouldThrowNotFoundOrder_whenOrderDoesNotExist()
     {
-        Integer orderId = 10;
+        int orderId = 10;
 
         when(orderService.findById(orderId)).thenReturn(null);
 
@@ -765,14 +760,14 @@ public class CustomerServiceTest {
         employee.setId(5);
         employee.setName("John");
         employee.setLast_name("Doe");
-        employee.setScore(10); // previous total score
+        employee.setScore(10);
 
         Orders order = new Orders();
         order.setId(orderId);
         order.setCustomer(customer);
         order.setEmployee(employee);
         order.setOrderState(OrderState.PAID);
-        order.setScore(null); // no previous comment
+        order.setScore(null);
 
         when(orderService.findById(orderId)).thenReturn(order);
 
@@ -787,7 +782,7 @@ public class CustomerServiceTest {
     @Test
     void addComment_shouldThrowNotFoundOrder_whenOrderNotFound()
     {
-        Integer orderId = 10;
+        int orderId = 10;
         Integer star = 4;
 
         when(orderService.findById(orderId)).thenReturn(null);
@@ -887,7 +882,7 @@ public class CustomerServiceTest {
         order.setId(orderId);
         order.setCustomer(customer);
         order.setEmployee(employee);
-        order.setOrderState(OrderState.STARTED); // not PAID
+        order.setOrderState(OrderState.STARTED);
         order.setScore(null);
 
         when(orderService.findById(orderId)).thenReturn(order);
@@ -905,7 +900,7 @@ public class CustomerServiceTest {
     {
         Integer customerId = 1;
         Integer orderId = 10;
-        Integer invalidStar = 6; // > 5
+        Integer invalidStar = 6;
 
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(customerId, null);
@@ -1068,17 +1063,12 @@ public class CustomerServiceTest {
         when(offerService.findAllOffersForSpecificOrder(orderId))
                 .thenReturn(List.of(offer1, offer2, offer3));
 
-        // 🔴 THIS WAS WRONG:
-        // SortingOffer input = new SortingOffer(orderId, customerId, true, false);
-
-        // ✅ FIXED: pass customerId first, orderId second
         SortingOffer input = new SortingOffer(customerId, orderId, true, false);
 
         List<SortedOfferDtoForCustomer> result =
                 customerService.sortedOfferForCustomer(input);
 
         assertEquals(3, result.size());
-        // scores: 1,3,5
         assertEquals(1, result.get(0).employeeScore());
         assertEquals(3, result.get(1).employeeScore());
         assertEquals(5, result.get(2).employeeScore());
@@ -1114,14 +1104,12 @@ public class CustomerServiceTest {
         when(offerService.findAllOffersForSpecificOrder(orderId))
                 .thenReturn(List.of(offer1, offer2, offer3));
 
-        // ✅ FIXED
         SortingOffer input = new SortingOffer(customerId, orderId, true, true);
 
         List<SortedOfferDtoForCustomer> result =
                 customerService.sortedOfferForCustomer(input);
 
         assertEquals(3, result.size());
-        // scores: 5,3,1
         assertEquals(5, result.get(0).employeeScore());
         assertEquals(3, result.get(1).employeeScore());
         assertEquals(1, result.get(2).employeeScore());
@@ -1155,14 +1143,12 @@ public class CustomerServiceTest {
         when(offerService.findAllOffersForSpecificOrder(orderId))
                 .thenReturn(List.of(offer1, offer2, offer3));
 
-        // ✅ FIXED
         SortingOffer input = new SortingOffer(customerId, orderId, false, false);
 
         List<SortedOfferDtoForCustomer> result =
                 customerService.sortedOfferForCustomer(input);
 
         assertEquals(3, result.size());
-        // prices: 100, 200, 300
         assertEquals(100L, result.get(0).offerPrice());
         assertEquals(200L, result.get(1).offerPrice());
         assertEquals(300L, result.get(2).offerPrice());
@@ -1196,14 +1182,12 @@ public class CustomerServiceTest {
         when(offerService.findAllOffersForSpecificOrder(orderId))
                 .thenReturn(List.of(offer1, offer2, offer3));
 
-        // ✅ FIXED
         SortingOffer input = new SortingOffer(customerId, orderId, false, true);
 
         List<SortedOfferDtoForCustomer> result =
                 customerService.sortedOfferForCustomer(input);
 
         assertEquals(3, result.size());
-        // prices: 300, 200, 100
         assertEquals(300L, result.get(0).offerPrice());
         assertEquals(200L, result.get(1).offerPrice());
         assertEquals(100L, result.get(2).offerPrice());
@@ -1216,9 +1200,7 @@ public class CustomerServiceTest {
     void sortedOfferForCustomer_shouldThrowNotFoundOrder_whenOrderNotFound()
     {
         Integer customerId = 1;
-        Integer orderId = 10;
-
-        // ✅ FIXED
+        int orderId = 10;
         SortingOffer input = new SortingOffer(customerId, orderId, true, true);
 
         when(orderService.findById(orderId)).thenReturn(null);
@@ -1318,8 +1300,6 @@ public class CustomerServiceTest {
     void getAllOrders_shouldMapOrdersToDtoIncludingEmployeeName()
     {
         Integer customerId = 1;
-
-        // order with employee
         Orders order1 = new Orders();
         order1.setId(10);
         order1.setOfferedPrice(200d);
@@ -1341,8 +1321,6 @@ public class CustomerServiceTest {
         SubHandler sub = new SubHandler();
         sub.setName("Kitchen");
         order1.setSubHandler(sub);
-
-        // order without employee
         Orders order2 = new Orders();
         order2.setId(11);
         order2.setOfferedPrice(300d);
@@ -1375,7 +1353,7 @@ public class CustomerServiceTest {
         assertEquals(11, dto2.id());
         assertNull(dto2.employeeId());
         assertNull(dto2.employeeName());
-        assertEquals("", dto2.subHandlerName()); // because name was null
+        assertEquals("", dto2.subHandlerName());
 
         verify(orderService, times(1)).findAllOrdersThatHaveSameCustomer(customerId);
     }
@@ -1440,7 +1418,6 @@ public class CustomerServiceTest {
 
         java.util.List<CustomerOutputDtoForReport> list =
                 java.util.List.of(dto1, dto2);
-
         when(customerRepository.selectCustomerByReports(
                 input.startDate(),
                 input.endDate(),
@@ -1450,9 +1427,7 @@ public class CustomerServiceTest {
 
         java.util.List<CustomerOutputDtoForReport> result =
                 customerService.findCustomerByReports(input);
-
         assertSame(list, result);
-
         verify(customerRepository, times(1))
                 .selectCustomerByReports(
                         input.startDate(),
@@ -1467,18 +1442,14 @@ public class CustomerServiceTest {
     {
         Integer customerId = 1;
         Integer subHandlerId = 2;
-
-        // time in future so it passes validation
         LocalDateTime timeOfWork = LocalDateTime.now().plusHours(1);
-
-        // ✅ match OrderDto constructor: offeredPrice, detail, timeOfWork, address, subHandlerId, customerId
         OrderDto orderDto = new OrderDto(
-                300.0,          // offeredPrice (Double)
-                "detail",       // detail
-                timeOfWork,     // timeOfWork
-                "Tehran",       // address
-                subHandlerId,   // subHandlerId
-                customerId      // customerId
+                300.0,
+                "detail",
+                timeOfWork,
+                "Tehran",
+                subHandlerId,
+                customerId
         );
 
         Customer customer = new Customer();
@@ -1486,7 +1457,7 @@ public class CustomerServiceTest {
 
         SubHandler subHandler = new SubHandler();
         subHandler.setId(subHandlerId);
-        subHandler.setBasePrice(200.0); // base price lower than offeredPrice
+        subHandler.setBasePrice(200.0);
 
         Orders mappedOrder = new Orders();
 
@@ -1512,30 +1483,30 @@ public class CustomerServiceTest {
                 // 1) time before now -> TimeOfWorkDoesntMatch
                 Arguments.of(
                         "time before now",
-                        300.0,               // offeredPrice
-                        past,                // timeOfWork
-                        true,                // customerExists
-                        true,                // subHandlerExists
-                        200.0,               // subHandlerBasePrice
+                        300.0,
+                        past,
+                        true,
+                        true,
+                        200.0,
                         TimeOfWorkDoesntMatch.class
                 ),
-                // 2) price < base -> OrderPriceShouldBeHigherThanBase
+
                 Arguments.of(
                         "price lower than base",
-                        100.0,               // offeredPrice
+                        100.0,
                         future,
                         true,
                         true,
                         200.0,
                         OrderPriceShouldBeHigherThanBase.class
                 ),
-                // 3) customer not found -> NotFoundCustomer
+
                 Arguments.of(
                         "customer not found",
                         300.0,
                         future,
-                        false,               // customerExists
-                        false,               // subHandlerExists (irrelevant)
+                        false,
+                        false,
                         200.0,
                         NotFoundCustomer.class
                 ),
@@ -1544,8 +1515,8 @@ public class CustomerServiceTest {
                         "subHandler not found",
                         300.0,
                         future,
-                        true,                // customer exists
-                        false,               // subHandler missing
+                        true,
+                        false,
                         200.0,
                         NotFoundHandler.class
                 )
@@ -1613,7 +1584,6 @@ public class CustomerServiceTest {
     {
         if (!customerExists)
         {
-            // service will never ask for subHandler if customer is missing
             return;
         }
 
@@ -1637,52 +1607,51 @@ public class CustomerServiceTest {
     private static Stream<Arguments> validateCustomerCases()
     {
         return Stream.of(
-                // 1) unique phone + strong password -> true
+
                 Arguments.of(
                         "unique phone, strong password",
-                        true,                 // repoReturnsNull -> not duplicate
-                        "ab12CD34",           // valid: 8 chars, letters + digits
-                        true,                 // expectedResult
-                        null                  // expectedException
+                        true,
+                        "ab12CD34",
+                        true,
+                        null
                 ),
-                // 2) duplicate phone + strong password -> false (short-circuit)
+
                 Arguments.of(
                         "duplicate phone, strong password",
-                        false,                // repoReturnsNull -> duplicate
+                        false,
                         "ab12CD34",
                         false,
                         null
                 ),
-                // 3) unique phone + short password -> PassNot8Digits
+
                 Arguments.of(
                         "unique phone, short password",
                         true,
-                        "aB12",               // length < 8
+                        "aB12",
                         null,
                         PassNot8Digits.class
                 ),
-                // 4) unique phone + only letters -> AllNotBeLetterOrDigits
+
                 Arguments.of(
                         "unique phone, only letters",
                         true,
-                        "abcdefgh",           // only letters
+                        "abcdefgh",
                         null,
                         AllNotBeLetterOrDigits.class
                 ),
-                // 5) unique phone + only digits -> AllNotBeLetterOrDigits
+
                 Arguments.of(
                         "unique phone, only digits",
                         true,
-                        "12345678",           // only digits
+                        "12345678",
                         null,
                         AllNotBeLetterOrDigits.class
                 ),
-                // 6) duplicate phone + invalid password -> false (no exception)
-                // because checkIfNotDuplicateUser == false => short-circuit
+
                 Arguments.of(
                         "duplicate phone, invalid password but short-circuited",
                         false,
-                        "123",                // would be invalid, but never checked
+                        "123",
                         false,
                         null
                 )
@@ -1702,7 +1671,7 @@ public class CustomerServiceTest {
     {
         String phone = "09120000000";
 
-        // ✅ stub repository for duplication check
+
         if (repoReturnsNull)
         {
             when(customerRepository.find(phone, Customer.class))
@@ -1716,14 +1685,13 @@ public class CustomerServiceTest {
                     .thenReturn(existing); // duplicate
         }
 
-        // ✅ build signup DTO
-        // 🔴 adjust constructor args to match your CustomerSignUpDto record
+
         CustomerSignUpDto dto = new CustomerSignUpDto(
-                "Ali",                  // name (example)
-                "Ahmadi",               // lastName
-                "a@test.com",           // email
-                phone,                  // phone
-                password                // password
+                "Ali",
+                "Ahmadi",
+                "a@test.com",
+                phone,
+                password
         );
 
         if (expectedException != null)
@@ -1745,9 +1713,9 @@ public class CustomerServiceTest {
         return Stream.of(
                 Arguments.of(
                         "existing score already set",
-                        3,                          // existingScore
-                        OrderState.PAID,            // orderState
-                        4,                          // star
+                        3,
+                        OrderState.PAID,
+                        4,
                         DuplicateCommentException.class
                 ),
                 Arguments.of(
@@ -1803,7 +1771,7 @@ public class CustomerServiceTest {
         order.setCustomer(customer);
         order.setEmployee(employee);
         order.setOrderState(orderState);
-        order.setScore(existingScore); // may be null or not
+        order.setScore(existingScore);
 
         when(orderService.findById(orderId)).thenReturn(order);
 
@@ -1831,14 +1799,14 @@ public class CustomerServiceTest {
 
         Employee employee = new Employee();
         employee.setId(5);
-        employee.setScore(10); // existing total score
+        employee.setScore(10);
 
         Orders order = new Orders();
         order.setId(orderId);
         order.setCustomer(customer);
         order.setEmployee(employee);
         order.setOrderState(OrderState.PAID);
-        order.setScore(null); // no previous score
+        order.setScore(null);
 
         when(orderService.findById(orderId)).thenReturn(order);
 
@@ -1854,7 +1822,7 @@ public class CustomerServiceTest {
     @Test
     void addComment_shouldThrowNotFoundOrder_whenOrderDoesNotExist()
     {
-        Integer orderId = 10;
+        int orderId = 10;
 
         when(orderService.findById(orderId)).thenReturn(null);
 
@@ -1914,7 +1882,7 @@ public class CustomerServiceTest {
         order.setOrderState(OrderState.UNDER_REACHING_EMPLOYEE);
 
         Offer offer = new Offer();
-        offer.setTimeOfWork(LocalDateTime.now().minusMinutes(5)); // before now -> OK
+        offer.setTimeOfWork(LocalDateTime.now().minusMinutes(5));
 
         when(orderService.findById(START_ORDER_ID)).thenReturn(order);
         when(offerService.findAcceptedOfferInOrder(START_ORDER_ID)).thenReturn(offer);
@@ -1931,18 +1899,18 @@ public class CustomerServiceTest {
                 // 1) order not found
                 Arguments.of(
                         "order not found",
-                        false,     // orderExists
-                        true,      // sameCustomer
-                        true,      // correctState
-                        true,      // offerExists
-                        false,     // offerTimeAfterNow
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
                         NotFoundOrder.class
                 ),
                 // 2) different customer
                 Arguments.of(
                         "different customer",
                         true,
-                        false,     // sameCustomer
+                        false,
                         true,
                         true,
                         false,
@@ -1953,12 +1921,12 @@ public class CustomerServiceTest {
                         "wrong state (not UNDER_REACHING_EMPLOYEE)",
                         true,
                         true,
-                        false,     // correctState
+                        false,
                         true,
                         false,
                         OrderStateIsNotCorrect.class
                 ),
-                // 4) accepted offer not found
+
                 Arguments.of(
                         "accepted offer not found",
                         true,
@@ -1968,7 +1936,7 @@ public class CustomerServiceTest {
                         false,
                         NotFoundOffer.class
                 ),
-                // 5) offer time after now
+
                 Arguments.of(
                         "offer time after now",
                         true,
@@ -2006,10 +1974,10 @@ public class CustomerServiceTest {
             Orders order = buildOrderForStart(sameCustomer, correctState);
             when(orderService.findById(START_ORDER_ID)).thenReturn(order);
 
-            // only stub offers if we pass customer + state checks
+
             if (sameCustomer && correctState)
             {
-                stubOfferForStart(offerExists, offerTimeAfterNow, START_ORDER_ID);
+                stubOfferForStart(offerExists, offerTimeAfterNow);
             }
         }
 
@@ -2036,11 +2004,11 @@ public class CustomerServiceTest {
         return order;
     }
 
-    private void stubOfferForStart(boolean offerExists, boolean offerTimeAfterNow, int orderId)
+    private void stubOfferForStart(boolean offerExists, boolean offerTimeAfterNow)
     {
         if (!offerExists)
         {
-            when(offerService.findAcceptedOfferInOrder(orderId)).thenReturn(null);
+            when(offerService.findAcceptedOfferInOrder(CustomerServiceTest.START_ORDER_ID)).thenReturn(null);
             return;
         }
 
@@ -2050,7 +2018,7 @@ public class CustomerServiceTest {
                 : LocalDateTime.now().minusMinutes(5);
         offer.setTimeOfWork(time);
 
-        when(offerService.findAcceptedOfferInOrder(orderId)).thenReturn(offer);
+        when(offerService.findAcceptedOfferInOrder(CustomerServiceTest.START_ORDER_ID)).thenReturn(offer);
     }
 
 
@@ -2064,7 +2032,7 @@ public class CustomerServiceTest {
                         "Ahmadi",
                         "a@test.com",
                         "09120000000",
-                        "Ab12Cd34" // valid password
+                        "Ab12Cd34"
                 );
 
         Customer mappedCustomer = new Customer();
@@ -2083,13 +2051,12 @@ public class CustomerServiceTest {
         when(passwordEncoder.encode("Ab12Cd34"))
                 .thenReturn("ENC(Ab12Cd34)");
 
-        // act
+
         CustomerSignUpDto result = spyService.createCustomer(dto);
 
-        // assert returned dto
         assertSame(dto, result);
 
-        // capture saved customer (signUp -> baseUserRepository.save)
+
         ArgumentCaptor<Customer> customerCaptor =
                 ArgumentCaptor.forClass(Customer.class);
 
@@ -2098,29 +2065,27 @@ public class CustomerServiceTest {
 
         Customer saved = customerCaptor.getValue();
 
-        // time of registration set
+
         assertNotNull(saved.getTimeOfRegistration());
 
-        // credit created and initialized
         assertNotNull(saved.getCredit());
         assertEquals(0d, saved.getCredit().getAmount());
         assertEquals(TypeOfUser.CUSTOMER, saved.getCredit().getTypeOfEmployee());
 
-        // passAndUser created and encoded
         assertNotNull(saved.getPassAndUser());
         assertEquals(dto.phone(), saved.getPassAndUser().getUsername());
         assertEquals("ENC(Ab12Cd34)", saved.getPassAndUser().getPass());
         assertEquals(TypeOfUser.CUSTOMER, saved.getPassAndUser().getTypeOfUser());
 
-        // mapper was used
+
         verify(entityMapper, times(1))
                 .dtoToCustomer(dto);
 
-        // event published
+
         verify(publisher, times(1))
                 .publishEvent(any(UserCreationEvent.class));
 
-        // sendToken called with correct args
+
         verify(spyService, times(1))
                 .sendToken(dto.email(), TypeOfUser.CUSTOMER);
     }
@@ -2207,7 +2172,7 @@ public class CustomerServiceTest {
         when(orderService.findPaidOrdersForCustomer(customerId))
                 .thenReturn(List.of(order1, order2));
 
-        // offers are null for both orders
+
         when(offerService.findAcceptedOfferInOrder(10)).thenReturn(null);
         when(offerService.findAcceptedOfferInOrder(11)).thenReturn(null);
 
@@ -2253,7 +2218,7 @@ public class CustomerServiceTest {
         order2.setCustomer(customer);
         order2.setSubHandler(subHandler);
         order2.setTimeOfWork(time2);
-        order2.setScore(null); // should become 0 in DTO
+        order2.setScore(null);
         order2.setComment("Ok");
 
         Employee emp1 = new Employee();
@@ -2301,7 +2266,7 @@ public class CustomerServiceTest {
         DoneDutiesDto dto2 = result.get(1);
         assertEquals(time2, dto2.timeOfDuty());
         assertEquals(300.0, dto2.price());
-        assertEquals(0, dto2.employeeScore()); // null -> 0
+        assertEquals(0, dto2.employeeScore());
         assertEquals(200, dto2.employeeId());
         assertEquals("Sara Mohammadi", dto2.employeeFullName());
 

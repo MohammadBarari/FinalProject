@@ -14,12 +14,13 @@ import org.example.dto.servisesDone.DoneDutiesDto;
 import org.example.dto.user.OrdersOutputDtoUser;
 import org.example.enumirations.TypeOfUser;
 import org.example.service.user.BaseUserService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface EmployeeService  extends BaseUserService<Employee> {
-    EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employee) throws Exception;
-    boolean validateEmployee(EmployeeSignUpDto employee, String file) throws Exception;
+    EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto , MultipartFile image) throws Exception;
+    boolean validateEmployee(EmployeeSignUpDto employee, MultipartFile file) throws Exception;
     OfferDto giveOfferToOrder(OfferDto offerDto);
     void saveEmployee( Employee employee);
     List<SubHandlerOutput> findAllSubHandlersForEmployee(Integer employeeId);
