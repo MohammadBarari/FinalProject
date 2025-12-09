@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.example.enumirations.EmployeeState;
 
 import java.util.Objects;
@@ -14,7 +15,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@SuperBuilder
 public class Employee extends Users {
+
     @Enumerated(EnumType.STRING)
     private EmployeeState employeeState;
 

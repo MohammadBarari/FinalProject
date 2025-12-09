@@ -2,6 +2,7 @@ package org.example.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.enumirations.TypeOfUser;
 
 
@@ -9,7 +10,7 @@ import org.example.enumirations.TypeOfUser;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table
 public class PassAndUser extends BaseEntity {

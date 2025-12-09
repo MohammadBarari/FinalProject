@@ -128,13 +128,21 @@ public class AdminServiceImp implements AdminService {
     }
 
     public List<DoneDutiesDto> findPaidWorksById(Integer id, TypeOfUser typeOfUser) {
-        switch (typeOfUser) {
-            case EMPLOYEE -> {
-                return employeeService.findDoneWorksById(id);}
-            case CUSTOMER -> {
-                return customerService.findDoneWorksById(id);}
+        if (typeOfUser == null)
+        {
+            throw new FailedDoingOperation("Unable to find DoneWorks by id : " + id);
         }
-        throw new FailedDoingOperation("Unable to find DoneWorks by id : "+ id);
+        return switch (typeOfUser)
+        {
+            case EMPLOYEE ->
+                    employeeService.findDoneWorksById(id);
+
+            case CUSTOMER ->
+                    customerService.findDoneWorksById(id);
+
+            case ADMIN ->
+                    throw new FailedDoingOperation("Admins do not have DoneWorks for id : " + id);
+        };
     }
 
     @Override
@@ -165,15 +173,13 @@ public class AdminServiceImp implements AdminService {
     @Override
     public void acceptEmployee(Integer employeeId){
            Employee employee = employeeService.findById(employeeId,Employee.class);
-            if (ifEmployeeIsAccepted(employee)){
-                employee.setEmployeeState(EmployeeState.ACCEPTED);
-                employeeService.updateUser(employee);
-            }
+           if (employee.getEmployeeState() == EmployeeState.ACCEPTED){
+               throw new RuntimeException("employee was already accepted");
+           }
+           employee.setEmployeeState(EmployeeState.ACCEPTED);
+           employeeService.updateUser(employee);
     }
 
-    private boolean ifEmployeeIsAccepted(Employee employee) {
-        return true;
-    }
     @Override
     public List<CustomerOutputDtoForReport> findCustomerByReports(FindCustomerByFilterDto input) {
         return customerService.findCustomerByReports(input);

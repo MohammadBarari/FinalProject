@@ -12,6 +12,7 @@ import org.example.enumirations.TypeOfUser;
 import org.example.service.user.employee.EmployeeService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,8 +24,12 @@ public class EmployeeController {
 
     @PostMapping("/signUp")
     public EmployeeSignUpDto signUp(
-            @RequestBody @Valid
-            EmployeeSignUpDto employeeSignUpDto) throws Exception {
+            @ModelAttribute @Valid
+            EmployeeSignUpDto employeeSignUpDto,
+
+            @RequestPart("image") MultipartFile image
+
+    ) throws Exception {
         return employeeService.signUpEmployee(employeeSignUpDto);
     }
 

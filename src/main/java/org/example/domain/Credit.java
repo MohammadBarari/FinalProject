@@ -2,12 +2,13 @@ package org.example.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.enumirations.TypeOfUser;
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Credit extends BaseEntity{
     private Double amount;
 

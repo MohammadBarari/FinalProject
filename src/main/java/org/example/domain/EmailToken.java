@@ -2,7 +2,9 @@ package org.example.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.example.enumirations.TypeOfUser;
 
 import java.time.LocalDateTime;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 @Table(name = "token")
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
 public class EmailToken extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;

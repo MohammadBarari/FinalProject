@@ -40,7 +40,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -85,7 +87,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 .username(employeeSignUpDto.phone()).build();
     }
 
-    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, String file){
+    private Employee getEmployee(EmployeeSignUpDto employeeSignUpDto, MultipartFile file){
         Employee employee =entityMapper.dtoToEmployee(employeeSignUpDto);
         employee.setImage(decodeImage(file));
         employee.setEmployeeState(EmployeeState.NEW);
@@ -311,7 +313,7 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 .orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
     }
 
-    private boolean validateImageJpg(String file) {
+    private boolean validateImageJpg(MultipartFile file) {
         byte[] imageBytes = decodeImage(file);
 
         if (imageBytes.length < 4) {
@@ -327,15 +329,19 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         }
         return true;
     }
-    private boolean checkImageSize (String file) {
+    private boolean checkImageSize (MultipartFile file) {
         long sizeInKb = decodeImage(file).length /1024;
         return sizeInKb < 300;
     }
-    public byte[] decodeImage(String base64Image) {
-        try {
-            return Base64.getDecoder().decode(base64Image);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Base64 input", e);
+    public byte[] decodeImage(MultipartFile imageFile)
+    {
+        try
+        {
+            return imageFile.getBytes();
+        }
+        catch (IOException e)
+        {
+            throw new IllegalArgumentException("Could not read image file", e);
         }
     }
 }
