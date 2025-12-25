@@ -20,11 +20,11 @@ import org.example.exeptions.NotFoundException.NotFoundCustomer;
 import org.example.exeptions.NotFoundException.NotFoundHandler;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
 import org.example.exeptions.NotFoundException.NotFoundOrder;
+import org.example.exeptions.duplicate.DuplicateException;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.exeptions.global.FailedDoingOperation;
 import org.example.exeptions.money.DontHaveEnoughMoney;
 import org.example.exeptions.password.PasswordNotCorrect;
-import org.example.exeptions.customer.InvalidCustomerDataException;
 import org.example.exeptions.duplicate.DuplicateCommentException;
 import org.example.exeptions.order.OrderPriceShouldBeHigherThanBase;
 import org.example.exeptions.order.OrderStateIsNotCorrect;
@@ -199,7 +199,7 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     @Override
     @Transactional
     public CustomerSignUpDto createCustomer(CustomerSignUpDto customerDto){
-        if (validateCustomer(customerDto)) {
+        validateCustomer(customerDto);
             Customer customer = entityMapper.dtoToCustomer(customerDto);
             customer.setTimeOfRegistration(LocalDateTime.now());
             addCreditAndPass(customer,customerDto);
@@ -208,17 +208,13 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
             sendToken(customerDto.email(),TypeOfUser.CUSTOMER);
             signUp(customer);
             return customerDto;
-        }
-        else {
-            throw new InvalidCustomerDataException("invalid customer data for sign up");
-        }
     }
 
     private void addCreditAndPass(Customer customer,CustomerSignUpDto customerDto){
         PassAndUser passAndUser = getPassAndUser(customerDto);
         passAndUser.setPass(passwordEncoder.encode(passAndUser.getPass()));
         Credit credit = new Credit();
-        credit.setTypeOfEmployee(TypeOfUser.CUSTOMER);
+        credit.setTypeOfUser(TypeOfUser.CUSTOMER);
         credit.setAmount(0d);
         customer.setCredit(credit);
         customer.setPassAndUser(passAndUser);
@@ -233,9 +229,9 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
-    public boolean validateCustomer(CustomerSignUpDto customerDto) {
-
-        return checkIfNotDuplicateUser(customerDto.phone()) && validatePassWord(customerDto.password());
+    public void validateCustomer(CustomerSignUpDto customerDto) {
+        checkIfNotDuplicateUser(customerDto.phone());
+        validatePassWord(customerDto.password());
     }
 
     @Override
@@ -249,8 +245,11 @@ public class CustomerServiceImp extends BaseUserServiceImp<Customer> implements 
     }
 
     @Override
-    public boolean checkIfNotDuplicateUser(String user) {
-        return Objects.isNull(customerRepository.find(user, Customer.class));
+    public void checkIfNotDuplicateUser(String user) {
+        boolean isUserNotDuplicate = Objects.isNull(customerRepository.find(user, Customer.class));
+        if (!isUserNotDuplicate){
+            throw new DuplicateException("user is duplicated");
+        }
     }
     @Override
     @Transactional

@@ -16,11 +16,12 @@ import org.example.enumirations.EmployeeState;
 import org.example.enumirations.OrderState;
 import org.example.enumirations.TypeOfUser;
 import org.example.events.UserCreationEvent;
+import org.example.exeptions.duplicate.DuplicateException;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.exeptions.NotFoundException.NotFoundEmployee;
 import org.example.exeptions.NotFoundException.NotFoundOffer;
+import org.example.exeptions.employee.ImageIsTooBig;
 import org.example.exeptions.password.PasswordNotCorrect;
-import org.example.exeptions.employee.InvalidEmployeeDataException;
 import org.example.exeptions.employee.NotJpgFile;
 import org.example.exeptions.order.OfferPriceIsLessThanOrderPrice;
 import org.example.exeptions.order.OrderStateIsNotCorrect;
@@ -66,18 +67,16 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     @Override
     @Transactional
     public EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto , MultipartFile image) {
-        if (validateEmployee(employeeSignUpDto,image)) {
-            Employee employee = getEmployee(employeeSignUpDto,image);
-            Credit credit = Credit.builder().typeOfEmployee(TypeOfUser.EMPLOYEE).amount(0.0d).build();
-            employee.setCredit(credit);
-            PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
-            employee.setPassAndUser(passAndUser);
-            publisher.publishEvent(new UserCreationEvent(TypeOfUser.CUSTOMER,employeeSignUpDto.email()));
-            sendToken(employeeSignUpDto.email(),TypeOfUser.EMPLOYEE);
-            saveEmployee(employee);
-            return employeeSignUpDto;
-        }
-        throw new InvalidEmployeeDataException("Invalid input data for employee sign up");
+        validateEmployee(employeeSignUpDto,image);
+        Employee employee = getEmployee(employeeSignUpDto,image);
+        Credit credit = Credit.builder().typeOfUser(TypeOfUser.EMPLOYEE).amount(0.0d).build();
+        employee.setCredit(credit);
+        PassAndUser passAndUser = getPassAndUser(employeeSignUpDto);
+        employee.setPassAndUser(passAndUser);
+        publisher.publishEvent(new UserCreationEvent(TypeOfUser.CUSTOMER,employeeSignUpDto.email()));
+        sendToken(employeeSignUpDto.email(),TypeOfUser.EMPLOYEE);
+        saveEmployee(employee);
+        return employeeSignUpDto;
     }
 
     private  PassAndUser getPassAndUser(EmployeeSignUpDto employeeSignUpDto) {
@@ -167,7 +166,8 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
                 if (employee.getSubHandlers() != null && !employee.getSubHandlers().isEmpty()) {
                     for (SubHandler subHandler : employee.getSubHandlers()) {
                         subHandlersNameString.
-                                add("name : " + subHandler.getName() + "||| handlerName : " + subHandler.getHandler().getName());
+                                add("name : " + subHandler.getName() + "||| handlerName : " +
+                                        subHandler.getHandler().getName());
                     }
                 }
                 employeeOutputDtoHandlers.add(new EmployeeOutputDtoHandlers(employee.getId(),
@@ -218,9 +218,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public boolean validateEmployee(EmployeeSignUpDto employee, MultipartFile file) {
-        return validatePassWord(employee.password()) && checkIfNotDuplicateUser(employee.phone())
-                && validateImageJpg (file) && checkImageSize(file);
+    public void validateEmployee(EmployeeSignUpDto employee, MultipartFile file) {
+        validatePassWord(employee.password());
+        checkIfNotDuplicateUser(employee.phone());
+        validateImageJpg (file);
+        checkImageSize(file);
     }
 
     @Override
@@ -235,8 +237,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
     }
 
     @Override
-    public boolean checkIfNotDuplicateUser(String user) {
-        return Objects.isNull(employeeRepository.find(user, Employee.class));
+    public void checkIfNotDuplicateUser(String user) {
+        boolean isUserNotDuplicate = Objects.isNull(employeeRepository.find(user, Employee.class));
+        if (!isUserNotDuplicate){
+            throw new DuplicateException("user is duplicated");
+        }
     }
 
     @Override
@@ -309,11 +314,11 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
 
     @Override
     public Double getCreditAmount(Integer id) {
-        return Optional.ofNullable(creditService.findByEmployeeId(id).getAmount())
+        return Optional.ofNullable(creditService.findByEmployeeId(id)).map(Credit::getAmount)
                 .orElseThrow(()-> new NotFoundEmployee("employee not found with id: "+id ) );
     }
 
-    private boolean validateImageJpg(MultipartFile file) {
+    private void validateImageJpg(MultipartFile file) {
         byte[] imageBytes = decodeImage(file);
 
         if (imageBytes.length < 4) {
@@ -327,11 +332,12 @@ public class EmployeeServiceImp extends BaseUserServiceImp<Employee> implements 
         if (imageBytes[imageBytes.length - 2] != (byte) 0xFF || imageBytes[imageBytes.length - 1] != (byte) 0xD9) {
             throw new NotJpgFile("The file is not a valid JPG image (missing footer)");
         }
-        return true;
     }
-    private boolean checkImageSize (MultipartFile file) {
+    private void checkImageSize (MultipartFile file) {
         long sizeInKb = decodeImage(file).length /1024;
-        return sizeInKb < 300;
+         if(!(sizeInKb < 300)){
+             throw new ImageIsTooBig();
+         }
     }
     public byte[] decodeImage(MultipartFile imageFile)
     {

@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface EmployeeService  extends BaseUserService<Employee> {
     EmployeeSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto , MultipartFile image) throws Exception;
-    boolean validateEmployee(EmployeeSignUpDto employee, MultipartFile file) throws Exception;
+    void validateEmployee(EmployeeSignUpDto employee, MultipartFile file) throws Exception;
     OfferDto giveOfferToOrder(OfferDto offerDto);
     void saveEmployee( Employee employee);
     List<SubHandlerOutput> findAllSubHandlersForEmployee(Integer employeeId);

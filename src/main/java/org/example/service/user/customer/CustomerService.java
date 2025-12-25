@@ -19,11 +19,11 @@ import java.util.List;
 @Service
 public interface CustomerService extends BaseUserService<Customer> {
     CustomerSignUpDto createCustomer(CustomerSignUpDto customerDto);
-    boolean validateCustomer(CustomerSignUpDto customerDto);
+    void validateCustomer(CustomerSignUpDto customerDto);
     OrderDto createOrder(OrderDto orderDto);
     List<OfferDtoForCustomer> getOffersForOrder(Integer orderId);
     void startOrder(Integer orderId);
-    boolean checkIfNotDuplicateUser(String user);
+    void checkIfNotDuplicateUser(String user);
     void addComment(Integer ordersId, Integer star, String comment);
     List<OrdersOutputDtoCustomer> getAllOrders( Integer customerId);
     void customerAcceptOffer(Integer offerId);

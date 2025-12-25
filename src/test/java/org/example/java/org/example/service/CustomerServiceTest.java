@@ -18,6 +18,7 @@ import org.example.exeptions.NotFoundException.NotFoundOffer;
 import org.example.exeptions.NotFoundException.NotFoundOrder;
 import org.example.exeptions.customer.InvalidCustomerDataException;
 import org.example.exeptions.duplicate.DuplicateCommentException;
+import org.example.exeptions.duplicate.DuplicateException;
 import org.example.exeptions.emailToken.InvalidTokenExceptions;
 import org.example.exeptions.money.DontHaveEnoughMoney;
 import org.example.exeptions.order.OrderPriceShouldBeHigherThanBase;
@@ -1607,53 +1608,41 @@ public class CustomerServiceTest {
     private static Stream<Arguments> validateCustomerCases()
     {
         return Stream.of(
-
                 Arguments.of(
                         "unique phone, strong password",
                         true,
                         "ab12CD34",
-                        true,
                         null
                 ),
-
                 Arguments.of(
                         "duplicate phone, strong password",
                         false,
                         "ab12CD34",
-                        false,
-                        null
+                        DuplicateException.class
                 ),
-
                 Arguments.of(
                         "unique phone, short password",
                         true,
                         "aB12",
-                        null,
                         PassNot8Digits.class
                 ),
-
                 Arguments.of(
                         "unique phone, only letters",
                         true,
                         "abcdefgh",
-                        null,
                         AllNotBeLetterOrDigits.class
                 ),
-
                 Arguments.of(
                         "unique phone, only digits",
                         true,
                         "12345678",
-                        null,
                         AllNotBeLetterOrDigits.class
                 ),
-
                 Arguments.of(
                         "duplicate phone, invalid password but short-circuited",
                         false,
                         "123",
-                        false,
-                        null
+                        DuplicateException.class
                 )
         );
     }
@@ -1665,12 +1654,10 @@ public class CustomerServiceTest {
             String caseName,
             boolean repoReturnsNull,           // true -> not duplicate, false -> duplicate
             String password,
-            Boolean expectedResult,            // null if expecting exception
             Class<? extends Throwable> expectedException
     )
     {
         String phone = "09120000000";
-
 
         if (repoReturnsNull)
         {
@@ -1684,7 +1671,6 @@ public class CustomerServiceTest {
             when(customerRepository.find(phone, Customer.class))
                     .thenReturn(existing); // duplicate
         }
-
 
         CustomerSignUpDto dto = new CustomerSignUpDto(
                 "Ali",
@@ -1703,8 +1689,9 @@ public class CustomerServiceTest {
         }
         else
         {
-            boolean result = customerService.validateCustomer(dto);
-            assertEquals(expectedResult, result);
+            assertDoesNotThrow(
+                    () -> customerService.validateCustomer(dto)
+            );
         }
     }
 
@@ -2025,7 +2012,6 @@ public class CustomerServiceTest {
     @Test
     void createCustomer_shouldMapAddCreditPublishEventSendTokenAndSignUp_whenValid()
     {
-        // arrange
         CustomerSignUpDto dto =
                 new CustomerSignUpDto(
                         "Ali",
@@ -2038,10 +2024,10 @@ public class CustomerServiceTest {
         Customer mappedCustomer = new Customer();
         mappedCustomer.setId(1);
 
-        // spy so we can stub validateCustomer + verify sendToken
         CustomerServiceImp spyService = Mockito.spy(customerService);
 
-        doReturn(true)
+        // validation succeeds (do nothing)
+        doNothing()
                 .when(spyService)
                 .validateCustomer(dto);
 
@@ -2051,11 +2037,9 @@ public class CustomerServiceTest {
         when(passwordEncoder.encode("Ab12Cd34"))
                 .thenReturn("ENC(Ab12Cd34)");
 
-
         CustomerSignUpDto result = spyService.createCustomer(dto);
 
         assertSame(dto, result);
-
 
         ArgumentCaptor<Customer> customerCaptor =
                 ArgumentCaptor.forClass(Customer.class);
@@ -2065,30 +2049,27 @@ public class CustomerServiceTest {
 
         Customer saved = customerCaptor.getValue();
 
-
         assertNotNull(saved.getTimeOfRegistration());
 
         assertNotNull(saved.getCredit());
         assertEquals(0d, saved.getCredit().getAmount());
-        assertEquals(TypeOfUser.CUSTOMER, saved.getCredit().getTypeOfEmployee());
+        assertEquals(TypeOfUser.CUSTOMER, saved.getCredit().getTypeOfUser());
 
         assertNotNull(saved.getPassAndUser());
         assertEquals(dto.phone(), saved.getPassAndUser().getUsername());
         assertEquals("ENC(Ab12Cd34)", saved.getPassAndUser().getPass());
         assertEquals(TypeOfUser.CUSTOMER, saved.getPassAndUser().getTypeOfUser());
 
-
         verify(entityMapper, times(1))
                 .dtoToCustomer(dto);
-
 
         verify(publisher, times(1))
                 .publishEvent(any(UserCreationEvent.class));
 
-
         verify(spyService, times(1))
                 .sendToken(dto.email(), TypeOfUser.CUSTOMER);
     }
+
 
     @Test
     void createCustomer_shouldThrowInvalidCustomerDataException_whenValidationFails()
@@ -2104,8 +2085,7 @@ public class CustomerServiceTest {
 
         CustomerServiceImp spyService = Mockito.spy(customerService);
 
-        // force validation to fail
-        doReturn(false)
+        doThrow(InvalidCustomerDataException.class)
                 .when(spyService)
                 .validateCustomer(dto);
 
@@ -2114,12 +2094,12 @@ public class CustomerServiceTest {
                 () -> spyService.createCustomer(dto)
         );
 
-        // ensure nothing else is called
         verify(entityMapper, never()).dtoToCustomer(any());
         verify(baseUserRepository, never()).save(any());
         verify(publisher, never()).publishEvent(any());
         verify(spyService, never()).sendToken(anyString(), any());
     }
+
 
     @Test
     void findDoneWorksById_shouldThrowNotFoundOrder_whenNoPaidOrders()

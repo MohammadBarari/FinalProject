@@ -13,9 +13,9 @@ public interface BaseUserService<T extends Users> {
 
     void updateUser(T t);
 
-    boolean validatePassWord(String pass);
+    void validatePassWord(String pass);
 
-    boolean checkIfNotDuplicateUser(String user);
+    void checkIfNotDuplicateUser(String user);
 
     String changingPassword(ChangingPasswordDto changingPasswordDto);
 

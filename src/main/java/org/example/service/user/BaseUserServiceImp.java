@@ -56,11 +56,10 @@ public abstract class BaseUserServiceImp <T extends Users> implements BaseUserSe
 
 
     @Override
-    public boolean validatePassWord(String pass) {
+    public void validatePassWord(String pass) {
         String spaceRemovedPassword = pass.replaceAll("\\s","");
         checkIfIts8Digits(spaceRemovedPassword);
         checkIfAllNotBeLetterOrDigit(spaceRemovedPassword);
-        return true;
     }
 
     @Override

@@ -13,7 +13,7 @@ public class Credit extends BaseEntity{
     private Double amount;
 
     @Enumerated(EnumType.STRING)
-    private TypeOfUser typeOfEmployee;
+    private TypeOfUser typeOfUser;
 
     public Credit() {
         this.amount = 0.0;
